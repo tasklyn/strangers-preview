@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strangers · لوحة الكاشير للحجوزات والجلسات</title>
+<meta name="description" content="لوحة تحكم إدارة المقاعد والحجوزات والجلسات لمقاهي Strangers — بدون دفع، بالتكامل مع Foodics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#FAF7F2;
+  --surface:#EFE6D8;
+  --surface-2:#F4EDE1;
+  --card:#FFFDF9;
+  --ink:#141110;
+  --ink-soft:#3A322B;
+  --brown:#4A3322;
+  --brown-soft:#6B4F38;
+  --gold:#B8955A;
+  --gold-deep:#9A7A45;
+  --gold-faint:rgba(184,149,90,.16);
+  --line:rgba(74,51,34,.14);
+  --line-2:rgba(74,51,34,.09);
+  --line-dark:rgba(250,247,242,.12);
+  --dark:#141110;
+  --dark-2:#1C1714;
+  --dark-3:#241C15;
+
+  /* semantic seat/session states — muted, no neon */
+  --st-avail:#5E7A57;      --st-avail-bg:rgba(94,122,87,.14);
+  --st-reserved:#B8955A;   --st-reserved-bg:rgba(184,149,90,.16);
+  --st-await:#C79A4E;      --st-await-bg:rgba(199,154,78,.16);
+  --st-occupied:#6B4F38;   --st-occupied-bg:rgba(107,79,56,.14);
+  --st-expiring:#C0803A;   --st-expiring-bg:rgba(192,128,58,.17);
+  --st-expired:#9A3B2E;    --st-expired-bg:rgba(154,59,46,.14);
+  --st-cleaning:#8A857E;   --st-cleaning-bg:rgba(138,133,126,.16);
+  --st-unavail:#4B463F;    --st-unavail-bg:rgba(75,70,63,.13);
+
+  --font-ar:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  --font-latin:"Fraunces",serif;
+  --font-mono:"IBM Plex Mono",monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-spring:cubic-bezier(.34,1.4,.64,1);
+  --radius:16px;
+  --radius-sm:11px;
+  --radius-lg:22px;
+  --shadow:0 20px 50px -30px rgba(74,51,34,.4);
+  --shadow-sm:0 8px 24px -16px rgba(74,51,34,.4);
+  --sidebar-w:246px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:var(--font-ar);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.6;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+::selection{background:var(--gold);color:#fff}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:1rem;color:var(--ink)}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.latin{font-family:var(--font-latin)}
+html[lang="en"]{font-family:var(--font-latin)}
+html[lang="en"] body{font-family:"IBM Plex Sans Arabic",system-ui,sans-serif}
+
+/* ============ APP SHELL ============ */
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;height:100dvh}
+
+/* --- sidebar (right in RTL) --- */
+.sidebar{
+  background:linear-gradient(185deg,var(--dark) 0%,var(--dark-2) 100%);
+  color:var(--bg);display:flex;flex-direction:column;
+  border-inline-start:1px solid var(--dark-3);
+  position:relative;z-index:20;
+}
+.sb-brand{display:flex;align-items:center;gap:.7rem;padding:1.25rem 1.3rem 1.1rem}
+.sb-brand svg{width:42px;height:42px;color:var(--gold);flex-shrink:0}
+.sb-brand .bt{font-family:var(--font-latin);font-size:1.05rem;letter-spacing:.02em;line-height:1.1}
+.sb-brand .bt small{display:block;font-family:var(--font-mono);font-size:.58rem;letter-spacing:.16em;color:rgba(250,247,242,.5);margin-top:2px}
+.sb-branchpick{margin:0 1rem .6rem;position:relative}
+.sb-branchpick select{
+  width:100%;background:rgba(250,247,242,.05);border:1px solid var(--line-dark);
+  color:var(--bg);border-radius:10px;padding:.55rem .8rem;font-size:.82rem;font-weight:500;
+  appearance:none;cursor:pointer;
+}
+.sb-branchpick::after{content:"";position:absolute;inset-inline-start:.85rem;top:50%;width:7px;height:7px;border-inline-end:1.6px solid var(--gold);border-bottom:1.6px solid var(--gold);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.sb-nav{flex:1;overflow-y:auto;padding:.5rem .7rem;display:flex;flex-direction:column;gap:2px}
+.sb-nav .grp{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.18em;color:rgba(250,247,242,.36);padding:.9rem .8rem .35rem;text-transform:uppercase}
+.navlink{
+  display:flex;align-items:center;gap:.7rem;padding:.62rem .8rem;border-radius:11px;
+  font-size:.88rem;font-weight:500;color:rgba(250,247,242,.72);
+  transition:background .22s,color .22s;position:relative;
+}
+.navlink svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.navlink:hover{background:rgba(250,247,242,.06);color:var(--bg)}
+.navlink.active{background:rgba(184,149,90,.15);color:var(--gold)}
+.navlink.active::before{content:"";position:absolute;inset-inline-end:0;top:22%;bottom:22%;width:3px;border-radius:3px;background:var(--gold)}
+.navlink .badge{margin-inline-start:auto;font-family:var(--font-mono);font-size:.68rem;background:rgba(184,149,90,.22);color:var(--gold);border-radius:999px;padding:.05rem .45rem;min-width:20px;text-align:center}
+.navlink .badge.warn{background:var(--st-expired-bg);color:#E08A7C}
+.sb-foot{padding:.9rem 1.1rem;border-top:1px solid var(--line-dark);font-size:.72rem;color:rgba(250,247,242,.42)}
+.sb-foot .mono{color:rgba(250,247,242,.6)}
+
+/* --- header --- */
+.main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{
+  display:flex;align-items:center;gap:1rem;padding:.85rem 1.5rem;
+  background:rgba(250,247,242,.85);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);flex-shrink:0;z-index:10;
+}
+.tb-title h1{font-size:1.12rem;font-weight:700;line-height:1.2}
+.tb-title p{font-size:.74rem;color:var(--brown-soft);margin-top:1px}
+.tb-spacer{flex:1}
+.tb-clock{
+  display:flex;flex-direction:column;align-items:flex-end;line-height:1.15;
+  padding-inline-end:1rem;border-inline-end:1px solid var(--line);
+}
+.tb-clock .t{font-family:var(--font-mono);font-size:1.15rem;font-weight:600;color:var(--ink);letter-spacing:.02em}
+.tb-clock .d{font-size:.68rem;color:var(--brown-soft)}
+.tb-occ{display:flex;align-items:center;gap:.6rem;padding-inline-end:1rem;border-inline-end:1px solid var(--line)}
+.occ-ring{width:42px;height:42px;flex-shrink:0}
+.tb-occ .ot{line-height:1.1}
+.tb-occ .ot b{font-family:var(--font-mono);font-size:1.05rem;color:var(--gold-deep)}
+.tb-occ .ot small{display:block;font-size:.66rem;color:var(--brown-soft)}
+.tb-cashier{display:flex;align-items:center;gap:.6rem}
+.tb-cashier .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-deep));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--dark);font-size:.85rem;flex-shrink:0}
+.tb-cashier .cn{line-height:1.15}
+.tb-cashier .cn b{font-size:.82rem;font-weight:600}
+.tb-cashier .cn small{display:block;font-size:.66rem;color:var(--brown-soft)}
+.lang-btn{
+  font-family:var(--font-mono);font-size:.75rem;font-weight:600;
+  border:1px solid var(--line);border-radius:9px;padding:.45rem .7rem;color:var(--ink);
+  transition:all .25s;min-width:44px;
+}
+.lang-btn:hover{border-color:var(--gold);color:var(--gold-deep)}
+
+/* --- content scroll --- */
+.content{flex:1;overflow-y:auto;padding:1.5rem;scroll-behavior:smooth}
+.page{display:none;animation:pageIn .4s var(--ease-out)}
+.page.current{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page-head{margin-bottom:1.2rem;display:flex;align-items:flex-end;gap:1rem;flex-wrap:wrap}
+.page-head h2{font-size:1.35rem;font-weight:700}
+.page-head .eyebrow{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.16em;color:var(--gold-deep);text-transform:uppercase;display:block;margin-bottom:.3rem}
+.page-head p{font-size:.82rem;color:var(--brown-soft);max-width:60ch}
+.ph-spacer{flex:1}
+
+/* ============ STAT CARDS ============ */
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.9rem;margin-bottom:1.4rem}
+.stat{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1rem 1.1rem;position:relative;overflow:hidden;transition:transform .3s var(--ease-spring),box-shadow .3s;
+}
+.stat:hover{transform:translateY(-3px);box-shadow:var(--shadow-sm)}
+.stat .sv{font-family:var(--font-mono);font-size:1.75rem;font-weight:600;line-height:1;color:var(--ink)}
+.stat .sl{font-size:.74rem;color:var(--brown-soft);margin-top:.45rem}
+.stat .si{position:absolute;inset-inline-end:.7rem;top:.7rem;width:22px;height:22px;opacity:.5}
+.stat .si svg{width:100%;height:100%;stroke:var(--gold);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.stat.accent{background:linear-gradient(165deg,var(--dark),var(--dark-2));border-color:var(--dark-3)}
+.stat.accent .sv{color:var(--gold)}
+.stat.accent .sl{color:rgba(250,247,242,.6)}
+.stat.accent .si{opacity:.7}
+
+/* ============ DASH LAYOUT ============ */
+.dash-cols{display:grid;grid-template-columns:1.5fr 1fr;gap:1.2rem;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.2rem}
+.panel-h{display:flex;align-items:center;gap:.6rem;margin-bottom:.9rem}
+.panel-h h3{font-size:.98rem;font-weight:700}
+.panel-h .cnt{font-family:var(--font-mono);font-size:.72rem;color:var(--brown-soft);margin-inline-start:auto}
+.panel-h .dotpulse{width:8px;height:8px;border-radius:50%;background:var(--st-expiring);box-shadow:0 0 0 0 rgba(192,128,58,.5);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(192,128,58,.5)}70%{box-shadow:0 0 0 7px rgba(192,128,58,0)}100%{box-shadow:0 0 0 0 rgba(192,128,58,0)}}
+
+/* expiring session rows */
+.exp-row{
+  display:flex;align-items:center;gap:.8rem;padding:.7rem .3rem;border-bottom:1px solid var(--line-2);cursor:pointer;transition:background .2s;border-radius:8px;
+}
+.exp-row:last-child{border-bottom:none}
+.exp-row:hover{background:var(--surface-2)}
+.exp-row .seatpill{font-family:var(--font-mono);font-size:.78rem;font-weight:600;background:var(--surface);border-radius:8px;padding:.3rem .55rem;min-width:56px;text-align:center}
+.exp-row .who b{font-size:.86rem;font-weight:600}
+.exp-row .who small{display:block;font-size:.7rem;color:var(--brown-soft)}
+.exp-row .rtime{margin-inline-start:auto;text-align:end}
+.exp-row .rtime .cd{font-family:var(--font-mono);font-size:1.05rem;font-weight:600}
+.exp-row .rtime small{font-size:.64rem;color:var(--brown-soft)}
+.cd.t15{color:var(--st-occupied)} .cd.t10{color:var(--st-expiring)} .cd.t5{color:var(--st-expired)} .cd.over{color:var(--st-expired)}
+.empty-note{text-align:center;color:var(--brown-soft);font-size:.82rem;padding:1.6rem 0}
+
+/* upcoming reservations mini */
+.resv-mini{display:flex;align-items:center;gap:.75rem;padding:.6rem .3rem;border-bottom:1px solid var(--line-2)}
+.resv-mini:last-child{border-bottom:none}
+.resv-mini .rt{font-family:var(--font-mono);font-size:.85rem;font-weight:600;color:var(--gold-deep);min-width:52px}
+.resv-mini .rn b{font-size:.84rem;font-weight:600}
+.resv-mini .rn small{display:block;font-size:.7rem;color:var(--brown-soft)}
+.resv-mini .rs{margin-inline-start:auto}
+
+/* status chip */
+.chip{display:inline-flex;align-items:center;gap:.4rem;border-radius:999px;padding:.22rem .6rem;font-size:.72rem;font-weight:600;white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.9}
+.chip.available{color:var(--st-avail);background:var(--st-avail-bg)}
+.chip.reserved{color:var(--st-reserved);background:var(--st-reserved-bg)}
+.chip.awaiting{color:var(--st-await);background:var(--st-await-bg)}
+.chip.occupied{color:var(--st-occupied);background:var(--st-occupied-bg)}
+.chip.expiring{color:var(--st-expiring);background:var(--st-expiring-bg)}
+.chip.expired{color:var(--st-expired);background:var(--st-expired-bg)}
+.chip.renewal{color:var(--st-await);background:var(--st-await-bg)}
+.chip.cleaning{color:var(--st-cleaning);background:var(--st-cleaning-bg)}
+.chip.unavailable,.chip.outofservice{color:var(--st-unavail);background:var(--st-unavail-bg)}
+
+/* ============ SEAT MAP ============ */
+.map-wrap{display:grid;grid-template-columns:1fr;gap:1rem}
+.map-panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.1rem}
+.seatmap{width:100%;height:auto;display:block;touch-action:manipulation;border-radius:14px;background:
+  linear-gradient(rgba(74,51,34,.03) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(74,51,34,.03) 1px,transparent 1px);
+  background-size:38px 38px;background-color:var(--surface-2)}
+.seat{cursor:pointer;transition:opacity .2s}
+.seat:hover{opacity:.82}
+.seat .shape{transition:fill .4s,stroke .3s}
+.seat.sel .shape{stroke:var(--ink);stroke-width:3}
+.seat .lbl{font-family:var(--font-mono);font-size:11px;font-weight:600;fill:#fff;pointer-events:none;dominant-baseline:middle;text-anchor:middle}
+.seat .lbl.dark{fill:var(--ink)}
+.zone-lbl{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;fill:var(--brown-soft);text-transform:uppercase}
+.legend{display:flex;flex-wrap:wrap;gap:.7rem 1.2rem;margin-top:.9rem;font-size:.74rem;color:var(--brown-soft)}
+.legend span{display:inline-flex;align-items:center;gap:.4rem}
+.legend i{width:12px;height:12px;border-radius:4px;display:inline-block}
+
+/* ============ SIDE DRAWER ============ */
+.scrim{position:fixed;inset:0;background:rgba(20,17,16,.42);opacity:0;pointer-events:none;transition:opacity .35s;z-index:40}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;height:100dvh;width:min(420px,92vw);
+  background:var(--bg);z-index:50;box-shadow:0 0 60px -10px rgba(20,17,16,.4);
+  transition:transform .42s var(--ease-out);
+  display:flex;flex-direction:column;
+}
+html[dir="ltr"] .drawer{left:0;right:auto;transform:translateX(-102%)}
+html[dir="rtl"] .drawer{right:0;left:auto;transform:translateX(102%)}
+html[dir="ltr"] .drawer.open,html[dir="rtl"] .drawer.open{transform:translateX(0)}
+.drawer-h{display:flex;align-items:center;gap:.7rem;padding:1.1rem 1.2rem;border-bottom:1px solid var(--line);flex-shrink:0}
+.drawer-h .did{font-family:var(--font-mono);font-size:1.4rem;font-weight:600;color:var(--gold-deep)}
+.drawer-h .dclose{margin-inline-start:auto;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--surface);transition:background .2s}
+.drawer-h .dclose:hover{background:var(--surface-2)}
+.drawer-h .dclose svg{width:17px;height:17px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round}
+.drawer-b{flex:1;overflow-y:auto;padding:1.2rem}
+.drawer-sec{margin-bottom:1.3rem}
+.drawer-sec>.st{font-family:var(--font-mono);font-size:.64rem;letter-spacing:.14em;color:var(--brown-soft);text-transform:uppercase;margin-bottom:.6rem;display:block}
+.kv{display:flex;justify-content:space-between;gap:1rem;font-size:.84rem;padding:.4rem 0;border-bottom:1px dashed var(--line-2)}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--brown-soft)}
+.kv .v{font-weight:600;text-align:end}
+.kv .v.mono{font-family:var(--font-mono)}
+
+/* countdown block */
+.cd-block{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem;text-align:center;margin-bottom:1rem}
+.cd-block .cd-big{font-family:var(--font-mono);font-size:2.6rem;font-weight:600;line-height:1;letter-spacing:.02em}
+.cd-block .cd-cap{font-size:.72rem;color:var(--brown-soft);margin-top:.4rem}
+.cd-block.prep{background:var(--st-await-bg);border-color:transparent}
+.cd-block.prep .cd-big{font-size:1.15rem;color:var(--gold-deep);line-height:1.4}
+.cd-bar{height:6px;background:var(--surface);border-radius:999px;overflow:hidden;margin-top:.8rem}
+.cd-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--st-avail),var(--gold));border-radius:999px;transition:width 1s linear,background .5s}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-weight:600;font-size:.86rem;border-radius:11px;padding:.7rem 1.1rem;transition:transform .2s var(--ease-spring),box-shadow .25s,background .2s,border-color .2s;min-height:44px;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn-gold{background:var(--gold);color:var(--dark);box-shadow:var(--shadow-sm)}
+.btn-gold:hover{background:var(--gold-deep);color:var(--bg);transform:translateY(-2px)}
+.btn-dark{background:var(--dark);color:var(--bg)}
+.btn-dark:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.btn-ghost{border:1.5px solid var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-deep)}
+.btn-danger{background:var(--st-expired-bg);color:var(--st-expired)}
+.btn-danger:hover{background:var(--st-expired);color:#fff}
+.btn-avail{background:var(--st-avail-bg);color:var(--st-avail)}
+.btn-avail:hover{background:var(--st-avail);color:#fff}
+.btn.full{width:100%}
+.btn.sm{padding:.5rem .8rem;min-height:38px;font-size:.8rem;border-radius:9px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.7rem}
+.btn-row.one{grid-template-columns:1fr}
+
+/* ============ QR SCAN ============ */
+.qr-layout{display:grid;grid-template-columns:.85fr 1.15fr;gap:1.3rem;align-items:start}
+.scan-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.6rem;text-align:center}
+.scan-frame{
+  width:190px;height:190px;margin:1rem auto;border-radius:20px;position:relative;
+  background:linear-gradient(135deg,var(--dark),var(--dark-2));display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.scan-frame svg.qricon{width:88px;height:88px;stroke:rgba(184,149,90,.5);fill:none;stroke-width:1.4}
+.scan-frame .corner{position:absolute;width:26px;height:26px;border:3px solid var(--gold)}
+.scan-frame .c1{top:14px;inset-inline-start:14px;border-inline-end:none;border-bottom:none;border-radius:8px 0 0 0}
+.scan-frame .c2{top:14px;inset-inline-end:14px;border-inline-start:none;border-bottom:none;border-radius:0 8px 0 0}
+.scan-frame .c3{bottom:14px;inset-inline-start:14px;border-inline-end:none;border-top:none;border-radius:0 0 0 8px}
+.scan-frame .c4{bottom:14px;inset-inline-end:14px;border-inline-start:none;border-top:none;border-radius:0 0 8px 0}
+.scan-line{position:absolute;inset-inline:20px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);top:20px;animation:scanmove 2.4s ease-in-out infinite}
+@keyframes scanmove{0%,100%{top:20px}50%{top:168px}}
+.field{display:flex;flex-direction:column;gap:.4rem;text-align:start;margin-top:1rem}
+.field label{font-size:.78rem;font-weight:600;color:var(--ink-soft)}
+.field input,.field select{border:1.5px solid var(--line);border-radius:10px;padding:.65rem .85rem;background:var(--card);min-height:44px;transition:border-color .25s,box-shadow .25s;width:100%}
+.field input:focus,.field select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-faint)}
+.field input::placeholder{color:rgba(74,51,34,.4)}
+
+/* customer profile card */
+.cust-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;min-height:280px}
+.cust-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:280px;color:var(--brown-soft);gap:.8rem;text-align:center;padding:2rem}
+.cust-empty svg{width:52px;height:52px;stroke:var(--line);stroke-width:1.4;fill:none}
+.cust-head{background:linear-gradient(135deg,var(--dark),var(--dark-2));color:var(--bg);padding:1.3rem 1.4rem;display:flex;align-items:center;gap:1rem;position:relative;overflow:hidden}
+.cust-head::after{content:"";position:absolute;inset-inline-end:-30px;top:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(184,149,90,.22),transparent 70%)}
+.cust-head .cav{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--gold),var(--gold-deep));display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--dark);font-size:1.3rem;flex-shrink:0;z-index:1}
+.cust-head .cinfo{z-index:1}
+.cust-head .cinfo h3{font-size:1.15rem;font-weight:700}
+.cust-head .cinfo .cmeta{font-family:var(--font-mono);font-size:.74rem;color:rgba(250,247,242,.6);margin-top:2px}
+.tier-badge{margin-inline-start:auto;z-index:1;font-family:var(--font-latin);font-style:italic;font-size:.9rem;color:var(--gold);border:1px solid rgba(184,149,90,.5);border-radius:999px;padding:.25rem .8rem}
+.cust-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.cust-stats .cs{background:var(--card);padding:.9rem;text-align:center}
+.cust-stats .cs b{font-family:var(--font-mono);font-size:1.2rem;color:var(--gold-deep);display:block}
+.cust-stats .cs small{font-size:.68rem;color:var(--brown-soft)}
+.cust-body{padding:1.2rem 1.4rem}
+
+/* ============ TABLES ============ */
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden}
+.tbl-tools{display:flex;gap:.6rem;padding:1rem 1.2rem;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.tbl-tools .seg{display:flex;gap:.3rem;background:var(--surface-2);border-radius:10px;padding:.25rem}
+.tbl-tools .seg button{font-size:.78rem;font-weight:600;padding:.4rem .8rem;border-radius:8px;color:var(--brown-soft);transition:all .2s}
+.tbl-tools .seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow-sm)}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:.72rem;font-weight:600;color:var(--brown-soft);text-align:start;padding:.75rem 1.2rem;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface-2)}
+tbody td{padding:.8rem 1.2rem;font-size:.84rem;border-bottom:1px solid var(--line-2);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{transition:background .18s}
+tbody tr:hover{background:var(--surface-2)}
+td .mono{font-weight:600}
+td .grace{font-family:var(--font-mono);font-weight:600}
+.rowbtns{display:flex;gap:.4rem;justify-content:flex-end}
+
+/* ============ CLEANING ============ */
+.clean-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem}
+.clean-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1.1rem;transition:transform .3s var(--ease-spring),box-shadow .3s}
+.clean-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-sm)}
+.clean-card .ch{display:flex;align-items:center;gap:.6rem;margin-bottom:.7rem}
+.clean-card .ch .seatpill{font-family:var(--font-mono);font-size:.9rem;font-weight:600;background:var(--st-cleaning-bg);color:var(--st-cleaning);border-radius:9px;padding:.35rem .6rem}
+.clean-card .cmeta{font-size:.76rem;color:var(--brown-soft);margin-bottom:.3rem}
+.clean-card .cmeta b{color:var(--ink)}
+.clean-card .waited{font-family:var(--font-mono);font-size:.76rem;color:var(--st-expiring);margin-bottom:.8rem}
+
+/* ============ REPORTS ============ */
+.rep-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin-bottom:1.3rem}
+.rep-cols{display:grid;grid-template-columns:1.3fr 1fr;gap:1.2rem;align-items:start}
+.bar-chart{display:flex;align-items:flex-end;gap:.5rem;height:200px;padding-top:1rem}
+.bar-chart .bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:.4rem;height:100%;justify-content:flex-end}
+.bar-chart .bar .col{width:100%;max-width:34px;background:linear-gradient(180deg,var(--gold),var(--gold-deep));border-radius:7px 7px 0 0;transition:height 1s var(--ease-out);position:relative}
+.bar-chart .bar .col.peak{background:linear-gradient(180deg,var(--st-expired),#7A2E24)}
+.bar-chart .bar small{font-family:var(--font-mono);font-size:.66rem;color:var(--brown-soft)}
+.bar-chart .bar .val{font-family:var(--font-mono);font-size:.68rem;font-weight:600;color:var(--ink-soft)}
+.donut-wrap{display:flex;align-items:center;gap:1.2rem}
+.rep-list .rl{display:flex;align-items:center;gap:.7rem;padding:.6rem 0;border-bottom:1px solid var(--line-2);font-size:.84rem}
+.rep-list .rl:last-child{border-bottom:none}
+.rep-list .rl .rv{margin-inline-start:auto;font-family:var(--font-mono);font-weight:600}
+.rep-list .rl .rbar{flex:1;height:6px;background:var(--surface);border-radius:999px;overflow:hidden;max-width:120px}
+.rep-list .rl .rbar span{display:block;height:100%;background:var(--gold);border-radius:999px}
+
+/* ============ AUDIT LOG ============ */
+.audit{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.1rem;max-height:340px;overflow-y:auto}
+.audit-row{display:flex;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--line-2);font-size:.8rem}
+.audit-row:last-child{border-bottom:none}
+.audit-row .at{font-family:var(--font-mono);font-size:.72rem;color:var(--brown-soft);flex-shrink:0;min-width:52px}
+.audit-row .adot{width:7px;height:7px;border-radius:50%;background:var(--gold);margin-top:.4rem;flex-shrink:0}
+.audit-row .atx b{font-weight:600}
+
+/* order preview */
+.order-card{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;margin-top:.8rem}
+.order-card .oh{display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem}
+.order-card .oh .foodics{font-family:var(--font-mono);font-size:.68rem;font-weight:600;color:#fff;background:#3A322B;border-radius:6px;padding:.2rem .5rem}
+
+/* ============ TOAST ============ */
+.toast-wrap{position:fixed;bottom:1.4rem;inset-inline-start:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:.6rem;align-items:center;pointer-events:none}
+html[dir="rtl"] .toast-wrap{transform:translateX(50%);inset-inline-start:auto;inset-inline-end:50%}
+.toast{
+  background:var(--dark);color:var(--bg);border-radius:12px;padding:.8rem 1.2rem;
+  display:flex;align-items:center;gap:.7rem;font-size:.85rem;font-weight:500;
+  box-shadow:var(--shadow);border:1px solid rgba(184,149,90,.35);
+  transform:translateY(20px);opacity:0;animation:toastIn .4s var(--ease-out) forwards;max-width:90vw;
+}
+.toast .tdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.toast.info .tdot{background:var(--gold)}
+.toast.warn .tdot{background:var(--st-expiring)}
+.toast.danger .tdot{background:#E08A7C}
+.toast.good .tdot{background:var(--st-avail)}
+@keyframes toastIn{to{transform:translateY(0);opacity:1}}
+.toast.out{animation:toastOut .35s var(--ease-out) forwards}
+@keyframes toastOut{to{transform:translateY(14px);opacity:0}}
+
+/* form modal (extend/transfer) */
+.modal-scrim{position:fixed;inset:0;background:rgba(20,17,16,.5);z-index:60;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+.modal-scrim.open{opacity:1;pointer-events:auto}
+.modal{background:var(--bg);border-radius:var(--radius-lg);width:min(440px,100%);padding:1.5rem;box-shadow:var(--shadow);transform:scale(.94);transition:transform .3s var(--ease-spring);max-height:88dvh;overflow-y:auto}
+.modal-scrim.open .modal{transform:scale(1)}
+.modal h3{font-size:1.1rem;font-weight:700;margin-bottom:.3rem}
+.modal p.msub{font-size:.8rem;color:var(--brown-soft);margin-bottom:1.1rem}
+.opt-row{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.opt{display:flex;align-items:center;gap:.7rem;border:1.5px solid var(--line);border-radius:12px;padding:.8rem 1rem;cursor:pointer;transition:border-color .2s,background .2s}
+.opt:hover{border-color:var(--gold)}
+.opt.sel{border-color:var(--gold);background:var(--gold-faint)}
+.opt .oradio{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.opt.sel .oradio{border-color:var(--gold)}
+.opt.sel .oradio::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--gold)}
+.opt .otx{flex:1}
+.opt .otx b{font-size:.86rem;font-weight:600;display:block}
+.opt .otx small{font-size:.72rem;color:var(--brown-soft)}
+.opt .oval{font-family:var(--font-mono);font-weight:600;font-size:.85rem;color:var(--gold-deep)}
+
+/* small helpers */
+.seatpick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:.5rem;margin-top:.5rem;max-height:200px;overflow-y:auto}
+.seatpick-grid .sp{border:1.5px solid var(--line);border-radius:9px;padding:.5rem;text-align:center;cursor:pointer;font-family:var(--font-mono);font-size:.76rem;font-weight:600;transition:all .2s}
+.seatpick-grid .sp:hover{border-color:var(--gold)}
+.seatpick-grid .sp.sel{border-color:var(--gold);background:var(--gold-faint);color:var(--gold-deep)}
+.hint{font-size:.74rem;color:var(--brown-soft);margin-top:.5rem;display:flex;gap:.4rem;align-items:flex-start}
+.hint svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.7;flex-shrink:0;margin-top:2px}
+.divider{height:1px;background:var(--line);margin:1rem 0}
+.pill-info{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-mono);font-size:.74rem;background:var(--surface);border-radius:8px;padding:.3rem .6rem;font-weight:600}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+}
+
+/* responsive */
+@media (max-width:1180px){
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .dash-cols,.qr-layout,.rep-cols{grid-template-columns:1fr}
+  .rep-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:820px){
+  :root{--sidebar-w:0px}
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;top:0;height:100dvh;width:250px;transition:transform .4s var(--ease-out);z-index:60;border-inline-start:none}
+  html[dir="rtl"] .sidebar{right:0;left:auto;transform:translateX(100%)}
+  html[dir="ltr"] .sidebar{left:0;right:auto;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)!important}
+  .menu-toggle{display:flex!important}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .tb-clock .d,.tb-occ .ot small{display:none}
+  .tb-cashier .cn{display:none}
+}
+.menu-toggle{display:none;width:40px;height:40px;border-radius:10px;background:var(--surface);align-items:center;justify-content:center}
+.menu-toggle svg{width:20px;height:20px;stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round}
+</style>
+</head>
+<body>
+
+<!-- SVG defs: logo -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="stampLogo">
+    <circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" stroke-width="2.5"/>
+    <circle cx="60" cy="60" r="38" fill="none" stroke="currentColor" stroke-width="1.6"/>
+    <g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M46 58 h24 v10 a12 12 0 0 1 -24 0 z"/>
+      <path d="M70 60 h5 a5 5 0 0 1 0 10 h-5"/>
+      <path d="M52 50 c-2 -3 2 -5 0 -8"/>
+      <path d="M60 50 c-2 -3 2 -5 0 -8"/>
+      <path d="M50 84 h20"/>
+    </g>
+    <text x="60" y="34" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="6" letter-spacing="2" fill="currentColor">ESTD 2017</text>
+  </g>
+</defs></svg>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <svg viewBox="0 0 120 120"><use href="#stampLogo"/></svg>
+      <div class="bt">Strangers<small data-k="brandSub">CASHIER · FLOOR OPS</small></div>
+    </div>
+    <div class="sb-branchpick">
+      <select id="branchSelect" aria-label="branch">
+        <option value="rbw">فرع الربوة · الرياض</option>
+        <option value="ktb">فرع الكتيبة · الرياض</option>
+        <option value="ula">فرع العليا · الرياض</option>
+      </select>
+    </div>
+    <nav class="sb-nav" id="sbNav">
+      <span class="grp" data-k="grpMain">التشغيل</span>
+      <a class="navlink active" data-tab="home"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span data-k="navHome">الرئيسية والإشغال</span></a>
+      <a class="navlink" data-tab="scan"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M20 8V5a1 1 0 0 0-1-1h-3M4 16v3a1 1 0 0 0 1 1h3M20 16v3a1 1 0 0 1-1 1h-3"/><path d="M4 12h16"/></svg><span data-k="navScan">مسح كود العضوية</span></a>
+      <a class="navlink" data-tab="seats"><svg viewBox="0 0 24 24"><path d="M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/><path d="M4 11h16a1 1 0 0 1 1 1v4H3v-4a1 1 0 0 1 1-1z"/><path d="M6 16v3M18 16v3"/></svg><span data-k="navSeats">خريطة المقاعد</span></a>
+      <a class="navlink" data-tab="sessions"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span data-k="navSessions">الجلسات النشطة</span><span class="badge" id="badgeSessions">0</span></a>
+      <span class="grp" data-k="grpMng">الإدارة</span>
+      <a class="navlink" data-tab="reservations"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M8.5 14l2 2 4-4"/></svg><span data-k="navResv">الحجوزات</span><span class="badge" id="badgeResv">0</span></a>
+      <a class="navlink" data-tab="cleaning"><svg viewBox="0 0 24 24"><path d="M6 3l3 3M9 6l-4 4a2.8 2.8 0 0 0 4 4l4-4M13 10l6 6a2 2 0 0 1-3 3l-6-6"/></svg><span data-k="navClean">قائمة التنظيف</span><span class="badge warn" id="badgeClean">0</span></a>
+      <a class="navlink" data-tab="reports"><svg viewBox="0 0 24 24"><path d="M4 20V4M4 20h16M8 16v-5M12 16V7M16 16v-8"/></svg><span data-k="navReports">تقارير الجلسات</span></a>
+    </nav>
+    <div class="sb-foot">
+      <div data-k="footNote">لوحة تشغيل — بدون دفع أو فوترة</div>
+      <div class="mono">Foodics · SYNC LIVE</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="tb-title">
+        <h1 id="tbBranch">فرع الربوة</h1>
+        <p data-k="tbSub">إدارة المقاعد والحجوزات والجلسات</p>
+      </div>
+      <div class="tb-spacer"></div>
+      <div class="tb-occ">
+        <svg class="occ-ring" viewBox="0 0 42 42" id="occRing">
+          <circle cx="21" cy="21" r="16" fill="none" stroke="var(--line)" stroke-width="5"/>
+          <circle cx="21" cy="21" r="16" fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round" stroke-dasharray="100.5" stroke-dashoffset="100.5" transform="rotate(-90 21 21)" id="occArc"/>
+        </svg>
+        <div class="ot"><b id="occPct">0%</b><small data-k="occLbl">الإشغال</small></div>
+      </div>
+      <div class="tb-clock">
+        <span class="t" id="clockT">--:--:--</span>
+        <span class="d" id="clockD">—</span>
+      </div>
+      <div class="tb-cashier">
+        <div class="av">ن</div>
+        <div class="cn"><b>نايف القحطاني</b><small data-k="cashierRole">كاشير · وردية مسائية</small></div>
+      </div>
+      <button class="lang-btn" id="langBtn">EN</button>
+    </header>
+
+    <main class="content" id="content">
+
+      <!-- ===== HOME / OCCUPANCY ===== -->
+      <section class="page current" id="page-home">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">LIVE OCCUPANCY</span>
+            <h2 data-k="homeTitle">نظرة الإشغال اللحظية</h2>
+          </div>
+        </div>
+        <div class="stat-grid" id="homeStats"></div>
+
+        <div class="dash-cols">
+          <div style="display:flex;flex-direction:column;gap:1.2rem">
+            <div class="map-panel">
+              <div class="panel-h"><h3 data-k="mapTitle">خريطة المقاعد التفاعلية</h3><span class="cnt" data-k="mapHint">اضغط أي مقعد لعرض التفاصيل والإجراءات</span></div>
+              <svg class="seatmap" id="seatmapHome" viewBox="0 0 760 470" role="group" aria-label="seat map"></svg>
+              <div class="legend" id="legendHome"></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1.2rem">
+            <div class="panel">
+              <div class="panel-h"><span class="dotpulse"></span><h3 data-k="expTitle">جلسات تقارب الانتهاء</h3><span class="cnt" id="expCount">—</span></div>
+              <div id="expiringList"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h3 data-k="upResvTitle">الحجوزات القادمة</h3><span class="cnt" id="upResvCount">—</span></div>
+              <div id="upcomingResv"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-h"><h3 data-k="auditTitle">سجل العمليات</h3></div>
+              <div class="audit" id="auditLogHome" style="max-height:200px;padding:0;border:none"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== QR SCAN ===== -->
+      <section class="page" id="page-scan">
+        <div class="page-head">
+          <div><span class="eyebrow">MEMBERSHIP · QR</span><h2 data-k="scanTitle">مسح كود العضوية</h2>
+          <p data-k="scanDesc">امسح كود العضو أو أدخل رقم العضوية لجلب ملفه من نظام الولاء، ثم عيّن له مقعداً.</p></div>
+        </div>
+        <div class="qr-layout">
+          <div class="scan-box">
+            <div class="scan-frame">
+              <svg class="qricon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3M20 14v0M14 20h0M17 20h4v-3"/></svg>
+              <span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span>
+              <span class="scan-line"></span>
+            </div>
+            <button class="btn btn-dark full" id="simScanBtn"><svg viewBox="0 0 24 24"><path d="M4 12h16M4 8V5a1 1 0 0 1 1-1h3M20 8V5a1 1 0 0 0-1-1h-3M4 16v3a1 1 0 0 0 1 1h3M20 16v3a1 1 0 0 1-1 1h-3"/></svg><span data-k="simScan">محاكاة مسح كود</span></button>
+            <div class="field">
+              <label data-k="memLabel">أو أدخل رقم العضوية يدوياً</label>
+              <input type="text" id="memInput" placeholder="STR-4xxxxx" inputmode="text">
+            </div>
+            <button class="btn btn-ghost full" id="lookupBtn" style="margin-top:.7rem"><span data-k="lookupBtn">جلب الملف</span></button>
+            <div class="hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg><span data-k="scanHintTxt">جرّب: STR-448120 أو STR-330915 أو STR-501774</span></div>
+          </div>
+          <div class="cust-card" id="custCard">
+            <div class="cust-empty" id="custEmpty">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+              <div data-k="custEmptyTxt">لا يوجد عميل محدد — امسح كوداً أو أدخل رقم عضوية للبدء.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SEAT MAP + ASSIGN ===== -->
+      <section class="page" id="page-seats">
+        <div class="page-head">
+          <div><span class="eyebrow">FLOOR MAP</span><h2 data-k="seatsTitle">خريطة المقاعد</h2>
+          <p data-k="seatsDesc">حالة كل مقعد لحظياً. اضغط المقعد لفتح لوحة الإجراءات: تعيين، ربط طلب، نقل، تنظيف، إتاحة.</p></div>
+          <div class="ph-spacer"></div>
+          <div class="pill-info" id="seatsSummary">—</div>
+        </div>
+        <div class="map-panel">
+          <svg class="seatmap" id="seatmapFull" viewBox="0 0 760 470" role="group" aria-label="seat map full"></svg>
+          <div class="legend" id="legendFull"></div>
+        </div>
+      </section>
+
+      <!-- ===== SESSIONS ===== -->
+      <section class="page" id="page-sessions">
+        <div class="page-head">
+          <div><span class="eyebrow">ACTIVE SESSIONS</span><h2 data-k="sessTitle">الجلسات النشطة</h2>
+          <p data-k="sessDesc">المؤقت لا يبدأ إلا بعد اعتماد "الطلب جاهز للتقديم". من هنا تدير التمديد، النقل، والمغادرة.</p></div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th data-k="thSess">الجلسة</th><th data-k="thCust">العميل</th><th data-k="thSeat">المقعد</th>
+              <th data-k="thOrder">طلب Foodics</th><th data-k="thVal">قيمة مؤهلة</th><th data-k="thState">الحالة</th>
+              <th data-k="thTimer">المتبقي</th><th></th>
+            </tr></thead>
+            <tbody id="sessTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== RESERVATIONS ===== -->
+      <section class="page" id="page-reservations">
+        <div class="page-head">
+          <div><span class="eyebrow">RESERVATIONS</span><h2 data-k="resvTitle">الحجوزات</h2>
+          <p data-k="resvDesc">فترة سماح 15 دقيقة بعد الموعد. سياسة العربون 50%. أكّد الحضور أو سجّل عدم الحضور.</p></div>
+        </div>
+        <div class="tbl-wrap">
+          <div class="tbl-tools">
+            <div class="seg" id="resvSeg">
+              <button class="on" data-f="all" data-k="fAll">الكل</button>
+              <button data-f="confirmed" data-k="fConfirmed">مؤكد</button>
+              <button data-f="grace" data-k="fGrace">فترة سماح</button>
+              <button data-f="checkedin" data-k="fCheckedin">حضر</button>
+              <button data-f="noshow" data-k="fNoshow">لم يحضر</button>
+            </div>
+          </div>
+          <table>
+            <thead><tr>
+              <th data-k="thResvNo">رقم الحجز</th><th data-k="thGuest">الضيف</th><th data-k="thTime">الموعد</th>
+              <th data-k="thParty">الأفراد</th><th data-k="thZone">المنطقة</th><th data-k="thDeposit">العربون</th>
+              <th data-k="thResvState">الحالة</th><th></th>
+            </tr></thead>
+            <tbody id="resvTbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== CLEANING ===== -->
+      <section class="page" id="page-cleaning">
+        <div class="page-head">
+          <div><span class="eyebrow">CLEANING QUEUE</span><h2 data-k="cleanTitle">قائمة التنظيف</h2>
+          <p data-k="cleanDesc">أماكن أنهى ضيوفها وتحتاج تجهيزاً قبل إتاحتها من جديد.</p></div>
+        </div>
+        <div class="clean-grid" id="cleanGrid"></div>
+      </section>
+
+      <!-- ===== REPORTS ===== -->
+      <section class="page" id="page-reports">
+        <div class="page-head">
+          <div><span class="eyebrow">SESSION REPORTS</span><h2 data-k="repTitle">تقارير الجلسات</h2>
+          <p data-k="repDesc">ملخص يوم التشغيل — بيانات عرض توضيحية.</p></div>
+        </div>
+        <div class="rep-grid" id="repStats"></div>
+        <div class="rep-cols">
+          <div class="panel">
+            <div class="panel-h"><h3 data-k="repPeakTitle">توزيع الجلسات على ساعات اليوم</h3></div>
+            <div class="bar-chart" id="peakChart"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><h3 data-k="repTurnTitle">دوران المقاعد ومتوسط القيمة</h3></div>
+            <div class="rep-list" id="repList"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- scrim + drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-h">
+    <span class="did mono" id="drawerId">—</span>
+    <span class="chip" id="drawerChip"><i></i><span></span></span>
+    <button class="dclose" id="drawerClose" aria-label="close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="drawer-b" id="drawerBody"></div>
+</aside>
+
+<!-- modal (extend / transfer) -->
+<div class="modal-scrim" id="modalScrim">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<!-- toasts -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+"use strict";
+/* =========================================================
+   Strangers Cashier — Seating / Reservation / Session Ops
+   NOT a POS. No payment UI. Reads order value from Foodics.
+   ========================================================= */
+
+/* ---------- i18n ---------- */
+const I18N = {
+  brandSub:["CASHIER · FLOOR OPS","CASHIER · FLOOR OPS"],
+  grpMain:["التشغيل","OPERATIONS"], grpMng:["الإدارة","MANAGEMENT"],
+  navHome:["الرئيسية والإشغال","Home & Occupancy"], navScan:["مسح كود العضوية","Scan Membership"],
+  navSeats:["خريطة المقاعد","Seat Map"], navSessions:["الجلسات النشطة","Active Sessions"],
+  navResv:["الحجوزات","Reservations"], navClean:["قائمة التنظيف","Cleaning Queue"], navReports:["تقارير الجلسات","Session Reports"],
+  footNote:["لوحة تشغيل — بدون دفع أو فوترة","Ops board — no payment or billing"],
+  tbSub:["إدارة المقاعد والحجوزات والجلسات","Seating, reservations & sessions"],
+  occLbl:["الإشغال","Occupancy"], cashierRole:["كاشير · وردية مسائية","Cashier · Evening shift"],
+  homeTitle:["نظرة الإشغال اللحظية","Live occupancy overview"],
+  mapTitle:["خريطة المقاعد التفاعلية","Interactive seat map"], mapHint:["اضغط أي مقعد لعرض التفاصيل والإجراءات","Tap any seat for details & actions"],
+  expTitle:["جلسات تقارب الانتهاء","Sessions ending soon"], upResvTitle:["الحجوزات القادمة","Upcoming reservations"],
+  auditTitle:["سجل العمليات","Activity log"],
+  scanTitle:["مسح كود العضوية","Scan membership code"],
+  scanDesc:["امسح كود العضو أو أدخل رقم العضوية لجلب ملفه من نظام الولاء، ثم عيّن له مقعداً.","Scan the member code or enter a membership number to pull their loyalty profile, then assign a seat."],
+  simScan:["محاكاة مسح كود","Simulate scan"], memLabel:["أو أدخل رقم العضوية يدوياً","Or enter membership number"],
+  lookupBtn:["جلب الملف","Fetch profile"], scanHintTxt:["جرّب: STR-448120 أو STR-330915 أو STR-501774","Try: STR-448120, STR-330915 or STR-501774"],
+  custEmptyTxt:["لا يوجد عميل محدد — امسح كوداً أو أدخل رقم عضوية للبدء.","No customer selected — scan a code or enter a membership number."],
+  seatsTitle:["خريطة المقاعد","Seat map"],
+  seatsDesc:["حالة كل مقعد لحظياً. اضغط المقعد لفتح لوحة الإجراءات: تعيين، ربط طلب، نقل، تنظيف، إتاحة.","Live seat status. Tap a seat for actions: assign, link order, transfer, clean, release."],
+  sessTitle:["الجلسات النشطة","Active sessions"],
+  sessDesc:["المؤقت لا يبدأ إلا بعد اعتماد \"الطلب جاهز للتقديم\". من هنا تدير التمديد، النقل، والمغادرة.","The timer starts only after \"Ready for Serving\" is approved. Manage extension, transfer and departure here."],
+  thSess:["الجلسة","Session"], thCust:["العميل","Customer"], thSeat:["المقعد","Seat"], thOrder:["طلب Foodics","Foodics order"],
+  thVal:["قيمة مؤهلة","Qualifying value"], thState:["الحالة","State"], thTimer:["المتبقي","Remaining"],
+  resvTitle:["الحجوزات","Reservations"],
+  resvDesc:["فترة سماح 15 دقيقة بعد الموعد. سياسة العربون 50%. أكّد الحضور أو سجّل عدم الحضور.","15-minute grace after the slot. 50% deposit policy. Check guests in or mark no-show."],
+  fAll:["الكل","All"], fConfirmed:["مؤكد","Confirmed"], fGrace:["فترة سماح","Grace"], fCheckedin:["حضر","Checked in"], fNoshow:["لم يحضر","No show"],
+  thResvNo:["رقم الحجز","Ref"], thGuest:["الضيف","Guest"], thTime:["الموعد","Slot"], thParty:["الأفراد","Party"],
+  thZone:["المنطقة","Zone"], thDeposit:["العربون","Deposit"], thResvState:["الحالة","State"],
+  cleanTitle:["قائمة التنظيف","Cleaning queue"], cleanDesc:["أماكن أنهى ضيوفها وتحتاج تجهيزاً قبل إتاحتها من جديد.","Spots whose guests have left and need prep before release."],
+  repTitle:["تقارير الجلسات","Session reports"], repDesc:["ملخص يوم التشغيل — بيانات عرض توضيحية.","Operating-day summary — demo data."],
+  repPeakTitle:["توزيع الجلسات على ساعات اليوم","Sessions across the day"], repTurnTitle:["دوران المقاعد ومتوسط القيمة","Seat turnover & average value"],
+};
+let LANG = 0; // 0=ar 1=en
+function applyLang(){
+  const en = LANG===1;
+  document.documentElement.lang = en?"en":"ar";
+  document.documentElement.dir = en?"ltr":"rtl";
+  document.getElementById('langBtn').textContent = en?"ع":"EN";
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    const k = el.getAttribute('data-k'); if(I18N[k]) el.textContent = I18N[k][LANG];
+  });
+  // re-render dynamic surfaces
+  renderAll();
+  if(selectedSeatId){
+    const s=seatById(selectedSeatId);
+    if(s){
+      const chip=document.getElementById('drawerChip');
+      chip.className='chip '+stCls(s.state); chip.querySelector('span').textContent=stName(s.state);
+      document.getElementById('drawerBody').innerHTML=buildDrawerBody(s); wireDrawer(s);
+    }
+  }
+}
+const T = (ar,en)=> LANG===1 ? en : ar;
+
+/* ---------- state meta ---------- */
+const STATES = {
+  available:{ar:"متاح",en:"Available",cls:"available",color:"var(--st-avail)"},
+  reserved:{ar:"محجوز",en:"Reserved",cls:"reserved",color:"var(--st-reserved)"},
+  awaiting:{ar:"بانتظار العميل",en:"Awaiting Customer",cls:"awaiting",color:"var(--st-await)"},
+  occupied:{ar:"مشغول",en:"Occupied",cls:"occupied",color:"var(--st-occupied)"},
+  expiring:{ar:"ينتهي قريباً",en:"Expiring Soon",cls:"expiring",color:"var(--st-expiring)"},
+  expired:{ar:"انتهى الوقت",en:"Time Expired",cls:"expired",color:"var(--st-expired)"},
+  renewal:{ar:"بانتظار التجديد",en:"Awaiting Renewal",cls:"renewal",color:"var(--st-await)"},
+  cleaning:{ar:"يحتاج تنظيف",en:"Cleaning Required",cls:"cleaning",color:"var(--st-cleaning)"},
+  unavailable:{ar:"غير متاح مؤقتاً",en:"Temporarily Unavailable",cls:"unavailable",color:"var(--st-unavail)"},
+  outofservice:{ar:"خارج الخدمة",en:"Out of Service",cls:"outofservice",color:"var(--st-unavail)"},
+};
+function stName(s){ return STATES[s] ? STATES[s][LANG===1?'en':'ar'] : s; }
+function stColor(s){ return STATES[s] ? STATES[s].color : "var(--ink)"; }
+function stCls(s){ return STATES[s] ? STATES[s].cls : ""; }
+
+/* ---------- seat type meta ---------- */
+const TYPE_META = {
+  chair:{ar:"كرسي فردي",en:"Single chair"},
+  table:{ar:"طاولة",en:"Table"},
+  room:{ar:"غرفة اجتماعات",en:"Meeting room"},
+  family:{ar:"قسم عائلي",en:"Family section"},
+};
+/* time rules (minutes) */
+/* per Strangers policy §14: chair min SAR13 → 1h, full-day at SAR40, +SAR5/h.
+   table min SAR40 → 1h, full-day at SAR100, +SAR20/h. room/family extrapolated. */
+const FULL_DAY_MIN = 1440; // up to 24h / end of operating day
+const RULES = {
+  chair: { minValue:13,  step:5,  stepMin:60, min:60, fullDay:40,  extPrice:5,  extMin:60 },
+  table: { minValue:40,  step:20, stepMin:60, min:60, fullDay:100, extPrice:20, extMin:60 },
+  room:  { minValue:100, step:40, stepMin:60, min:60, fullDay:220, extPrice:40, extMin:60 },
+  family:{ minValue:40,  step:20, stepMin:60, min:60, fullDay:100, extPrice:20, extMin:60 },
+};
+function computeEntitledMin(type, orderValue){
+  const r = RULES[type] || RULES.chair;
+  if(orderValue >= r.fullDay) return FULL_DAY_MIN;
+  if(orderValue < r.minValue) return r.min;
+  const extra = Math.floor((orderValue - r.minValue) / r.step);
+  return r.min + extra * r.stepMin;
+}
+
+/* ---------- seat layout (viewBox 760x470) ---------- */
+const SEATS = [];
+function seat(id,type,x,y,w,h,shape,state){ return {id,type,x,y,w,h,shape,state,session:null}; }
+// chairs zone (top): S-101..S-108 circles r=22
+(function(){
+  const ids=['S-101','S-102','S-103','S-104','S-105','S-106','S-107','S-108'];
+  ids.forEach((id,i)=>{ const col=i%4, row=Math.floor(i/4);
+    SEATS.push(seat(id,'chair', 70+col*80, 70+row*80, 44,44,'circle','available'));
+  });
+})();
+// tables zone (mid-left): T-201..T-206 rounded rect
+(function(){
+  const ids=['T-201','T-202','T-203','T-204','T-205','T-206'];
+  ids.forEach((id,i)=>{ const col=i%3, row=Math.floor(i/3);
+    SEATS.push(seat(id,'table', 60+col*105, 260+row*95, 84,70,'rect','available'));
+  });
+})();
+// meeting room M-01 (right top)
+SEATS.push(seat('M-01','room', 470,60, 240,120,'rect','available'));
+// family sections F-01 F-02 (right bottom)
+SEATS.push(seat('F-01','family', 470,215, 115,110,'rect','available'));
+SEATS.push(seat('F-02','family', 595,215, 115,110,'rect','available'));
+// couple more chairs near right
+SEATS.push(seat('S-109','chair', 480,360, 44,44,'circle','available'));
+SEATS.push(seat('S-110','chair', 560,360, 44,44,'circle','available'));
+SEATS.push(seat('T-207','table', 620,350, 84,70,'rect','available'));
+
+const seatById = id => SEATS.find(s=>s.id===id);
+
+/* ---------- customers (loyalty) ---------- */
+const CUSTOMERS = {
+  'STR-448120':{name:"عبدالله المطيري",tier:"Gold",points:2840,visits:47,last:"لاتيه مثلج + كرواسون لوز",initial:"ع"},
+  'STR-330915':{name:"سارة الدوسري",tier:"Silver",points:1120,visits:19,last:"في60 + تشيز كيك",initial:"س"},
+  'STR-501774':{name:"محمد العتيبي",tier:"Gold",points:3960,visits:63,last:"إسبريسو مزدوج",initial:"م"},
+  'STR-712043':{name:"نورة الشمري",tier:"Platinum",points:7310,visits:112,last:"سبانش لاتيه + كوكيز",initial:"ن"},
+};
+const CUST_CODES = Object.keys(CUSTOMERS);
+
+/* ---------- Foodics mock orders ---------- */
+const FOODICS = {
+  '10482':{branch:"الربوة",value:38.00,time:"—",items:3,status:"ready"},
+  '10485':{branch:"الربوة",value:64.50,time:"—",items:5,status:"preparing"},
+  '10490':{branch:"الربوة",value:22.00,time:"—",items:2,status:"ready"},
+  '10493':{branch:"الربوة",value:128.00,time:"—",items:8,status:"preparing"},
+  '10496':{branch:"الربوة",value:52.00,time:"—",items:4,status:"ready"},
+};
+let foodicsSeq = 10500;
+function mockFoodicsLookup(no){
+  if(FOODICS[no]) return {...FOODICS[no], no};
+  // generate plausible one
+  const val = [26,34,48,58,72,96][Math.floor(Math.random()*6)];
+  const o = {branch:"الربوة",value:val,time:"—",items:Math.ceil(val/14),status:Math.random()>.5?"ready":"preparing", no};
+  FOODICS[no]=o; return o;
+}
+
+/* ---------- sessions ---------- */
+let sessionSeq = 3040;
+const AUDIT = [];
+function nowT(){ const d=new Date(); return d.toTimeString().slice(0,5); }
+function logAudit(ar,en){ AUDIT.unshift({t:nowT(), ar, en}); if(AUDIT.length>40)AUDIT.pop(); renderAudit(); }
+
+/* seed some live sessions */
+function seedSessions(){
+  // occupied running session close to expiry
+  startSeeded('S-102','STR-501774','10496', -1, 6);   // 6 min left
+  startSeeded('T-202','STR-712043','10493', -1, 12);  // 12 min left
+  startSeeded('S-105','STR-330915','10490', -1, 27);  // 27 min
+  startSeeded('T-205','STR-448120','10485', -1, 44);  // running
+  // one awaiting-serving (timer not started)
+  const s = seatById('S-107');
+  const cust = CUSTOMERS['STR-448120'];
+  s.state='occupied';
+  s.session = makeSession(s, 'STR-448120','10482', false);
+  // reserved seats
+  seatById('M-01').state='reserved';
+  seatById('F-01').state='reserved';
+  // cleaning
+  seatById('S-104').state='cleaning'; seatById('S-104').cleanSince=Date.now()-8*60000;
+  seatById('T-206').state='cleaning'; seatById('T-206').cleanSince=Date.now()-3*60000;
+  // out of service
+  seatById('T-207').state='outofservice';
+  seatById('S-110').state='unavailable';
+}
+function makeSession(seat, code, orderNo, started){
+  const cust = CUSTOMERS[code];
+  const ord = FOODICS[orderNo] ? {...FOODICS[orderNo],no:orderNo} : mockFoodicsLookup(orderNo);
+  const entitled = computeEntitledMin(seat.type, ord.value);
+  return {
+    no:'S'+(sessionSeq++), code, custName:cust.name, orderNo, orderValue:ord.value,
+    entitledMin:entitled, started:!!started, startTs:null, endTs:null,
+    flag5:false, flagEnd:false, prepReady:false,
+  };
+}
+function startSeeded(seatId, code, orderNo, addedMin, minutesLeft){
+  const s = seatById(seatId); if(!s) return;
+  s.state='occupied';
+  s.session = makeSession(s, code, orderNo, true);
+  s.session.prepReady=true;
+  s.session.startTs = Date.now() - (s.session.entitledMin-minutesLeft)*60000;
+  s.session.endTs = s.session.startTs + s.session.entitledMin*60000;
+}
+
+/* remaining ms */
+function remainingMs(sess){ if(!sess.started||!sess.endTs) return null; return sess.endTs - Date.now(); }
+function fmtDur(ms){
+  if(ms==null) return "—";
+  const neg = ms<0; ms=Math.abs(ms);
+  const m=Math.floor(ms/60000), s=Math.floor((ms%60000)/1000);
+  return (neg?"-":"")+String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
+}
+
+/* ---------- reservations ---------- */
+const RESV = [
+  {ref:"RZ-8841",guest:"فيصل الحربي",time:"19:30",party:4,zone:"عائلي F-01",zoneEn:"Family F-01",deposit:90,state:"confirmed"},
+  {ref:"RZ-8842",guest:"لمى القرني",time:"19:45",party:2,zone:"طاولة T-203",zoneEn:"Table T-203",deposit:40,state:"grace"},
+  {ref:"RZ-8843",guest:"تركي السبيعي",time:"20:00",party:6,zone:"غرفة M-01",zoneEn:"Room M-01",deposit:150,state:"confirmed"},
+  {ref:"RZ-8844",guest:"ريم الغامدي",time:"18:50",party:3,zone:"عائلي F-02",zoneEn:"Family F-02",deposit:75,state:"checkedin"},
+  {ref:"RZ-8845",guest:"سلطان المالكي",time:"18:30",party:2,zone:"طاولة T-201",zoneEn:"Table T-201",deposit:40,state:"noshow"},
+  {ref:"RZ-8846",guest:"جواهر العنزي",time:"20:20",party:4,zone:"طاولة T-204",zoneEn:"Table T-204",deposit:80,state:"confirmed"},
+];
+const RESV_STATES = {
+  confirmed:{ar:"مؤكد · عربون مدفوع",en:"Confirmed · deposit paid",cls:"reserved"},
+  grace:{ar:"فترة سماح",en:"Grace period",cls:"expiring"},
+  checkedin:{ar:"حضر",en:"Checked in",cls:"available"},
+  noshow:{ar:"لم يحضر",en:"No show",cls:"expired"},
+};
+let resvFilter='all';
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function renderAll(){
+  renderStats(); renderSeatMaps(); renderExpiring(); renderUpcoming();
+  renderSessions(); renderReservations(); renderCleaning(); renderReports();
+  renderBadges(); renderAudit(); renderOccupancy(); updateSeatsSummary();
+}
+
+/* --- stat cards --- */
+function counts(){
+  const c={total:SEATS.length,available:0,occupied:0,reserved:0,cleaning:0,expiring:0,other:0};
+  SEATS.forEach(s=>{
+    if(s.state==='available')c.available++;
+    else if(s.state==='occupied'||s.state==='expiring'||s.state==='expired'||s.state==='renewal'){
+      c.occupied++;
+      if(s.session){ const r=remainingMs(s.session); if(r!=null && r<=15*60000)c.expiring++; }
+    }
+    else if(s.state==='reserved'||s.state==='awaiting')c.reserved++;
+    else if(s.state==='cleaning')c.cleaning++;
+    else c.other++;
+  });
+  return c;
+}
+function renderStats(){
+  const c=counts();
+  const occPct = Math.round((c.occupied/c.total)*100);
+  const cards=[
+    {v:c.total,l:T("إجمالي المقاعد","Total seats"),ic:'<rect x="3" y="10" width="18" height="8" rx="2"/><path d="M6 10V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3"/>'},
+    {v:c.occupied,l:T("مشغول","Occupied"),ic:'<circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/>'},
+    {v:c.available,l:T("متاح","Available"),ic:'<path d="M20 6L9 17l-5-5"/>'},
+    {v:c.reserved,l:T("محجوز","Reserved"),ic:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 11h16"/>'},
+    {v:c.cleaning,l:T("يحتاج تنظيف","Needs cleaning"),ic:'<path d="M6 3l3 3M9 6l-4 4a2.8 2.8 0 0 0 4 4l4-4"/>'},
+    {v:occPct+"%",l:T("نسبة الإشغال","Occupancy"),accent:true,ic:'<path d="M4 20V4M4 20h16M8 16v-5M12 16V7M16 16v-8"/>'},
+  ];
+  document.getElementById('homeStats').innerHTML = cards.map(k=>`
+    <div class="stat${k.accent?' accent':''}">
+      <div class="si"><svg viewBox="0 0 24 24">${k.ic}</svg></div>
+      <div class="sv mono">${k.v}</div><div class="sl">${k.l}</div>
+    </div>`).join('');
+}
+
+function renderOccupancy(){
+  const c=counts(); const pct=Math.round((c.occupied/c.total)*100);
+  document.getElementById('occPct').textContent=pct+"%";
+  const circ=2*Math.PI*16;
+  const arc=document.getElementById('occArc');
+  arc.setAttribute('stroke-dasharray',circ.toFixed(1));
+  arc.setAttribute('stroke-dashoffset',(circ*(1-pct/100)).toFixed(1));
+}
+
+/* --- seat maps --- */
+function seatSVG(s){
+  const st=STATES[s.state];
+  const col = st.color;
+  const bg = `color-mix(in srgb, ${col} 78%, #000 0%)`;
+  let shape;
+  const darkLbl = false;
+  if(s.shape==='circle'){
+    const cx=s.x+s.w/2, cy=s.y+s.h/2, r=s.w/2;
+    shape=`<circle class="shape" cx="${cx}" cy="${cy}" r="${r}" fill="${col}" stroke="${col}" stroke-width="1.5"/>
+           <text class="lbl" x="${cx}" y="${cy+1}">${s.id.replace('S-','')}</text>`;
+  }else{
+    const cx=s.x+s.w/2, cy=s.y+s.h/2;
+    shape=`<rect class="shape" x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" rx="12" fill="${col}" stroke="${col}" stroke-width="1.5"/>
+           <text class="lbl" x="${cx}" y="${cy+1}">${s.id}</text>`;
+  }
+  // small remaining timer overlay for running sessions
+  let extra='';
+  if(s.session && s.session.started){
+    const r=remainingMs(s.session);
+    const cx=s.x+s.w/2, cy=s.y+s.h;
+    extra=`<text class="lbl" x="${cx}" y="${cy-6}" style="font-size:9px;fill:rgba(255,255,255,.85)">${fmtDur(r)}</text>`;
+  }
+  return `<g class="seat${s.id===selectedSeatId?' sel':''}" data-id="${s.id}" role="button" tabindex="0" aria-label="${s.id} ${stName(s.state)}">${shape}${extra}</g>`;
+}
+function renderSeatMaps(){
+  const zones = `
+    <text class="zone-lbl" x="70" y="30">${T('الكراسي الفردية','SINGLE CHAIRS')}</text>
+    <text class="zone-lbl" x="60" y="245">${T('الطاولات','TABLES')}</text>
+    <text class="zone-lbl" x="470" y="45">${T('غرفة الاجتماعات','MEETING ROOM')}</text>
+    <text class="zone-lbl" x="470" y="205">${T('الأقسام العائلية','FAMILY SECTIONS')}</text>`;
+  const body = zones + SEATS.map(seatSVG).join('');
+  ['seatmapHome','seatmapFull'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.innerHTML=body;
+  });
+  // legends
+  const legItems = ['available','occupied','reserved','expiring','expired','cleaning','unavailable'];
+  const legHTML = legItems.map(s=>`<span><i style="background:${STATES[s].color}"></i>${stName(s)}</span>`).join('');
+  ['legendHome','legendFull'].forEach(id=>{ const el=document.getElementById(id); if(el)el.innerHTML=legHTML; });
+}
+function updateSeatsSummary(){
+  const c=counts();
+  document.getElementById('seatsSummary').textContent =
+    `${c.available} ${T('متاح','free')} · ${c.occupied} ${T('مشغول','busy')} · ${c.cleaning} ${T('تنظيف','cleaning')}`;
+}
+
+/* --- expiring list --- */
+function renderExpiring(){
+  const rows=[];
+  SEATS.forEach(s=>{
+    if(s.session && s.session.started){
+      const r=remainingMs(s.session);
+      if(r!=null && r<=15*60000) rows.push({s,r});
+    }
+  });
+  rows.sort((a,b)=>a.r-b.r);
+  const el=document.getElementById('expiringList');
+  document.getElementById('expCount').textContent = rows.length + " " + T('جلسة','sessions');
+  if(!rows.length){ el.innerHTML=`<div class="empty-note">${T('لا جلسات قريبة من الانتهاء الآن','No sessions ending soon')}</div>`; return; }
+  el.innerHTML = rows.map(({s,r})=>{
+    const mins=r/60000; let cls='t15'; if(mins<=5)cls='t5'; else if(mins<=10)cls='t10'; if(r<0)cls='over';
+    return `<div class="exp-row" data-seat="${s.id}">
+      <span class="seatpill">${s.id}</span>
+      <div class="who"><b>${s.session.custName}</b><small>${T('طلب','order')} #${s.session.orderNo} · ${s.session.orderValue.toFixed(2)} ${T('ر.س','SAR')}</small></div>
+      <div class="rtime"><div class="cd mono ${cls}">${fmtDur(r)}</div><small>${r<0?T('تجاوز','over'):T('متبقٍ','left')}</small></div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.exp-row').forEach(row=>row.addEventListener('click',()=>openDrawer(row.dataset.seat)));
+}
+
+/* --- upcoming reservations --- */
+function renderUpcoming(){
+  const up=RESV.filter(r=>r.state==='confirmed'||r.state==='grace').slice(0,4);
+  const el=document.getElementById('upcomingResv');
+  document.getElementById('upResvCount').textContent = up.length;
+  el.innerHTML = up.map(r=>`
+    <div class="resv-mini">
+      <span class="rt mono">${r.time}</span>
+      <div class="rn"><b>${r.guest}</b><small>${LANG?r.zoneEn:r.zone} · ${r.party} ${T('أفراد','pax')}</small></div>
+      <span class="rs"><span class="chip ${RESV_STATES[r.state].cls}"><i></i>${RESV_STATES[r.state][LANG?'en':'ar']}</span></span>
+    </div>`).join('');
+}
+
+/* --- sessions table --- */
+function renderSessions(){
+  const rows=[];
+  SEATS.forEach(s=>{ if(s.session) rows.push(s); });
+  const tb=document.getElementById('sessTbody');
+  if(!rows.length){ tb.innerHTML=`<tr><td colspan="8"><div class="empty-note">${T('لا جلسات نشطة','No active sessions')}</div></td></tr>`; return; }
+  tb.innerHTML = rows.map(s=>{
+    const ss=s.session; const r=remainingMs(ss);
+    let stateKey = s.state;
+    let timerTxt, timerCls='';
+    if(!ss.started){ timerTxt=T('لم يبدأ','not started'); timerCls='t15'; stateKey='occupied'; }
+    else { timerTxt=fmtDur(r); const m=r/60000; if(r<0){timerCls='over';} else if(m<=5)timerCls='t5'; else if(m<=10)timerCls='t10'; else if(m<=15)timerCls='t15'; }
+    const badge = !ss.started
+      ? `<span class="chip awaiting"><i></i>${T('قيد التحضير','preparing')}</span>`
+      : `<span class="chip ${stCls(s.state)}"><i></i>${stName(s.state)}</span>`;
+    return `<tr>
+      <td class="mono">${ss.no}</td>
+      <td>${ss.custName}</td>
+      <td class="mono">${s.id}</td>
+      <td class="mono">#${ss.orderNo}</td>
+      <td class="mono">${ss.orderValue.toFixed(2)} <small style="color:var(--brown-soft)">${T('ر.س','SAR')}</small></td>
+      <td>${badge}</td>
+      <td><span class="cd mono ${timerCls}" style="font-size:.95rem;font-weight:600">${timerTxt}</span></td>
+      <td><div class="rowbtns"><button class="btn btn-ghost sm" data-open="${s.id}">${T('إدارة','Manage')}</button></div></td>
+    </tr>`;
+  }).join('');
+  tb.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openDrawer(b.dataset.open)));
+}
+
+/* --- reservations table --- */
+function renderReservations(){
+  const tb=document.getElementById('resvTbody');
+  const list = RESV.filter(r=>resvFilter==='all'||r.state===resvFilter);
+  if(!list.length){ tb.innerHTML=`<tr><td colspan="8"><div class="empty-note">${T('لا حجوزات في هذا التصنيف','No reservations in this filter')}</div></td></tr>`; return; }
+  tb.innerHTML = list.map(r=>{
+    const rs=RESV_STATES[r.state];
+    let grace='';
+    if(r.state==='grace'){ grace=`<div class="grace" style="color:var(--st-expiring);font-size:.72rem;margin-top:2px" data-grace="${r.ref}">${T('سماح','grace')} 15:00</div>`; }
+    let actions='';
+    if(r.state==='confirmed'||r.state==='grace'){
+      actions=`<button class="btn btn-avail sm" data-checkin="${r.ref}">${T('تسجيل حضور','Check-in')}</button>
+               <button class="btn btn-ghost sm" data-noshow="${r.ref}">${T('لم يحضر','No-show')}</button>`;
+    } else {
+      actions=`<span class="pill-info">${r.state==='checkedin'?T('تم الحضور','Arrived'):T('مُغلق','Closed')}</span>`;
+    }
+    return `<tr>
+      <td class="mono">${r.ref}</td>
+      <td>${r.guest}${grace}</td>
+      <td class="mono">${r.time}</td>
+      <td class="mono">${r.party}</td>
+      <td>${LANG?r.zoneEn:r.zone}</td>
+      <td class="mono">${r.deposit.toFixed(0)} ${T('ر.س','SAR')} <small style="color:var(--brown-soft)">(50%)</small></td>
+      <td><span class="chip ${rs.cls}"><i></i>${rs[LANG?'en':'ar']}</span></td>
+      <td><div class="rowbtns">${actions}</div></td>
+    </tr>`;
+  }).join('');
+  tb.querySelectorAll('[data-checkin]').forEach(b=>b.addEventListener('click',()=>resvAction(b.dataset.checkin,'checkedin')));
+  tb.querySelectorAll('[data-noshow]').forEach(b=>b.addEventListener('click',()=>resvAction(b.dataset.noshow,'noshow')));
+}
+function resvAction(ref,newState){
+  const r=RESV.find(x=>x.ref===ref); if(!r)return; r.state=newState;
+  if(newState==='checkedin'){ toast('good', T(`سُجّل حضور ${r.guest}`,`${r.guest} checked in`)); logAudit(`تسجيل حضور حجز ${ref}`,`Check-in ${ref}`); }
+  else { toast('warn', T(`سُجّل عدم حضور ${r.guest} — احتُجز 50% عربون`,`${r.guest} marked no-show — 50% deposit held`)); logAudit(`عدم حضور ${ref}`,`No-show ${ref}`); }
+  renderReservations(); renderUpcoming(); renderBadges();
+}
+
+/* --- cleaning --- */
+function renderCleaning(){
+  const list=SEATS.filter(s=>s.state==='cleaning');
+  const el=document.getElementById('cleanGrid');
+  if(!list.length){ el.innerHTML=`<div class="empty-note" style="grid-column:1/-1">${T('لا شيء بانتظار التنظيف — القاعة جاهزة','Nothing to clean — floor is ready')}</div>`; return; }
+  el.innerHTML=list.map(s=>{
+    const waited = s.cleanSince ? Math.floor((Date.now()-s.cleanSince)/60000) : 0;
+    return `<div class="clean-card">
+      <div class="ch"><span class="seatpill">${s.id}</span><span class="chip cleaning"><i></i>${stName('cleaning')}</span></div>
+      <div class="cmeta">${T('النوع','Type')}: <b>${TYPE_META[s.type][LANG?'en':'ar']}</b></div>
+      <div class="waited mono">${T('بانتظار','Waiting')} ${waited} ${T('دقيقة','min')}</div>
+      <button class="btn btn-avail full sm" data-clean="${s.id}"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>${T('تم التنظيف — إتاحة','Cleaned — release')}</button>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('[data-clean]').forEach(b=>b.addEventListener('click',()=>markCleaned(b.dataset.clean)));
+}
+function markCleaned(id){
+  const s=seatById(id); if(!s)return; s.state='available'; s.cleanSince=null;
+  toast('good', T(`${id} نُظّف وأصبح متاحاً`,`${id} cleaned & available`)); logAudit(`تنظيف وإتاحة ${id}`,`Cleaned & released ${id}`);
+  renderAll();
+}
+
+/* --- reports --- */
+function renderReports(){
+  const stats=[
+    {v:"128",l:T("جلسات اليوم","Sessions today")},
+    {v:"1س 12د",l:T("متوسط المدة","Avg duration"),en:"1h 12m"},
+    {v:"46.20",l:T("متوسط قيمة الطلب","Avg order value")},
+    {v:"3.4×",l:T("دوران المقعد","Seat turnover")},
+  ];
+  document.getElementById('repStats').innerHTML=stats.map(s=>`
+    <div class="stat"><div class="sv mono">${s.en&&LANG?s.en:s.v}</div><div class="sl">${s.l}</div></div>`).join('');
+  const hours=[['12',22],['1',35],['2',48],['3',41],['4',55],['5',72],['6',88],['7',96],['8',80],['9',61]];
+  const max=Math.max(...hours.map(h=>h[1]));
+  document.getElementById('peakChart').innerHTML=hours.map(h=>{
+    const peak=h[1]===max;
+    return `<div class="bar"><span class="val">${h[1]}</span><div class="col${peak?' peak':''}" style="height:${(h[1]/max*100)}%"></div><small>${h[0]}${LANG?'':' '}${LANG?'':''}</small></div>`;
+  }).join('');
+  const turn=[
+    {l:T("كرسي فردي","Single chair"),v:"4.1×",p:82},
+    {l:T("طاولة","Table"),v:"2.9×",p:58},
+    {l:T("قسم عائلي","Family"),v:"1.8×",p:36},
+    {l:T("غرفة اجتماعات","Meeting room"),v:"1.2×",p:24},
+    {l:T("لا حضور (No Show)","No-show"),v:"6",p:14},
+  ];
+  document.getElementById('repList').innerHTML=turn.map(t=>`
+    <div class="rl"><span>${t.l}</span><div class="rbar"><span style="width:${t.p}%"></span></div><span class="rv">${t.v}</span></div>`).join('');
+}
+
+/* --- badges --- */
+function renderBadges(){
+  let activeSess=0; SEATS.forEach(s=>{ if(s.session)activeSess++; });
+  document.getElementById('badgeSessions').textContent=activeSess;
+  document.getElementById('badgeResv').textContent=RESV.filter(r=>r.state==='confirmed'||r.state==='grace').length;
+  document.getElementById('badgeClean').textContent=SEATS.filter(s=>s.state==='cleaning').length;
+}
+
+/* --- audit --- */
+function renderAudit(){
+  const html = AUDIT.slice(0,14).map(a=>`
+    <div class="audit-row"><span class="adot"></span><div style="flex:1"><div class="atx">${a[LANG?'en':'ar']}</div><span class="at mono">${a.t}</span></div></div>`).join('')
+    || `<div class="empty-note">${T('لا عمليات بعد','No actions yet')}</div>`;
+  const el=document.getElementById('auditLogHome'); if(el)el.innerHTML=html;
+}
+
+/* =========================================================
+   DRAWER (seat detail + actions)
+   ========================================================= */
+let selectedSeatId=null;
+function openDrawer(id){
+  const s=seatById(id); if(!s)return;
+  selectedSeatId=id;
+  document.getElementById('drawerId').textContent=id;
+  const chip=document.getElementById('drawerChip');
+  chip.className='chip '+stCls(s.state);
+  chip.querySelector('span').textContent=stName(s.state);
+  document.getElementById('drawerBody').innerHTML=buildDrawerBody(s);
+  wireDrawer(s);
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer').setAttribute('aria-hidden','false');
+  document.getElementById('scrim').classList.add('open');
+  renderSeatMaps();
+}
+function closeDrawer(){
+  selectedSeatId=null;
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer').setAttribute('aria-hidden','true');
+  document.getElementById('scrim').classList.remove('open');
+  renderSeatMaps();
+}
+function buildDrawerBody(s){
+  const typeName=TYPE_META[s.type][LANG?'en':'ar'];
+  let html=`<div class="drawer-sec"><span class="st">${T('بيانات المقعد','Seat info')}</span>
+    <div class="kv"><span class="k">${T('المعرّف','ID')}</span><span class="v mono">${s.id}</span></div>
+    <div class="kv"><span class="k">${T('النوع','Type')}</span><span class="v">${typeName}</span></div>
+    <div class="kv"><span class="k">${T('الحالة','State')}</span><span class="v" style="color:${stColor(s.state)}">${stName(s.state)}</span></div>
+    <div class="kv"><span class="k">${T('الحد الأدنى','Minimum')}</span><span class="v mono">${RULES[s.type].minValue} ${T('ر.س','SAR')} · ${T('ساعة','1h')}</span></div>
+    <div class="kv"><span class="k">${T('اليوم الكامل','Full day')}</span><span class="v mono">${RULES[s.type].fullDay} ${T('ر.س','SAR')}</span></div>
+  </div>`;
+
+  // ---- session block ----
+  if(s.session){
+    const ss=s.session;
+    html+=`<div class="drawer-sec"><span class="st">${T('الجلسة','Session')} ${ss.no}</span>`;
+    if(!ss.started){
+      html+=`<div class="cd-block prep">
+        <div class="cd-big">${T('قيد التحضير — لم يبدأ الوقت','In preparation — timer not started')}</div>
+        <div class="cd-cap">${T('الوقت يبدأ فقط عند اعتماد جاهزية الطلب الكاملة','Timer starts only when the full order is confirmed ready')}</div>
+      </div>`;
+    } else {
+      const r=remainingMs(ss); const m=r/60000; let cls=''; if(r<0)cls='over';else if(m<=5)cls='t5';else if(m<=10)cls='t10';else if(m<=15)cls='t15';
+      const pct = Math.max(0, Math.min(100, (r/(ss.entitledMin*60000))*100));
+      html+=`<div class="cd-block">
+        <div class="cd-big mono ${cls}" data-live-cd="${s.id}">${fmtDur(r)}</div>
+        <div class="cd-cap">${r<0?T('تجاوز الوقت المستحق','over the entitled time'):T('المتبقّي من الوقت المستحق','remaining of entitled time')}</div>
+        <div class="cd-bar"><span data-live-bar="${s.id}" style="width:${pct}%;${r<0?'background:var(--st-expired)':''}"></span></div>
+      </div>`;
+    }
+    html+=`
+      <div class="kv"><span class="k">${T('العميل','Customer')}</span><span class="v">${ss.custName}</span></div>
+      <div class="kv"><span class="k">${T('طلب Foodics','Foodics order')}</span><span class="v mono">#${ss.orderNo}</span></div>
+      <div class="kv"><span class="k">${T('القيمة المؤهِّلة','Qualifying value')}</span><span class="v mono">${ss.orderValue.toFixed(2)} ${T('ر.س','SAR')}</span></div>
+      <div class="kv"><span class="k">${T('الوقت المستحق','Entitled time')}</span><span class="v mono">${ss.entitledMin} ${T('دقيقة','min')}</span></div>`;
+    if(ss.started){
+      const st=new Date(ss.startTs), en=new Date(ss.endTs);
+      html+=`<div class="kv"><span class="k">${T('بدأ','Started')}</span><span class="v mono">${st.toTimeString().slice(0,5)}</span></div>
+             <div class="kv"><span class="k">${T('ينتهي','Ends')}</span><span class="v mono">${en.toTimeString().slice(0,5)}</span></div>`;
+    }
+    html+=`</div>`;
+
+    // actions
+    html+=`<div class="drawer-sec"><span class="st">${T('الإجراءات','Actions')}</span>`;
+    if(!ss.started){
+      html+=`<button class="btn btn-gold full" data-act="ready"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>${T('اعتماد: الطلب جاهز للتقديم','Approve: Ready for Serving')}</button>
+      <div class="hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg><span>${T('الاعتماد يبدأ المؤقت ويسجّل وقت البداية والنهاية.','Approval starts the timer and records start/end times.')}</span></div>`;
+    } else {
+      html+=`<div class="btn-row">
+        <button class="btn btn-ghost" data-act="extend"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 2M12 3a9 9 0 1 0 9 9"/></svg>${T('تمديد','Extend')}</button>
+        <button class="btn btn-ghost" data-act="transfer"><svg viewBox="0 0 24 24"><path d="M7 8l-4 4 4 4M3 12h13M17 4l4 4-4 4M21 8H10"/></svg>${T('نقل الجلسة','Transfer')}</button>
+      </div>
+      <button class="btn btn-danger full" data-act="left" style="margin-top:.6rem"><svg viewBox="0 0 24 24"><path d="M16 17l5-5-5-5M21 12H9M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7"/></svg>${T('العميل غادر','Customer left')}</button>`;
+    }
+    html+=`</div>`;
+    return html;
+  }
+
+  // ---- reserved seat ----
+  if(s.state==='reserved'||s.state==='awaiting'){
+    html+=`<div class="drawer-sec"><span class="st">${T('حجز','Reservation')}</span>
+      <div class="hint"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4"/></svg><span>${T('هذا المكان محجوز مسبقاً. عند وصول الضيف سجّل الحضور من شاشة الحجوزات، أو عيّن له الجلسة مباشرة.','Reserved in advance. Check the guest in from Reservations, or assign a session now.')}</span></div>
+      <button class="btn btn-gold full" data-act="assignFlow" style="margin-top:.8rem">${T('تعيين عميل وربط طلب','Assign customer & link order')}</button>
+      <button class="btn btn-ghost full" data-act="release" style="margin-top:.6rem">${T('إلغاء الحجز وإتاحة المكان','Cancel reservation & release')}</button>
+    </div>`;
+    return html;
+  }
+
+  // ---- cleaning ----
+  if(s.state==='cleaning'){
+    const waited=s.cleanSince?Math.floor((Date.now()-s.cleanSince)/60000):0;
+    html+=`<div class="drawer-sec"><span class="st">${T('تنظيف','Cleaning')}</span>
+      <div class="kv"><span class="k">${T('بانتظار التنظيف منذ','Waiting since')}</span><span class="v mono">${waited} ${T('دقيقة','min')}</span></div>
+      <button class="btn btn-avail full" data-act="clean" style="margin-top:.8rem"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>${T('تم التنظيف — إتاحة','Cleaned — release')}</button>
+    </div>`;
+    return html;
+  }
+
+  // ---- unavailable / out of service ----
+  if(s.state==='unavailable'||s.state==='outofservice'){
+    html+=`<div class="drawer-sec"><span class="st">${T('غير متاح','Unavailable')}</span>
+      <div class="hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg><span>${s.state==='outofservice'?T('هذا المكان خارج الخدمة (صيانة).','This spot is out of service (maintenance).'):T('هذا المكان معطّل مؤقتاً.','This spot is temporarily blocked.')}</span></div>
+      <button class="btn btn-avail full" data-act="reactivate" style="margin-top:.8rem">${T('إعادة تفعيل وإتاحة','Reactivate & make available')}</button>
+    </div>`;
+    return html;
+  }
+
+  // ---- available ----
+  html+=`<div class="drawer-sec"><span class="st">${T('مكان متاح','Available spot')}</span>
+    <div class="hint"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>${T('جاهز للتعيين. اربط عميلاً وطلب Foodics لبدء جلسة.','Ready to assign. Link a customer and Foodics order to open a session.')}</span></div>
+    <button class="btn btn-gold full" data-act="assignFlow" style="margin-top:.8rem"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>${T('تعيين عميل وربط طلب','Assign customer & link order')}</button>
+    <div class="btn-row" style="margin-top:.6rem">
+      <button class="btn btn-ghost" data-act="reserve">${T('حجز مسبق','Reserve')}</button>
+      <button class="btn btn-ghost" data-act="block">${T('تعطيل مؤقت','Block')}</button>
+    </div>
+  </div>`;
+  return html;
+}
+function wireDrawer(s){
+  document.getElementById('drawerBody').querySelectorAll('[data-act]').forEach(b=>{
+    b.addEventListener('click',()=>seatAction(s.id, b.dataset.act));
+  });
+}
+
+/* ---------- seat actions ---------- */
+function seatAction(id, act){
+  const s=seatById(id); if(!s)return;
+  switch(act){
+    case 'ready':{
+      const ss=s.session; if(!ss)return;
+      ss.started=true; ss.prepReady=true; ss.startTs=Date.now(); ss.endTs=Date.now()+ss.entitledMin*60000;
+      ss.flag5=false; ss.flagEnd=false;
+      s.state='occupied';
+      toast('good', T(`بدأ وقت ${id} — ${ss.entitledMin} دقيقة`,`${id} timer started — ${ss.entitledMin} min`));
+      logAudit(`اعتماد جاهزية الطلب #${ss.orderNo} وبدء وقت ${id}`,`Order #${ss.orderNo} ready — timer started on ${id}`);
+      openDrawer(id); renderAll(); break;
+    }
+    case 'left':{
+      const ss=s.session;
+      s.session=null; s.state='cleaning'; s.cleanSince=Date.now();
+      toast('info', T(`${id}: غادر العميل — أُرسل للتنظيف`,`${id}: customer left — sent to cleaning`));
+      logAudit(`مغادرة العميل من ${id} → تنظيف`,`Customer left ${id} → cleaning`);
+      closeDrawer(); renderAll(); break;
+    }
+    case 'clean': markCleaned(id); closeDrawer(); break;
+    case 'release':
+      s.state='available';
+      toast('info', T(`أُلغي حجز ${id} وأصبح متاحاً`,`${id} reservation cancelled — available`));
+      logAudit(`إلغاء حجز ${id}`,`Cancelled reservation ${id}`);
+      closeDrawer(); renderAll(); break;
+    case 'reactivate':
+      s.state='available';
+      toast('good', T(`${id} أُعيد تفعيله`,`${id} reactivated`));
+      logAudit(`إعادة تفعيل ${id}`,`Reactivated ${id}`);
+      closeDrawer(); renderAll(); break;
+    case 'reserve':
+      s.state='reserved';
+      toast('info', T(`${id} حُجز`,`${id} reserved`));
+      logAudit(`حجز ${id} يدوياً`,`Manually reserved ${id}`);
+      openDrawer(id); renderAll(); break;
+    case 'block':
+      s.state='unavailable';
+      toast('warn', T(`${id} عُطّل مؤقتاً`,`${id} temporarily blocked`));
+      logAudit(`تعطيل ${id}`,`Blocked ${id}`);
+      closeDrawer(); renderAll(); break;
+    case 'assignFlow': openAssignModal(id); break;
+    case 'extend': openExtendModal(id); break;
+    case 'transfer': openTransferModal(id); break;
+  }
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+const modalScrim=document.getElementById('modalScrim');
+const modalBox=document.getElementById('modalBox');
+function openModal(html){ modalBox.innerHTML=html; modalScrim.classList.add('open'); }
+function closeModal(){ modalScrim.classList.remove('open'); }
+modalScrim.addEventListener('click',e=>{ if(e.target===modalScrim)closeModal(); });
+
+/* --- assign flow: pick customer + link order --- */
+let assignCtx=null;
+function openAssignModal(seatId){
+  const s=seatById(seatId);
+  assignCtx={seatId, code:null, order:null};
+  openModal(`
+    <h3>${T('تعيين جلسة','Open a session')} · ${seatId}</h3>
+    <p class="msub">${T('اربط العميل ثم طلب Foodics. لن يبدأ الوقت الآن.','Link the customer then the Foodics order. The timer will not start yet.')}</p>
+    <div class="field"><label>${T('رقم العضوية','Membership no.')}</label>
+      <input type="text" id="asgMem" placeholder="STR-448120" value="">
+      <button class="btn btn-ghost sm" id="asgFetch" style="margin-top:.5rem">${T('جلب العميل','Fetch customer')}</button>
+    </div>
+    <div id="asgCust"></div>
+    <div class="divider"></div>
+    <div class="field"><label>${T('رقم طلب Foodics','Foodics order no.')}</label>
+      <input type="text" id="asgOrder" placeholder="10485" inputmode="numeric">
+      <button class="btn btn-ghost sm" id="asgOrderFetch" style="margin-top:.5rem">${T('جلب الطلب','Fetch order')}</button>
+    </div>
+    <div id="asgOrderCard"></div>
+    <div class="btn-row" style="margin-top:1.1rem">
+      <button class="btn btn-ghost" id="asgCancel">${T('إلغاء','Cancel')}</button>
+      <button class="btn btn-gold" id="asgConfirm" disabled>${T('ربط الطلب بالمقعد','Link order to seat')}</button>
+    </div>
+  `);
+  document.getElementById('asgFetch').addEventListener('click',()=>{
+    const code=document.getElementById('asgMem').value.trim().toUpperCase()||CUST_CODES[0];
+    const c=CUSTOMERS[code];
+    if(!c){ document.getElementById('asgCust').innerHTML=`<div class="hint" style="color:var(--st-expired)"><span>${T('عضوية غير موجودة','Membership not found')}</span></div>`; return; }
+    assignCtx.code=code;
+    document.getElementById('asgCust').innerHTML=`<div class="order-card"><div class="oh"><b>${c.name}</b><span class="pill-info" style="margin-inline-start:auto">${c.tier}</span></div>
+      <div class="kv"><span class="k">${T('العضوية','Membership')}</span><span class="v mono">${code}</span></div>
+      <div class="kv"><span class="k">${T('الزيارات','Visits')}</span><span class="v mono">${c.visits}</span></div></div>`;
+    checkAssignReady();
+  });
+  document.getElementById('asgOrderFetch').addEventListener('click',()=>{
+    const no=document.getElementById('asgOrder').value.trim()||'10485';
+    const o=mockFoodicsLookup(no); assignCtx.order=o;
+    renderOrderCard('asgOrderCard',o); checkAssignReady();
+  });
+  document.getElementById('asgCancel').addEventListener('click',closeModal);
+  document.getElementById('asgConfirm').addEventListener('click',confirmAssign);
+}
+function renderOrderCard(elId,o){
+  const statusTxt = o.status==='ready'?T('جاهز','Ready'):T('قيد التحضير','Preparing');
+  document.getElementById(elId).innerHTML=`<div class="order-card">
+    <div class="oh"><span class="foodics">FOODICS</span><b>#${o.no}</b><span class="pill-info" style="margin-inline-start:auto">${statusTxt}</span></div>
+    <div class="kv"><span class="k">${T('الفرع','Branch')}</span><span class="v">${o.branch}</span></div>
+    <div class="kv"><span class="k">${T('عدد الأصناف','Items')}</span><span class="v mono">${o.items}</span></div>
+    <div class="kv"><span class="k">${T('القيمة المؤهِّلة','Qualifying value')}</span><span class="v mono">${o.value.toFixed(2)} ${T('ر.س','SAR')}</span></div>
+  </div>`;
+}
+function checkAssignReady(){
+  const btn=document.getElementById('asgConfirm');
+  if(btn) btn.disabled = !(assignCtx.code && assignCtx.order);
+}
+function confirmAssign(){
+  const s=seatById(assignCtx.seatId);
+  s.session=makeSession(s, assignCtx.code, assignCtx.order.no, false);
+  s.state='occupied';
+  const entitled=s.session.entitledMin;
+  closeModal(); closeDrawer();
+  toast('info', T(`رُبط الطلب #${assignCtx.order.no} بمقعد ${s.id} — الوقت لم يبدأ (${entitled}د مستحقة)`,
+                  `Order #${assignCtx.order.no} linked to ${s.id} — timer not started (${entitled}m entitled)`));
+  logAudit(`ربط طلب #${assignCtx.order.no} بـ ${s.id} — بانتظار الجاهزية`,`Linked order #${assignCtx.order.no} to ${s.id} — awaiting ready`);
+  renderAll(); openDrawer(s.id);
+}
+
+/* --- extend modal --- */
+function openExtendModal(seatId){
+  const s=seatById(seatId); const ss=s.session; const r=RULES[s.type];
+  openModal(`
+    <h3>${T('تمديد الجلسة','Extend session')} · ${seatId}</h3>
+    <p class="msub">${T('التمديد إما بطلب إضافي من Foodics (يعيد حساب الوقت) أو بشراء وقت إضافي.','Extend by a new Foodics order (recomputes time) or buy extra time.')}</p>
+    <div class="opt-row" id="extOpts">
+      <label class="opt sel" data-mode="buy">
+        <span class="oradio"></span>
+        <span class="otx"><b>${T('شراء وقت إضافي','Buy extra time')}</b><small>${T('يضيف','adds')} ${r.extMin} ${T('دقيقة','min')}</small></span>
+        <span class="oval">${r.extPrice} ${T('ر.س','SAR')}</span>
+      </label>
+      <label class="opt" data-mode="order">
+        <span class="oradio"></span>
+        <span class="otx"><b>${T('طلب إضافي من Foodics','Additional Foodics order')}</b><small>${T('يُعاد حساب الوقت حسب القيمة','recomputes time by value')}</small></span>
+        <span class="oval" id="extOrderVal">—</span>
+      </label>
+    </div>
+    <div id="extOrderField" style="display:none">
+      <div class="field"><label>${T('رقم الطلب الإضافي','Additional order no.')}</label>
+        <input type="text" id="extOrder" placeholder="10490" inputmode="numeric">
+        <button class="btn btn-ghost sm" id="extFetch" style="margin-top:.5rem">${T('جلب الطلب','Fetch order')}</button>
+      </div>
+      <div id="extOrderCard"></div>
+    </div>
+    <div class="btn-row" style="margin-top:1.1rem">
+      <button class="btn btn-ghost" id="extCancel">${T('إلغاء','Cancel')}</button>
+      <button class="btn btn-gold" id="extConfirm">${T('تأكيد التمديد','Confirm extension')}</button>
+    </div>
+  `);
+  let mode='buy', extOrder=null;
+  const opts=modalBox.querySelectorAll('#extOpts .opt');
+  opts.forEach(o=>o.addEventListener('click',()=>{
+    opts.forEach(x=>x.classList.remove('sel')); o.classList.add('sel'); mode=o.dataset.mode;
+    document.getElementById('extOrderField').style.display = mode==='order'?'block':'none';
+  }));
+  document.getElementById('extFetch').addEventListener('click',()=>{
+    const no=document.getElementById('extOrder').value.trim()||'10490';
+    extOrder=mockFoodicsLookup(no); renderOrderCard('extOrderCard',extOrder);
+    const add=computeEntitledMin(s.type, extOrder.value);
+    document.getElementById('extOrderVal').textContent=`+${add}${T('د','m')}`;
+  });
+  document.getElementById('extCancel').addEventListener('click',closeModal);
+  document.getElementById('extConfirm').addEventListener('click',()=>{
+    if(mode==='buy'){
+      ss.endTs += r.extMin*60000; ss.entitledMin += r.extMin; ss.flag5=false; ss.flagEnd=false;
+      if(s.state==='expired'||s.state==='expiring')s.state='occupied';
+      toast('good', T(`${seatId}: +${r.extMin} دقيقة (وقت مشترى)`,`${seatId}: +${r.extMin} min (purchased)`));
+      logAudit(`تمديد ${seatId} +${r.extMin}د بشراء وقت`,`Extended ${seatId} +${r.extMin}m purchased`);
+    } else {
+      if(!extOrder){ toast('warn',T('اجلب الطلب الإضافي أولاً','Fetch the additional order first')); return; }
+      const add=computeEntitledMin(s.type, extOrder.value);
+      ss.endTs += add*60000; ss.entitledMin += add; ss.orderValue += extOrder.value; ss.flag5=false; ss.flagEnd=false;
+      if(s.state==='expired'||s.state==='expiring')s.state='occupied';
+      toast('good', T(`${seatId}: أُضيف طلب #${extOrder.no} → +${add} دقيقة`,`${seatId}: order #${extOrder.no} added → +${add} min`));
+      logAudit(`تمديد ${seatId} بطلب #${extOrder.no} +${add}د`,`Extended ${seatId} via order #${extOrder.no} +${add}m`);
+    }
+    closeModal(); renderAll(); openDrawer(seatId);
+  });
+}
+
+/* --- transfer modal --- */
+function openTransferModal(seatId){
+  const s=seatById(seatId);
+  const targets=SEATS.filter(t=>t.state==='available' && t.id!==seatId);
+  openModal(`
+    <h3>${T('نقل الجلسة','Transfer session')} · ${seatId}</h3>
+    <p class="msub">${T('اختر مقعداً متاحاً. يُنقل الوقت المتبقّي كما هو.','Pick an available seat. Remaining time carries over unchanged.')}</p>
+    <div class="seatpick-grid" id="trGrid">
+      ${targets.map(t=>`<div class="sp" data-t="${t.id}">${t.id}<div style="font-size:.62rem;color:var(--brown-soft);font-weight:400">${TYPE_META[t.type][LANG?'en':'ar']}</div></div>`).join('') || `<div class="empty-note" style="grid-column:1/-1">${T('لا مقاعد متاحة للنقل','No available seats')}</div>`}
+    </div>
+    <div class="hint"><svg viewBox="0 0 24 24"><path d="M7 8l-4 4 4 4M3 12h13"/></svg><span id="trNote">${T('لم يُختر مقعد بعد','No target selected yet')}</span></div>
+    <div class="btn-row" style="margin-top:1.1rem">
+      <button class="btn btn-ghost" id="trCancel">${T('إلغاء','Cancel')}</button>
+      <button class="btn btn-gold" id="trConfirm" disabled>${T('نقل','Transfer')}</button>
+    </div>
+  `);
+  let target=null;
+  modalBox.querySelectorAll('#trGrid .sp').forEach(sp=>sp.addEventListener('click',()=>{
+    modalBox.querySelectorAll('#trGrid .sp').forEach(x=>x.classList.remove('sel')); sp.classList.add('sel');
+    target=sp.dataset.t; document.getElementById('trConfirm').disabled=false;
+    document.getElementById('trNote').textContent=T(`النقل إلى ${target}`,`Transfer to ${target}`);
+  }));
+  document.getElementById('trCancel').addEventListener('click',closeModal);
+  document.getElementById('trConfirm').addEventListener('click',()=>{
+    if(!target)return;
+    const to=seatById(target);
+    to.session=s.session; to.state=s.state;
+    // recompute entitled if type differs? keep remaining time, adjust endTs preserved
+    s.session=null; s.state='cleaning'; s.cleanSince=Date.now();
+    toast('good', T(`نُقلت الجلسة ${seatId} → ${target} (الوقت المتبقّي محفوظ)`,`Session moved ${seatId} → ${target} (remaining time kept)`));
+    logAudit(`نقل جلسة ${seatId} → ${target}`,`Transferred session ${seatId} → ${target}`);
+    closeModal(); renderAll(); openDrawer(target);
+  });
+}
+
+/* =========================================================
+   QR / CUSTOMER PROFILE
+   ========================================================= */
+function showCustomer(code){
+  const c=CUSTOMERS[code];
+  const card=document.getElementById('custCard');
+  if(!c){ toast('warn',T('عضوية غير موجودة','Membership not found')); return; }
+  logAudit(`مسح عضوية ${code} — ${c.name}`,`Scanned membership ${code} — ${c.name}`);
+  card.innerHTML=`
+    <div class="cust-head">
+      <div class="cav">${c.initial}</div>
+      <div class="cinfo"><h3>${c.name}</h3><div class="cmeta">${code}</div></div>
+      <span class="tier-badge">${c.tier}</span>
+    </div>
+    <div class="cust-stats">
+      <div class="cs"><b>${c.points.toLocaleString('en')}</b><small>${T('نقاط','Points')}</small></div>
+      <div class="cs"><b>${c.visits}</b><small>${T('زيارة','Visits')}</small></div>
+      <div class="cs"><b>${c.tier}</b><small>${T('المستوى','Tier')}</small></div>
+      <div class="cs"><b>${(c.visits*0.9|0)}</b><small>${T('جلسة','Sessions')}</small></div>
+    </div>
+    <div class="cust-body">
+      <div class="kv"><span class="k">${T('آخر طلب','Last order')}</span><span class="v">${c.last}</span></div>
+      <div class="kv"><span class="k">${T('الحالة','Status')}</span><span class="v" style="color:var(--st-avail)">${T('عضو فعّال','Active member')}</span></div>
+      <button class="btn btn-gold full" id="assignFromCust" style="margin-top:1rem"><svg viewBox="0 0 24 24"><path d="M5 11V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/><path d="M4 11h16v5H4z"/></svg>${T('تعيين مقعد لهذا العميل','Assign a seat to this customer')}</button>
+      <div class="hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg><span>${T('التعيين يفتح خريطة المقاعد لاختيار مكان متاح.','Assigning opens the seat map to pick an available spot.')}</span></div>
+    </div>`;
+  card.querySelector('#assignFromCust').addEventListener('click',()=>{
+    pendingCustomer=code;
+    switchTab('seats');
+    toast('info', T('اختر مقعداً متاحاً من الخريطة لهذا العميل','Pick an available seat from the map'));
+  });
+}
+let pendingCustomer=null;
+
+/* =========================================================
+   TABS
+   ========================================================= */
+const PAGE_TITLES = {
+  home:["فرع الربوة","Al Rabwah branch"],
+};
+function switchTab(tab){
+  document.querySelectorAll('.navlink').forEach(n=>n.classList.toggle('active',n.dataset.tab===tab));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('current',p.id==='page-'+tab));
+  document.getElementById('content').scrollTop=0;
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('scrim').classList.remove('open');
+}
+document.getElementById('sbNav').addEventListener('click',e=>{
+  const link=e.target.closest('.navlink'); if(!link)return; switchTab(link.dataset.tab);
+});
+
+/* =========================================================
+   TIMERS + LIVE TICK
+   ========================================================= */
+function tickClock(){
+  const d=new Date();
+  document.getElementById('clockT').textContent=d.toTimeString().slice(0,8);
+  const days=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const daysEn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dn = LANG?daysEn[d.getDay()]:days[d.getDay()];
+  document.getElementById('clockD').textContent=`${dn} · ${d.toLocaleDateString('en-GB')}`;
+}
+function tickSessions(){
+  let changed=false;
+  SEATS.forEach(s=>{
+    const ss=s.session; if(!ss||!ss.started)return;
+    const r=remainingMs(ss); const m=r/60000;
+    // toast thresholds
+    if(!ss.flag5 && r<=5*60000 && r>0){ ss.flag5=true; toast('warn', T(`${s.id}: تبقّت 5 دقائق`,`${s.id}: 5 minutes left`)); }
+    if(!ss.flagEnd && r<=0){ ss.flagEnd=true; toast('danger', T(`${s.id}: انتهى الوقت المستحق`,`${s.id}: time expired`)); logAudit(`انتهاء وقت ${s.id}`,`Time expired ${s.id}`); }
+    // state transitions
+    let newState = s.state;
+    if(r<=0) newState='expired';
+    else if(m<=15) newState='expiring';
+    else newState='occupied';
+    if(newState!==s.state && (s.state==='occupied'||s.state==='expiring'||s.state==='expired')){ s.state=newState; changed=true; }
+    // live update drawer countdown if open
+    if(selectedSeatId===s.id){
+      const cdEl=document.querySelector(`[data-live-cd="${s.id}"]`);
+      if(cdEl){ cdEl.textContent=fmtDur(r); cdEl.className=`cd-big mono ${r<0?'over':m<=5?'t5':m<=10?'t10':m<=15?'t15':''}`; }
+      const barEl=document.querySelector(`[data-live-bar="${s.id}"]`);
+      if(barEl){ const pct=Math.max(0,Math.min(100,(r/(ss.entitledMin*60000))*100)); barEl.style.width=pct+'%'; if(r<0)barEl.style.background='var(--st-expired)'; }
+    }
+  });
+  // lightweight surfaces every tick
+  renderExpiring(); renderSessionsTimers();
+  if(changed){ renderStats(); renderSeatMaps(); renderOccupancy(); updateSeatsSummary(); renderBadges();
+    if(selectedSeatId){ const chip=document.getElementById('drawerChip'); const s=seatById(selectedSeatId); if(s){chip.className='chip '+stCls(s.state); chip.querySelector('span').textContent=stName(s.state);} }
+  }
+  // update seat-map timer overlays cheaply
+  updateMapTimers();
+}
+function renderSessionsTimers(){
+  // update only timer cells in the sessions table for smoothness
+  if(!document.getElementById('page-sessions').classList.contains('current'))return;
+  renderSessions();
+}
+function updateMapTimers(){
+  SEATS.forEach(s=>{
+    if(s.session&&s.session.started){
+      // re-render maps is heavy; only refresh overlay text nodes
+    }
+  });
+}
+
+/* =========================================================
+   TOASTS
+   ========================================================= */
+function toast(kind,msg){
+  const wrap=document.getElementById('toastWrap');
+  const el=document.createElement('div');
+  el.className='toast '+kind;
+  el.innerHTML=`<span class="tdot"></span><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),350); }, 4200);
+}
+
+/* =========================================================
+   WIRING
+   ========================================================= */
+document.getElementById('langBtn').addEventListener('click',()=>{ LANG=LANG?0:1; applyLang(); });
+document.getElementById('drawerClose').addEventListener('click',closeDrawer);
+document.getElementById('scrim').addEventListener('click',()=>{
+  document.getElementById('sidebar').classList.remove('open');
+  closeDrawer();
+});
+document.getElementById('menuToggle').addEventListener('click',()=>{
+  const sb=document.getElementById('sidebar');
+  const opening=!sb.classList.contains('open');
+  sb.classList.toggle('open');
+  document.getElementById('scrim').classList.toggle('open',opening);
+});
+document.getElementById('simScanBtn').addEventListener('click',()=>{
+  const code=CUST_CODES[Math.floor(Math.random()*CUST_CODES.length)];
+  document.getElementById('memInput').value=code;
+  showCustomer(code);
+  toast('info', T('تم مسح كود عضوية','Membership code scanned'));
+});
+document.getElementById('lookupBtn').addEventListener('click',()=>{
+  const code=document.getElementById('memInput').value.trim().toUpperCase();
+  if(!code){ toast('warn',T('أدخل رقم عضوية','Enter a membership number')); return; }
+  showCustomer(code);
+});
+document.getElementById('memInput').addEventListener('keydown',e=>{ if(e.key==='Enter')document.getElementById('lookupBtn').click(); });
+document.getElementById('resvSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  document.querySelectorAll('#resvSeg button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  resvFilter=b.dataset.f; renderReservations();
+});
+document.getElementById('branchSelect').addEventListener('change',e=>{
+  const names={rbw:['فرع الربوة','Al Rabwah branch'],ktb:['فرع الكتيبة','Al Katiba branch'],ula:['فرع العليا','Al Olaya branch']};
+  const n=names[e.target.value]; document.getElementById('tbBranch').textContent=n[LANG];
+  toast('info', T('تم تبديل الفرع (بيانات عرض)','Branch switched (demo data)'));
+});
+// seat map click delegation
+['seatmapHome','seatmapFull'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    const g=e.target.closest('.seat'); if(!g)return;
+    const seatId=g.dataset.id;
+    if(pendingCustomer){
+      const s=seatById(seatId);
+      if(s.state!=='available'&&s.state!=='reserved'){ toast('warn',T('اختر مقعداً متاحاً','Pick an available seat')); return; }
+      const code=pendingCustomer; pendingCustomer=null;
+      openAssignPrefilled(seatId, code);
+      return;
+    }
+    openDrawer(seatId);
+  });
+  document.getElementById(id).addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key===' ')){ const g=e.target.closest('.seat'); if(g){e.preventDefault();openDrawer(g.dataset.id);} }
+  });
+});
+function openAssignPrefilled(seatId, code){
+  openAssignModal(seatId);
+  document.getElementById('asgMem').value=code;
+  document.getElementById('asgFetch').click();
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModal(); closeDrawer(); } });
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+seedSessions();
+logAudit('بدء وردية التشغيل المسائية','Evening ops shift started');
+applyLang();       // triggers renderAll
+tickClock();
+setInterval(tickClock,1000);
+setInterval(tickSessions,1000);
+// animate occupancy ring once mounted
+requestAnimationFrame(renderOccupancy);
+</script>
+</body>
+</html>

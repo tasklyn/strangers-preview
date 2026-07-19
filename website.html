@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strangers Company | شركة سترينجرز</title>
+<meta name="description" content="منظومة ضيافة سعودية متكاملة منذ 2017: قهوة، مخبز، حلول أعمال، كاترينج، ولوجستك.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#FAF7F2;
+  --surface:#EFE6D8;
+  --surface-2:#F4EDE1;
+  --ink:#141110;
+  --ink-soft:#3A322B;
+  --brown:#4A3322;
+  --brown-soft:#6B4F38;
+  --gold:#B8955A;
+  --gold-deep:#9A7A45;
+  --gold-faint:rgba(184,149,90,.16);
+  --line:rgba(74,51,34,.14);
+  --line-dark:rgba(250,247,242,.14);
+  --dark:#141110;
+  --dark-2:#1C1714;
+  --font-ar:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  --font-latin:"Fraunces",serif;
+  --font-mono:"IBM Plex Mono",monospace;
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --radius:18px;
+  --radius-lg:26px;
+  --shadow-warm:0 24px 60px -28px rgba(74,51,34,.35);
+  --shadow-gold:0 18px 44px -20px rgba(184,149,90,.5);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{overflow-x:clip}
+body{
+  font-family:var(--font-ar);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.75;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+::selection{background:var(--gold);color:#fff}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:1rem;color:var(--ink)}
+
+.latin{font-family:var(--font-latin)}
+.mono{font-family:var(--font-mono)}
+html[lang="en"] body{font-family:var(--font-latin)}
+html[lang="en"] .h-display,html[lang="en"] h1,html[lang="en"] h2,html[lang="en"] h3{font-family:var(--font-latin);letter-spacing:-.01em}
+html[lang="en"] .btn, html[lang="en"] nav, html[lang="en"] input, html[lang="en"] select, html[lang="en"] textarea, html[lang="en"] .chip{font-family:"IBM Plex Sans Arabic",system-ui,sans-serif}
+
+/* ============ SCROLL PROGRESS (CSS scroll-driven, no JS) ============ */
+.scroll-progress{
+  position:fixed;inset-inline-start:0;top:0;height:3px;width:100%;
+  background:linear-gradient(90deg,var(--gold),var(--gold-deep));
+  transform-origin:0 50%;transform:scaleX(0);
+  z-index:200;pointer-events:none;
+}
+html[dir="rtl"] .scroll-progress{transform-origin:100% 50%}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress{animation:progressGrow linear both;animation-timeline:scroll(root)}
+  @keyframes progressGrow{to{transform:scaleX(1)}}
+}
+
+/* ============ HEADER ============ */
+.site-header{
+  position:fixed;top:0;inset-inline:0;z-index:100;
+  transition:background .45s var(--ease-out), box-shadow .45s var(--ease-out), border-color .45s;
+  border-bottom:1px solid transparent;
+}
+.site-header.scrolled{
+  background:rgba(250,247,242,.82);
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+  backdrop-filter:blur(16px) saturate(1.4);
+  border-bottom-color:var(--line);
+  box-shadow:0 10px 40px -24px rgba(20,17,16,.25);
+}
+.header-inner{
+  max-width:1360px;margin-inline:auto;
+  display:flex;align-items:center;gap:1.4rem;
+  padding:.7rem 1.4rem;min-height:68px;
+}
+.brand-lockup{display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.brand-lockup svg{width:46px;height:46px}
+.brand-name{font-family:var(--font-latin);font-weight:500;font-size:1.15rem;letter-spacing:.02em;color:var(--ink)}
+.brand-name small{display:block;font-family:var(--font-ar);font-size:.62rem;font-weight:500;color:var(--brown-soft);letter-spacing:.1em}
+.site-header.on-dark:not(.scrolled) .brand-name{color:var(--bg)}
+.site-header.on-dark:not(.scrolled) .brand-name small{color:rgba(250,247,242,.6)}
+
+.main-nav{display:flex;align-items:center;gap:.15rem;margin-inline-start:auto;flex-wrap:nowrap}
+.main-nav a{
+  font-size:.83rem;font-weight:500;color:var(--ink-soft);
+  padding:.45rem .62rem;border-radius:999px;white-space:nowrap;
+  transition:color .25s,background .25s;
+}
+.main-nav a:hover{color:var(--ink);background:var(--gold-faint)}
+.main-nav a.active{color:var(--gold-deep);background:var(--gold-faint)}
+.site-header.on-dark:not(.scrolled) .main-nav a{color:rgba(250,247,242,.72)}
+.site-header.on-dark:not(.scrolled) .main-nav a:hover,
+.site-header.on-dark:not(.scrolled) .main-nav a.active{color:var(--gold);background:rgba(184,149,90,.14)}
+
+.header-actions{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
+.lang-toggle{
+  font-family:var(--font-mono);font-size:.78rem;font-weight:500;
+  border:1px solid var(--line);border-radius:999px;
+  padding:.42rem .95rem;color:var(--ink);
+  transition:all .3s var(--ease-out);min-height:36px;
+}
+.lang-toggle:hover{border-color:var(--gold);color:var(--gold-deep);transform:translateY(-1px)}
+.site-header.on-dark:not(.scrolled) .lang-toggle{color:var(--bg);border-color:var(--line-dark)}
+.menu-btn{display:none;flex-direction:column;gap:5px;padding:.7rem .5rem;min-width:44px;min-height:44px;justify-content:center;align-items:center}
+.menu-btn span{display:block;width:22px;height:1.8px;background:var(--ink);transition:transform .35s var(--ease-spring),opacity .25s}
+.site-header.on-dark:not(.scrolled) .menu-btn span{background:var(--bg)}
+.menu-btn.open span:nth-child(1){transform:translateY(6.8px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0}
+.menu-btn.open span:nth-child(3){transform:translateY(-6.8px) rotate(-45deg)}
+
+/* mobile sheet */
+.mobile-sheet{
+  position:fixed;inset:0;z-index:99;background:rgba(20,17,16,.4);
+  opacity:0;pointer-events:none;transition:opacity .35s;
+}
+.mobile-sheet.open{opacity:1;pointer-events:auto}
+.mobile-sheet .sheet-panel{
+  position:absolute;top:0;inset-inline:0;
+  background:var(--bg);border-bottom:1px solid var(--line);
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  padding:5.4rem 1.6rem 2rem;
+  transform:translateY(-100%);transition:transform .5s var(--ease-out);
+  max-height:92dvh;overflow-y:auto;
+}
+.mobile-sheet.open .sheet-panel{transform:translateY(0)}
+.sheet-panel a{
+  display:block;padding:.8rem .4rem;font-size:1.05rem;font-weight:600;
+  border-bottom:1px solid var(--line);min-height:44px;
+}
+.sheet-panel a.active{color:var(--gold-deep)}
+.sheet-panel a:last-child{border-bottom:none}
+
+/* ============ SPA PAGES ============ */
+.page{display:none}
+.page.current{display:block;animation:pageIn .6s var(--ease-out)}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ============ REVEALS ============ */
+.rv{opacity:0;transform:translateY(34px);transition:opacity .8s var(--ease-out),transform .8s var(--ease-out);transition-delay:var(--d,0ms)}
+.rv.in{opacity:1;transform:none}
+
+/* ============ GENERIC LAYOUT ============ */
+.wrap{max-width:1280px;margin-inline:auto;padding-inline:clamp(1.2rem,4vw,3rem)}
+.section{padding-block:clamp(4.4rem,9vw,7.5rem)}
+.section-head{max-width:640px;margin-bottom:clamp(2.2rem,5vw,3.6rem)}
+.eyebrow{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.22em;
+  color:var(--gold-deep);text-transform:uppercase;display:block;margin-bottom:1rem;
+}
+h1,h2,h3{line-height:1.3;font-weight:700;color:var(--ink)}
+h2{font-size:clamp(1.7rem,3.6vw,2.6rem)}
+h3{font-size:clamp(1.15rem,2vw,1.4rem)}
+.lead{color:var(--brown-soft);font-size:clamp(1rem,1.4vw,1.12rem);max-width:56ch;margin-top:1rem}
+.gold-rule{width:56px;height:2px;background:var(--gold);border:none;margin-block:1.2rem;border-radius:2px}
+
+/* buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.55rem;
+  font-weight:600;font-size:.95rem;border-radius:999px;
+  padding:.85rem 1.9rem;min-height:48px;white-space:nowrap;
+  transition:transform .35s var(--ease-spring),box-shadow .35s,background .3s,color .3s,border-color .3s;
+}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:var(--gold);color:var(--dark);box-shadow:var(--shadow-gold)}
+.btn-gold:hover{transform:translateY(-3px);background:var(--gold-deep);color:var(--bg)}
+.btn-ghost{border:1.5px solid var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-deep);transform:translateY(-3px)}
+.btn-ghost.on-dark{border-color:var(--line-dark);color:var(--bg)}
+.btn-ghost.on-dark:hover{border-color:var(--gold);color:var(--gold)}
+.btn-dark{background:var(--dark);color:var(--bg)}
+.btn-dark:hover{transform:translateY(-3px);box-shadow:var(--shadow-warm)}
+.btn .arr{display:inline-block;transition:transform .35s var(--ease-spring);font-family:var(--font-mono)}
+.btn:hover .arr{transform:translateX(-5px)}
+html[dir="ltr"] .btn:hover .arr{transform:translateX(5px)}
+
+/* dark section base */
+.dark-section{background:linear-gradient(180deg,var(--dark) 0%,var(--dark-2) 100%);color:var(--bg);position:relative;overflow:clip}
+.dark-section h1,.dark-section h2,.dark-section h3{color:var(--bg)}
+.dark-section .lead{color:rgba(250,247,242,.62)}
+.marble-section{
+  background:
+    radial-gradient(1100px 500px at 15% 0%,rgba(184,149,90,.07),transparent 60%),
+    radial-gradient(900px 600px at 90% 100%,rgba(74,51,34,.05),transparent 55%),
+    linear-gradient(160deg,#F4EDE1 0%, #EFE6D8 48%, #F6F0E6 100%);
+  position:relative;
+}
+.marble-section::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:
+    radial-gradient(2px 60px at 22% 30%,rgba(74,51,34,.05),transparent),
+    radial-gradient(2px 90px at 68% 60%,rgba(74,51,34,.04),transparent),
+    radial-gradient(1.5px 70px at 84% 20%,rgba(74,51,34,.05),transparent);
+}
+
+/* gold dust in dark sections */
+.dust{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.dust i{
+  position:absolute;width:3px;height:3px;border-radius:50%;
+  background:var(--gold);opacity:.22;
+  animation:dustFloat var(--dur,11s) ease-in-out infinite;
+  animation-delay:var(--dl,0s);
+}
+@keyframes dustFloat{
+  0%,100%{transform:translate(0,0);opacity:.1}
+  50%{transform:translate(var(--dx,10px),var(--dy,-26px));opacity:.4}
+}
+
+/* ============ HERO ============ */
+.hero{
+  min-height:100dvh;display:flex;flex-direction:column;justify-content:center;
+  position:relative;overflow:clip;padding-top:80px;
+}
+.hero-grid{
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:clamp(2rem,5vw,4rem);align-items:center;
+}
+.hero-copy .eyebrow{color:var(--gold)}
+.hero-title{
+  font-size:clamp(2.1rem,5.4vw,4rem);line-height:1.25;font-weight:700;color:var(--bg);
+}
+.hero-title .latin{
+  display:block;font-weight:400;font-size:clamp(1rem,1.8vw,1.35rem);
+  color:var(--gold);letter-spacing:.04em;margin-top:.8rem;font-style:italic;
+  line-height:1.4;padding-bottom:.2em;
+}
+.hero-sub{color:rgba(250,247,242,.64);max-width:44ch;margin-top:1.4rem;font-size:clamp(.98rem,1.3vw,1.1rem)}
+.hero-ctas{display:flex;gap:.9rem;margin-top:2.2rem;flex-wrap:wrap}
+.hero-copy>*{opacity:0;transform:translateY(26px);animation:heroRise .9s var(--ease-out) forwards}
+.hero-copy>*:nth-child(1){animation-delay:.15s}
+.hero-copy>*:nth-child(2){animation-delay:.3s}
+.hero-copy>*:nth-child(3){animation-delay:.48s}
+.hero-copy>*:nth-child(4){animation-delay:.64s}
+@keyframes heroRise{to{opacity:1;transform:none}}
+
+/* ---- 3D coffee cup scene ---- */
+.cup-stage{
+  position:relative;height:clamp(340px,44vw,480px);
+  display:flex;align-items:center;justify-content:center;
+  perspective:1100px;
+}
+.cup-scene{
+  position:relative;width:220px;height:230px;
+  transform-style:preserve-3d;
+  animation:cupSpin 22s linear infinite;
+}
+@keyframes cupSpin{from{transform:rotateX(-12deg) rotateY(0)}to{transform:rotateX(-12deg) rotateY(360deg)}}
+.cup-body{position:absolute;inset-inline-start:50%;top:40px;transform-style:preserve-3d}
+.cup-slat{
+  position:absolute;width:22px;height:150px;inset-inline-start:-11px;
+  background:linear-gradient(180deg,#F6F0E6 0%,#EFE6D8 55%,#DCCDB4 100%);
+  transform:rotateY(var(--a)) translateZ(78px);
+  backface-visibility:hidden;
+}
+.cup-top{
+  position:absolute;width:164px;height:164px;inset-inline-start:-82px;top:-82px;
+  border-radius:50%;
+  background:radial-gradient(circle at 42% 38%,#6B4A2E 0%,#3E2A18 58%,#2A1B0E 100%);
+  transform:rotateX(90deg) translateZ(-40px);
+  box-shadow:inset 0 0 24px rgba(0,0,0,.5);
+}
+.cup-top::after{
+  content:"";position:absolute;inset:14px;border-radius:50%;
+  background:radial-gradient(circle at 55% 45%,rgba(184,149,90,.35),transparent 55%);
+}
+.cup-rim{
+  position:absolute;width:168px;height:168px;inset-inline-start:-84px;top:-84px;
+  border-radius:50%;border:5px solid #F6F0E6;
+  transform:rotateX(90deg) translateZ(-38px);
+}
+.cup-saucer{
+  position:absolute;width:250px;height:250px;inset-inline-start:-125px;top:-125px;
+  border-radius:50%;
+  background:radial-gradient(circle,#EFE6D8 0%,#E4D6BF 55%,#D3C1A2 78%,transparent 79%);
+  transform:rotateX(90deg) translateZ(-192px);
+  box-shadow:0 0 40px rgba(20,17,16,.35);
+}
+.cup-handle{
+  position:absolute;width:64px;height:88px;top:66px;inset-inline-start:70px;
+  border:14px solid #EFE6D8;border-radius:50%;
+  border-inline-start-color:transparent;
+  transform:rotateY(90deg) translateZ(0px);
+}
+.steam{position:absolute;top:-46px;inset-inline-start:50%;transform:translateX(-50%);width:90px;height:110px;pointer-events:none}
+.steam path{
+  fill:none;stroke:rgba(250,247,242,.5);stroke-width:2.4;stroke-linecap:round;
+  stroke-dasharray:60 100;
+  animation:steamFlow 4.5s ease-in-out infinite;
+  animation-delay:var(--sd,0s);
+  opacity:0;
+}
+@keyframes steamFlow{
+  0%{stroke-dashoffset:160;opacity:0;transform:translateY(8px)}
+  30%{opacity:.85}
+  100%{stroke-dashoffset:0;opacity:0;transform:translateY(-16px)}
+}
+.bean{
+  position:absolute;width:26px;height:34px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;
+  background:radial-gradient(circle at 35% 30%,#6B4A2E,#3A2716 70%);
+  animation:beanFloat var(--bdur,7s) ease-in-out infinite;animation-delay:var(--bdl,0s);
+  opacity:.85;
+}
+.bean::after{
+  content:"";position:absolute;inset-inline-start:46%;top:12%;bottom:12%;width:2.5px;
+  background:rgba(20,17,16,.55);border-radius:3px;transform:rotate(6deg);
+}
+@keyframes beanFloat{
+  0%,100%{transform:translateY(0) rotate(var(--br,-14deg))}
+  50%{transform:translateY(-22px) rotate(calc(var(--br,-14deg) + 14deg))}
+}
+.hero-photo-glow{
+  position:absolute;inset:0;z-index:-1;
+  background:
+    radial-gradient(700px 420px at 72% 52%,rgba(184,149,90,.14),transparent 65%),
+    radial-gradient(500px 300px at 20% 85%,rgba(74,51,34,.35),transparent 70%);
+}
+.hero-img-strip{
+  position:absolute;inset-inline-start:0;bottom:0;top:0;width:100%;z-index:-2;opacity:.16;
+  background-image:url("assets/hero.jpg");
+  background-size:cover;background-position:center;
+  -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 40%,#000 70%,transparent 100%);
+  mask-image:linear-gradient(180deg,transparent 0%,#000 40%,#000 70%,transparent 100%);
+}
+
+/* ============ MARQUEE ============ */
+.marquee{
+  border-block:1px solid var(--line);
+  overflow:hidden;background:var(--surface-2);
+  padding-block:1.05rem;position:relative;
+}
+.marquee-track{
+  display:flex;gap:3.2rem;width:max-content;
+  animation:marqueeMove 30s linear infinite;
+}
+html[dir="rtl"] .marquee-track{animation-name:marqueeMoveRtl}
+@keyframes marqueeMove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes marqueeMoveRtl{from{transform:translateX(0)}to{transform:translateX(50%)}}
+.marquee-item{
+  display:flex;align-items:center;gap:3.2rem;flex-shrink:0;
+  font-family:var(--font-latin);font-size:1rem;letter-spacing:.14em;
+  color:var(--brown-soft);text-transform:uppercase;white-space:nowrap;
+}
+.marquee-item .ar{font-family:var(--font-ar);font-weight:600;letter-spacing:0}
+.marquee-item .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0}
+
+/* ============ STATS / COUNTERS ============ */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-block:1px solid var(--line);margin-top:3rem}
+.stat-cell{background:var(--bg);padding:1.8rem 1.2rem;text-align:center}
+.stat-num{font-family:var(--font-mono);font-size:clamp(1.9rem,3.4vw,2.7rem);font-weight:500;color:var(--gold-deep);line-height:1.1}
+.stat-label{font-size:.86rem;color:var(--brown-soft);margin-top:.5rem;font-weight:500}
+
+/* ============ TIMELINE (horizontal) ============ */
+.timeline-scroll{overflow-x:auto;padding-block:1rem;scrollbar-width:thin;scrollbar-color:var(--gold) transparent}
+.timeline-strip{display:flex;gap:0;min-width:max-content;position:relative;padding-top:1.5rem}
+.timeline-strip::before{content:"";position:absolute;top:1.9rem;inset-inline:2rem;height:1.5px;background:linear-gradient(90deg,var(--gold),var(--line))}
+.tl-node{width:230px;flex-shrink:0;padding-inline:2rem;position:relative;cursor:default;transition:transform .4s var(--ease-spring)}
+.tl-node:hover{transform:translateY(-6px)}
+.tl-node .tl-dot{width:13px;height:13px;border-radius:50%;background:var(--bg);border:3px solid var(--gold);margin-bottom:1.1rem;transition:background .3s}
+.tl-node:hover .tl-dot{background:var(--gold)}
+.tl-year{font-family:var(--font-mono);color:var(--gold-deep);font-size:1.05rem;font-weight:500}
+.tl-node h4{font-size:1rem;margin-block:.35rem;color:var(--ink)}
+.tl-node p{font-size:.85rem;color:var(--brown-soft)}
+
+/* ============ COMPANIES (asymmetric grid) ============ */
+.companies-grid{
+  display:grid;gap:1.4rem;
+  grid-template-columns:repeat(12,1fr);
+  grid-auto-rows:minmax(120px,auto);
+}
+.company-card{
+  border-radius:var(--radius-lg);overflow:hidden;position:relative;
+  background:var(--surface);min-height:300px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:box-shadow .45s;
+  transform-style:preserve-3d;will-change:transform;
+}
+.company-card:hover{box-shadow:var(--shadow-warm)}
+.company-card .card-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 1.1s var(--ease-out)}
+.company-card:hover .card-img{transform:scale(1.05)}
+.company-card .card-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,17,16,0) 32%,rgba(20,17,16,.86) 100%)}
+.company-card .card-body{position:relative;padding:1.7rem;color:var(--bg)}
+.company-card .card-kind{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+.company-card h3{color:var(--bg);margin-block:.45rem .3rem}
+.company-card p{font-size:.88rem;color:rgba(250,247,242,.72);max-width:40ch}
+.company-card .card-cta{
+  margin-top:1.1rem;display:inline-flex;align-items:center;gap:.5rem;
+  font-size:.85rem;font-weight:600;color:var(--gold);
+  border:1px solid rgba(184,149,90,.5);border-radius:999px;padding:.5rem 1.2rem;
+  transition:background .3s,color .3s;min-height:40px;
+}
+.company-card .card-cta:hover{background:var(--gold);color:var(--dark)}
+.cc-coffee{grid-column:span 7;grid-row:span 3;min-height:420px}
+.cc-bakery{grid-column:span 5;grid-row:span 3;min-height:420px}
+.cc-b2b{grid-column:span 4;grid-row:span 2;min-height:320px}
+.cc-catering{grid-column:span 4;grid-row:span 2;min-height:320px}
+.cc-logistic{grid-column:span 4;grid-row:span 2;min-height:320px;background:var(--dark)}
+.cc-logistic .route-mini{position:absolute;inset:0;opacity:.85}
+
+/* ============ EXPERIENCE STRIP ============ */
+.exp-strip{
+  display:flex;gap:1.2rem;overflow-x:auto;
+  padding:1rem .4rem 1.6rem;
+  scroll-snap-type:x mandatory;cursor:grab;
+  scrollbar-width:none;
+}
+.exp-strip::-webkit-scrollbar{display:none}
+.exp-strip.dragging{cursor:grabbing;scroll-snap-type:none}
+.exp-card{
+  flex:0 0 260px;scroll-snap-align:start;
+  background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.7rem 1.5rem;transition:transform .4s var(--ease-spring),border-color .3s,box-shadow .4s;
+  user-select:none;
+}
+.exp-card:hover{transform:translateY(-8px);border-color:var(--gold);box-shadow:var(--shadow-warm)}
+.exp-card .exp-num{font-family:var(--font-mono);font-size:2rem;color:var(--gold);opacity:.55;line-height:1}
+.exp-card h4{margin-block:.8rem .4rem;font-size:1.05rem}
+.exp-card p{font-size:.85rem;color:var(--brown-soft)}
+
+/* ============ NEWS GRID ============ */
+.news-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:1.4rem}
+.news-card{
+  border-radius:var(--radius);overflow:hidden;background:var(--bg);
+  border:1px solid var(--line);display:flex;flex-direction:column;
+  transition:transform .4s var(--ease-spring),box-shadow .4s;
+}
+.news-card:hover{transform:translateY(-7px);box-shadow:var(--shadow-warm)}
+.news-card .news-img{height:210px;background-size:cover;background-position:center}
+.news-card .news-body{padding:1.5rem;flex:1;display:flex;flex-direction:column}
+.news-date{font-family:var(--font-mono);font-size:.72rem;color:var(--gold-deep);letter-spacing:.08em}
+.news-card h4{margin-block:.5rem;font-size:1.05rem;line-height:1.5}
+.news-card p{font-size:.86rem;color:var(--brown-soft)}
+.nc-lg{grid-column:span 6;grid-row:span 2}
+.nc-lg .news-img{height:300px}
+.nc-sm{grid-column:span 6}
+.nc-sm{display:grid;grid-template-columns:200px 1fr}
+.nc-sm .news-img{height:100%;min-height:170px}
+
+/* ============ FORMS ============ */
+.form-card{
+  background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:clamp(1.6rem,3.5vw,2.6rem);box-shadow:var(--shadow-warm);
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 1.4rem}
+.field{display:flex;flex-direction:column;gap:.45rem}
+.field.full{grid-column:1/-1}
+.field label{font-size:.85rem;font-weight:600;color:var(--ink-soft)}
+.field input,.field select,.field textarea{
+  border:1.5px solid var(--line);border-radius:12px;
+  padding:.75rem 1rem;background:var(--bg);min-height:48px;
+  transition:border-color .3s,box-shadow .3s;width:100%;
+}
+.field textarea{min-height:110px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-faint);
+}
+.field .err{font-size:.76rem;color:#9A3324;display:none}
+.field.invalid input,.field.invalid select,.field.invalid textarea{border-color:#B4452F}
+.field.invalid .err{display:block}
+.form-success{
+  display:none;text-align:center;padding:3rem 1.5rem;
+}
+.form-success.show{display:block;animation:pageIn .6s var(--ease-out)}
+.form-success .tick{
+  width:74px;height:74px;border-radius:50%;background:var(--gold-faint);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 1.3rem;
+}
+.form-success .tick svg{width:36px;height:36px;stroke:var(--gold-deep)}
+.form-success h3{margin-bottom:.5rem}
+.form-success p{color:var(--brown-soft)}
+
+/* ============ COFFEE JOURNEY ============ */
+.journey-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.3rem;counter-reset:step}
+.journey-step{
+  position:relative;padding:2rem 1.6rem;border-radius:var(--radius);
+  background:rgba(250,247,242,.045);border:1px solid var(--line-dark);
+  transition:transform .45s var(--ease-spring),border-color .35s,background .35s;
+}
+.journey-step:hover{transform:translateY(-8px);border-color:rgba(184,149,90,.55);background:rgba(184,149,90,.07)}
+.journey-step .j-icon{width:52px;height:52px;margin-bottom:1.2rem}
+.journey-step .j-icon svg{width:100%;height:100%;stroke:var(--gold);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.journey-step h4{color:var(--bg);font-size:1.05rem}
+.journey-step p{font-size:.84rem;color:rgba(250,247,242,.58);margin-top:.4rem}
+.journey-step .j-num{position:absolute;top:1.3rem;inset-inline-end:1.4rem;font-family:var(--font-mono);color:rgba(184,149,90,.4);font-size:.85rem}
+
+/* ============ PRODUCTS ============ */
+.product-feature{
+  display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(1.8rem,4vw,3.5rem);
+  align-items:center;margin-bottom:clamp(3rem,6vw,4.5rem);
+}
+.product-feature.flip .pf-media{order:2}
+.pf-media{border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-warm)}
+.pf-media img{width:100%;height:clamp(280px,36vw,420px);object-fit:cover;transition:transform 1.2s var(--ease-out)}
+.product-feature:hover .pf-media img{transform:scale(1.04)}
+.pf-body .price{font-family:var(--font-mono);color:var(--gold-deep);font-size:1.05rem;margin-top:.8rem;display:block}
+.pf-body p{color:var(--brown-soft);margin-top:.7rem;max-width:48ch}
+.product-mosaic{display:grid;grid-template-columns:repeat(12,1fr);gap:1.2rem}
+.pm-item{
+  border-radius:var(--radius);overflow:hidden;position:relative;
+  transition:transform .4s var(--ease-spring),box-shadow .4s;background:var(--surface);
+}
+.pm-item:hover{transform:translateY(-6px);box-shadow:var(--shadow-warm)}
+.pm-item img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.pm-item .pm-tag{
+  position:relative;z-index:2;margin:auto 1.1rem 1.1rem;align-self:flex-start;
+  background:rgba(20,17,16,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  color:var(--bg);border-radius:999px;padding:.4rem 1rem;font-size:.8rem;font-weight:600;
+  display:inline-block;
+}
+.pm-item{display:flex;min-height:180px}
+.pm-a{grid-column:span 5;min-height:260px}
+.pm-b{grid-column:span 3}
+.pm-c{grid-column:span 4}
+.pm-d{grid-column:span 4}
+.pm-e{grid-column:span 3}
+.pm-f{grid-column:span 5;min-height:240px}
+
+/* ============ SEAT MAP ============ */
+.seatmap-wrap{display:grid;grid-template-columns:1.35fr .65fr;gap:1.6rem;align-items:start}
+.seatmap-panel{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-lg);padding:1.4rem;overflow:hidden}
+.seatmap-svg{width:100%;height:auto;display:block;touch-action:manipulation}
+.seatmap-svg .seat{cursor:pointer;transition:opacity .25s}
+.seatmap-svg .seat:hover{opacity:.75}
+.seatmap-svg .seat.selected .seat-shape{stroke:var(--ink);stroke-width:2.5}
+.seat-legend{display:flex;flex-wrap:wrap;gap:1.1rem;margin-top:1.1rem;font-size:.8rem;color:var(--brown-soft)}
+.seat-legend span{display:inline-flex;align-items:center;gap:.45rem}
+.seat-legend i{width:13px;height:13px;border-radius:4px;display:inline-block}
+.seat-detail{
+  background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-lg);
+  padding:1.7rem;position:sticky;top:96px;
+}
+.seat-detail .sd-empty{color:var(--brown-soft);font-size:.9rem;text-align:center;padding-block:2rem}
+.seat-detail .sd-id{font-family:var(--font-mono);font-size:1.6rem;color:var(--gold-deep)}
+.seat-detail .sd-state{
+  display:inline-block;border-radius:999px;padding:.25rem .9rem;font-size:.78rem;font-weight:600;margin-block:.7rem;
+}
+.sd-rows{display:flex;flex-direction:column;gap:.55rem;margin-top:.8rem}
+.sd-rows .row{display:flex;justify-content:space-between;font-size:.87rem;border-bottom:1px dashed var(--line);padding-bottom:.5rem}
+.sd-rows .row b{font-weight:600}
+.sd-rows .row:last-child{border-bottom:none}
+.seat-detail .btn{width:100%;margin-top:1.2rem}
+
+/* ============ MEMBERSHIP CARD 3D ============ */
+.member-zone{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(2rem,5vw,4rem);align-items:center}
+.member-stage{perspective:1300px;display:flex;justify-content:center}
+.member-card{
+  width:min(400px,92%);aspect-ratio:1.586;position:relative;
+  transform-style:preserve-3d;transition:transform 1s var(--ease-spring);
+  cursor:pointer;
+}
+.member-stage:hover .member-card,.member-card.flipped{transform:rotateY(180deg)}
+html[dir="rtl"] .member-stage:hover .member-card,html[dir="rtl"] .member-card.flipped{transform:rotateY(-180deg)}
+.mc-face{
+  position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;
+  padding:1.6rem;overflow:hidden;
+  box-shadow:0 30px 70px -30px rgba(20,17,16,.55);
+}
+.mc-front{
+  background:linear-gradient(135deg,#1C1714 0%,#141110 55%,#241C15 100%);
+  color:var(--bg);display:flex;flex-direction:column;justify-content:space-between;
+}
+.mc-front::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(400px 200px at 85% 10%,rgba(184,149,90,.22),transparent 60%);
+}
+.mc-back{
+  background:linear-gradient(135deg,#B8955A 0%,#9A7A45 100%);color:var(--dark);
+  transform:rotateY(180deg);display:flex;align-items:center;gap:1.4rem;
+}
+.mc-brand{display:flex;align-items:center;justify-content:space-between}
+.mc-brand svg{width:44px;height:44px}
+.mc-tier{
+  font-family:var(--font-latin);font-style:italic;color:var(--gold);
+  font-size:1.05rem;letter-spacing:.06em;
+}
+.mc-name{font-size:1.15rem;font-weight:600;letter-spacing:.02em}
+.mc-num{font-family:var(--font-mono);font-size:.85rem;color:rgba(250,247,242,.65);letter-spacing:.18em;margin-top:.3rem}
+.mc-since{font-family:var(--font-mono);font-size:.68rem;color:rgba(250,247,242,.45);letter-spacing:.14em}
+.mc-qr{width:108px;height:108px;background:var(--bg);border-radius:12px;padding:8px;flex-shrink:0}
+.mc-qr svg{width:100%;height:100%}
+.mc-back-info h4{font-size:1rem;color:var(--dark)}
+.mc-back-info p{font-size:.78rem;color:rgba(20,17,16,.75);margin-top:.4rem;line-height:1.6}
+
+/* ============ B2B TIMELINE ============ */
+.status-flow{position:relative;margin-top:2.4rem}
+.status-track{display:flex;flex-wrap:wrap;gap:.7rem}
+.status-chip{
+  display:inline-flex;align-items:center;gap:.55rem;
+  border:1.5px solid var(--line);border-radius:999px;
+  padding:.6rem 1.2rem;font-size:.85rem;font-weight:500;color:var(--brown-soft);
+  transition:all .35s var(--ease-out);cursor:pointer;min-height:44px;background:var(--bg);
+}
+.status-chip .s-idx{font-family:var(--font-mono);font-size:.7rem;opacity:.65}
+.status-chip.done{border-color:var(--gold);color:var(--gold-deep);background:var(--gold-faint)}
+.status-chip.active{background:var(--dark);border-color:var(--dark);color:var(--bg);box-shadow:var(--shadow-warm)}
+.status-chip.active .s-idx{color:var(--gold)}
+.status-desc{
+  margin-top:1.6rem;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radius);padding:1.5rem 1.7rem;max-width:640px;
+}
+.status-desc h4{font-size:1rem}
+.status-desc p{font-size:.88rem;color:var(--brown-soft);margin-top:.3rem}
+.status-nav{display:flex;gap:.7rem;margin-top:1.2rem}
+
+/* ============ CATERING PACKAGES ============ */
+.packages-grid{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:1.4rem;align-items:stretch}
+.pkg-card{
+  border-radius:var(--radius-lg);padding:2.2rem 1.9rem;position:relative;
+  border:1px solid var(--line);background:var(--bg);
+  display:flex;flex-direction:column;
+  transition:transform .45s var(--ease-spring),box-shadow .45s;
+}
+.pkg-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-warm)}
+.pkg-card .pkg-tier{font-family:var(--font-latin);font-style:italic;font-size:1.15rem;color:var(--gold-deep)}
+.pkg-card h3{margin-top:.3rem}
+.pkg-price{font-family:var(--font-mono);font-size:1.9rem;color:var(--ink);margin-block:1.1rem}
+.pkg-price small{font-size:.8rem;color:var(--brown-soft);font-family:var(--font-ar)}
+.pkg-list{list-style:none;display:flex;flex-direction:column;gap:.6rem;flex:1}
+.pkg-list li{font-size:.88rem;color:var(--ink-soft);display:flex;gap:.6rem;align-items:flex-start}
+.pkg-list li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:.55rem}
+.pkg-card .btn{margin-top:1.6rem}
+.pkg-featured{
+  background:linear-gradient(165deg,var(--dark) 0%,var(--dark-2) 100%);
+  border-color:rgba(184,149,90,.4);transform:scale(1.03);
+}
+.pkg-featured:hover{transform:scale(1.03) translateY(-8px)}
+.pkg-featured h3,.pkg-featured .pkg-price{color:var(--bg)}
+.pkg-featured .pkg-list li{color:rgba(250,247,242,.75)}
+.pkg-featured .pkg-tier{color:var(--gold)}
+.pkg-badge{
+  position:absolute;top:-13px;inset-inline-start:50%;transform:translateX(50%);
+  background:var(--gold);color:var(--dark);font-size:.72rem;font-weight:700;
+  border-radius:999px;padding:.3rem 1.1rem;white-space:nowrap;
+}
+html[dir="ltr"] .pkg-badge{transform:translateX(-50%)}
+
+/* ============ LOGISTIC ROUTE MAP ============ */
+.route-map{width:100%;height:auto;display:block}
+.route-map .route-path{
+  fill:none;stroke:var(--gold);stroke-width:2;stroke-dasharray:8 8;
+  animation:routeDash 1.4s linear infinite;
+}
+@keyframes routeDash{to{stroke-dashoffset:-16}}
+.route-map .truck-dot{
+  fill:var(--gold);
+}
+.route-map .city-dot{fill:var(--bg);stroke:var(--gold);stroke-width:2}
+.route-map .city-label{fill:rgba(250,247,242,.8);font-family:var(--font-ar);font-size:13px;font-weight:600}
+.fleet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;margin-top:2.6rem}
+.fleet-card{
+  border:1px solid var(--line-dark);border-radius:var(--radius);padding:1.8rem 1.5rem;
+  background:rgba(250,247,242,.04);transition:transform .4s var(--ease-spring),border-color .3s;
+}
+.fleet-card:hover{transform:translateY(-6px);border-color:rgba(184,149,90,.5)}
+.fleet-card .f-num{font-family:var(--font-mono);font-size:1.9rem;color:var(--gold)}
+.fleet-card h4{color:var(--bg);margin-block:.5rem .3rem;font-size:1rem}
+.fleet-card p{font-size:.84rem;color:rgba(250,247,242,.58)}
+
+/* ============ PHONE 3D ============ */
+.phone-zone{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,5vw,4rem);align-items:center}
+.phone-stage{perspective:1400px;display:flex;justify-content:center;padding-block:2rem}
+.phone-3d{
+  width:min(300px,80vw);aspect-ratio:9/19;border-radius:44px;
+  background:#241C15;padding:11px;position:relative;
+  transform-style:preserve-3d;
+  transform:rotateY(calc(var(--ry,0) * 1deg)) rotateX(calc(var(--rx,0) * 1deg));
+  transition:transform .25s ease-out;
+  box-shadow:0 50px 100px -40px rgba(20,17,16,.6), 0 0 0 2px rgba(184,149,90,.35);
+}
+.phone-screen{
+  width:100%;height:100%;border-radius:34px;overflow:hidden;
+  background:linear-gradient(180deg,#1C1714,#141110);
+  display:flex;flex-direction:column;padding:1.2rem 1rem;color:var(--bg);
+  position:relative;
+}
+.phone-notch{
+  position:absolute;top:10px;inset-inline-start:50%;transform:translateX(-50%);
+  width:38%;height:22px;background:#241C15;border-radius:999px;z-index:5;
+}
+.ps-head{display:flex;justify-content:space-between;align-items:center;margin-top:2.2rem}
+.ps-head .ps-hi{font-size:.8rem;color:rgba(250,247,242,.6)}
+.ps-head .ps-name{font-weight:600;font-size:.95rem}
+.ps-head svg{width:30px;height:30px}
+.ps-card{
+  margin-top:1rem;border-radius:16px;padding:1rem;
+  background:linear-gradient(135deg,rgba(184,149,90,.28),rgba(184,149,90,.08));
+  border:1px solid rgba(184,149,90,.4);
+}
+.ps-card .ps-tier{font-family:var(--font-latin);font-style:italic;color:var(--gold);font-size:.85rem}
+.ps-card .ps-num{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.16em;color:rgba(250,247,242,.6);margin-top:.4rem}
+.ps-qr{width:76px;height:76px;background:var(--bg);border-radius:10px;padding:6px;margin-top:.8rem}
+.ps-qr svg{width:100%;height:100%}
+.ps-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.55rem;margin-top:1.1rem}
+.ps-actions button{
+  background:rgba(250,247,242,.07);border:1px solid rgba(250,247,242,.12);
+  border-radius:12px;padding:.7rem .3rem;font-size:.68rem;color:var(--bg);
+  display:flex;flex-direction:column;gap:.4rem;align-items:center;font-weight:500;
+}
+.ps-actions svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:1.7}
+.ps-session{
+  margin-top:auto;background:rgba(250,247,242,.05);border-radius:12px;padding:.8rem 1rem;
+  font-size:.72rem;color:rgba(250,247,242,.65);display:flex;justify-content:space-between;align-items:center;
+}
+.ps-session b{color:var(--gold);font-family:var(--font-mono)}
+.store-badges{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem}
+.store-badge{
+  display:inline-flex;align-items:center;gap:.8rem;
+  background:var(--dark);color:var(--bg);border-radius:14px;
+  padding:.7rem 1.4rem;min-height:56px;
+  transition:transform .35s var(--ease-spring),box-shadow .35s;
+}
+.store-badge:hover{transform:translateY(-4px);box-shadow:var(--shadow-warm)}
+.store-badge svg{width:26px;height:26px;fill:var(--bg)}
+.store-badge .sb-txt small{display:block;font-size:.62rem;opacity:.65}
+.store-badge .sb-txt b{font-size:.95rem;font-weight:600}
+
+/* ============ CONTACT / BRANCHES ============ */
+.branches-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem}
+.branch-card{
+  border:1px solid var(--line);border-radius:var(--radius);padding:1.7rem 1.5rem;background:var(--bg);
+  transition:transform .4s var(--ease-spring),box-shadow .4s;
+}
+.branch-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-warm)}
+.branch-card .b-city{font-family:var(--font-mono);font-size:.72rem;color:var(--gold-deep);letter-spacing:.14em}
+.branch-card h4{margin-block:.45rem .3rem}
+.branch-card p{font-size:.85rem;color:var(--brown-soft)}
+.contact-info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;margin-bottom:3rem}
+.ci-cell{border-inline-start:2px solid var(--gold);padding-inline-start:1.2rem}
+.ci-cell .ci-label{font-size:.78rem;color:var(--brown-soft);font-weight:500}
+.ci-cell .ci-val{font-weight:600;font-size:1.02rem;margin-top:.2rem;direction:ltr;text-align:end}
+html[dir="ltr"] .ci-cell .ci-val{text-align:start}
+
+/* ============ ABOUT VALUES ============ */
+.values-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:1.3rem}
+.value-card{border-radius:var(--radius);padding:2rem 1.7rem;background:var(--bg);border:1px solid var(--line);transition:transform .4s var(--ease-spring),box-shadow .4s}
+.value-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-warm)}
+.value-card.vc-dark{background:var(--dark);color:var(--bg);border-color:var(--dark)}
+.value-card.vc-dark h4{color:var(--bg)}
+.value-card.vc-dark p{color:rgba(250,247,242,.65)}
+.value-card.vc-gold{background:linear-gradient(150deg,var(--gold),var(--gold-deep));color:var(--dark);border-color:transparent}
+.value-card.vc-gold h4{color:var(--dark)}
+.value-card.vc-gold p{color:rgba(20,17,16,.78)}
+.value-card h4{font-size:1.1rem;margin-bottom:.5rem}
+.value-card p{font-size:.88rem;color:var(--brown-soft)}
+.vc-w6{grid-column:span 6}.vc-w4{grid-column:span 4}.vc-w8{grid-column:span 8}
+
+/* bakery quality list */
+.quality-cols{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem 3rem;margin-top:2.5rem}
+.q-item{display:flex;gap:1.1rem;align-items:flex-start}
+.q-item .q-mark{
+  width:44px;height:44px;border-radius:12px;background:var(--gold-faint);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.q-item .q-mark svg{width:22px;height:22px;stroke:var(--gold-deep);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.q-item h4{font-size:1rem}
+.q-item p{font-size:.86rem;color:var(--brown-soft);margin-top:.25rem}
+
+/* footer */
+.site-footer{background:var(--dark);color:var(--bg);position:relative;overflow:clip}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:2.5rem;padding-block:4.5rem 3rem}
+.footer-grid h5{font-size:.85rem;color:var(--gold);margin-bottom:1.1rem;letter-spacing:.06em}
+.footer-grid a{display:block;font-size:.88rem;color:rgba(250,247,242,.62);padding-block:.35rem;transition:color .25s}
+.footer-grid a:hover{color:var(--gold)}
+.footer-brand p{color:rgba(250,247,242,.55);font-size:.88rem;max-width:34ch;margin-top:1.2rem}
+.footer-bottom{
+  border-top:1px solid var(--line-dark);padding-block:1.4rem;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+  font-size:.78rem;color:rgba(250,247,242,.45);
+}
+.footer-bottom .latin{letter-spacing:.08em}
+
+/* toast */
+.toast{
+  position:fixed;bottom:1.6rem;inset-inline-start:50%;transform:translate(50%,120%);
+  background:var(--dark);color:var(--bg);border:1px solid rgba(184,149,90,.5);
+  border-radius:999px;padding:.85rem 1.7rem;font-size:.9rem;font-weight:500;
+  z-index:300;transition:transform .55s var(--ease-spring);box-shadow:var(--shadow-warm);
+  max-width:92vw;text-align:center;
+}
+html[dir="ltr"] .toast{transform:translate(-50%,120%)}
+.toast.show{transform:translate(50%,0)}
+html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
+
+/* page hero (inner pages) */
+.page-hero{
+  padding:clamp(8rem,14vw,10.5rem) 0 clamp(3.5rem,7vw,5rem);
+  position:relative;overflow:clip;
+}
+.page-hero h1{font-size:clamp(2rem,4.6vw,3.4rem);line-height:1.28;max-width:20ch}
+.page-hero .latin-tag{
+  font-family:var(--font-latin);font-style:italic;color:var(--gold-deep);
+  font-size:clamp(1rem,1.6vw,1.25rem);display:block;margin-top:.8rem;line-height:1.4;padding-bottom:.2em;
+}
+.page-hero.dark-section .latin-tag{color:var(--gold)}
+
+/* story blocks (about) */
+.story-block{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,5vw,4.5rem);align-items:center;margin-bottom:clamp(3.4rem,7vw,5.5rem)}
+.story-block:last-child{margin-bottom:0}
+.story-block.flip .sb-media{order:2}
+.sb-media{border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-warm)}
+.sb-media img{width:100%;height:clamp(300px,38vw,440px);object-fit:cover}
+.sb-body p{color:var(--brown-soft);margin-top:.9rem;max-width:52ch}
+
+/* ============ REDUCED MOTION ============ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
+  .rv{opacity:1;transform:none}
+  .hero-copy>*{opacity:1;transform:none;animation:none}
+  .cup-scene{animation:none;transform:rotateX(-12deg) rotateY(-28deg)}
+  .phone-3d{transform:none !important}
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1080px){
+  .main-nav{display:none}
+  .menu-btn{display:flex}
+  .companies-grid,.news-grid{grid-template-columns:repeat(6,1fr)}
+  .cc-coffee,.cc-bakery{grid-column:span 6}
+  .cc-b2b,.cc-catering,.cc-logistic{grid-column:span 6}
+  .nc-lg,.nc-sm{grid-column:span 6}
+  .journey-grid{grid-template-columns:1fr 1fr}
+  .packages-grid{grid-template-columns:1fr;max-width:520px;margin-inline:auto}
+  .pkg-featured{transform:none}
+  .pkg-featured:hover{transform:translateY(-8px)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .seatmap-wrap{grid-template-columns:1fr}
+  .seat-detail{position:static}
+  .fleet-grid,.branches-grid,.contact-info-row{grid-template-columns:1fr 1fr}
+  .pm-a,.pm-b,.pm-c,.pm-d,.pm-e,.pm-f{grid-column:span 6;min-height:220px}
+}
+@media (max-width:768px){
+  .hero-grid,.member-zone,.phone-zone,.product-feature,.story-block,.quality-cols{grid-template-columns:1fr}
+  .product-feature.flip .pf-media,.story-block.flip .sb-media{order:0}
+  .cup-stage{height:320px;margin-top:1rem}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .journey-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .fleet-grid,.branches-grid,.contact-info-row{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr;gap:1.8rem;padding-block:3rem 2rem}
+  .nc-sm{grid-template-columns:1fr}
+  .nc-sm .news-img{height:190px}
+  .companies-grid .company-card{min-height:300px}
+  .hero{padding-top:92px;padding-bottom:2.5rem}
+  .hero-ctas .btn{width:100%}
+  .values-grid .value-card{grid-column:span 12}
+  .pm-a,.pm-b,.pm-c,.pm-d,.pm-e,.pm-f{grid-column:span 12;min-height:210px}
+  .member-stage{margin-top:1.5rem}
+  .footer-bottom{justify-content:center;text-align:center}
+}
+</style>
+</head>
+<body>
+<div class="scroll-progress" aria-hidden="true"></div>
+
+<!-- SVG defs: brand stamp -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="stampLogo">
+      <circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <circle cx="60" cy="60" r="38" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <path id="stampArcTop" d="M 60 60 m -47.5 0 a 47.5 47.5 0 1 1 95 0" fill="none"/>
+      <path id="stampArcBot" d="M 60 60 m -47.5 0 a 47.5 47.5 0 1 0 95 0" fill="none"/>
+      <text font-family="IBM Plex Mono, monospace" font-size="7.2" letter-spacing="1.6" fill="currentColor">
+        <textPath href="#stampArcTop" startOffset="50%" text-anchor="middle">COME AS A STRANGER</textPath>
+      </text>
+      <text font-family="IBM Plex Mono, monospace" font-size="7.2" letter-spacing="1.6" fill="currentColor">
+        <textPath href="#stampArcBot" startOffset="50%" text-anchor="middle" side="right">LEAVE AS A FRIEND</textPath>
+      </text>
+      <!-- monoline cup -->
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M46 58 h24 v10 a12 12 0 0 1 -24 0 z"/>
+        <path d="M70 60 h5 a5 5 0 0 1 0 10 h-5"/>
+        <path d="M52 50 c-2 -3 2 -5 0 -8"/>
+        <path d="M60 50 c-2 -3 2 -5 0 -8"/>
+        <path d="M50 84 h20"/>
+      </g>
+      <text x="60" y="40" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="6" letter-spacing="2" fill="currentColor">ESTD 2017</text>
+    </g>
+  </defs>
+</svg>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="#/" class="brand-lockup" aria-label="Strangers Company">
+      <svg viewBox="0 0 120 120" style="color:var(--gold)"><use href="#stampLogo"/></svg>
+      <span class="brand-name">Strangers<small data-i18n="brand.sub">شركة سترينجرز</small></span>
+    </a>
+    <nav class="main-nav" id="mainNav" aria-label="التنقل الرئيسي">
+      <a href="#/" data-route="home" data-i18n="nav.home">الرئيسية</a>
+      <a href="#/about" data-route="about" data-i18n="nav.about">من نحن</a>
+      <a href="#/coffee" data-route="coffee" data-i18n="nav.coffee">القهوة</a>
+      <a href="#/bakery" data-route="bakery" data-i18n="nav.bakery">المخبز</a>
+      <a href="#/b2b" data-route="b2b" data-i18n="nav.b2b">أعمال B2B</a>
+      <a href="#/catering" data-route="catering" data-i18n="nav.catering">الكاترينج</a>
+      <a href="#/logistic" data-route="logistic" data-i18n="nav.logistic">اللوجستك</a>
+      <a href="#/news" data-route="news" data-i18n="nav.news">الأخبار</a>
+      <a href="#/contact" data-route="contact" data-i18n="nav.contact">تواصل</a>
+      <a href="#/app" data-route="app" data-i18n="nav.app">التطبيق</a>
+    </nav>
+    <div class="header-actions">
+      <button class="lang-toggle" id="langToggle" aria-label="Switch language">EN</button>
+      <button class="menu-btn" id="menuBtn" aria-label="القائمة" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-sheet" id="mobileSheet">
+  <div class="sheet-panel" id="sheetPanel">
+    <a href="#/" data-route="home" data-i18n="nav.home">الرئيسية</a>
+    <a href="#/about" data-route="about" data-i18n="nav.about">من نحن</a>
+    <a href="#/coffee" data-route="coffee" data-i18n="nav.coffee">القهوة</a>
+    <a href="#/bakery" data-route="bakery" data-i18n="nav.bakery">المخبز</a>
+    <a href="#/b2b" data-route="b2b" data-i18n="nav.b2b">أعمال B2B</a>
+    <a href="#/catering" data-route="catering" data-i18n="nav.catering">الكاترينج</a>
+    <a href="#/logistic" data-route="logistic" data-i18n="nav.logistic">اللوجستك</a>
+    <a href="#/news" data-route="news" data-i18n="nav.news">الأخبار</a>
+    <a href="#/contact" data-route="contact" data-i18n="nav.contact">تواصل</a>
+    <a href="#/app" data-route="app" data-i18n="nav.app">التطبيق</a>
+  </div>
+</div>
+
+<main id="app">
+
+<!-- ==================================================== HOME ==================================================== -->
+<section class="page" id="page-home">
+
+  <div class="hero dark-section">
+    <div class="hero-img-strip" aria-hidden="true"></div>
+    <div class="hero-photo-glow" aria-hidden="true"></div>
+    <div class="dust" data-dust="14" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow" data-i18n="hero.eyebrow">شركة سترينجرز · منذ 2017</span>
+        <h1 class="hero-title">
+          <span data-i18n="hero.title">علامة واحدة. تجارب متعددة.</span>
+          <span class="latin" data-i18n="hero.tagline">Come as a Stranger, Leave as a Friend</span>
+        </h1>
+        <p class="hero-sub" data-i18n="hero.sub">من فنجان القهوة إلى منظومة ضيافة سعودية متكاملة: مقهى، مخبز مركزي، حلول أعمال، كاترينج، ولوجستك.</p>
+        <div class="hero-ctas">
+          <a href="#companies" class="btn btn-gold" id="exploreBtn"><span data-i18n="hero.cta">استكشف عالم سترينجرز</span><span class="arr">&larr;</span></a>
+          <a href="#talk" class="btn btn-ghost on-dark" id="talkBtn" data-i18n="hero.cta2">تواصل معنا</a>
+        </div>
+      </div>
+      <div class="cup-stage" id="cupStage" aria-hidden="true">
+        <div class="cup-scene" id="cupScene">
+          <div class="cup-body" id="cupBody">
+            <div class="cup-top"></div>
+            <div class="cup-rim"></div>
+            <div class="cup-saucer"></div>
+          </div>
+          <svg class="steam" viewBox="0 0 90 110">
+            <path style="--sd:0s"   d="M30 100 C 22 80, 40 68, 32 48 C 26 34, 36 24, 32 8"/>
+            <path style="--sd:1.4s" d="M48 100 C 42 78, 58 66, 50 46 C 44 32, 54 22, 50 6"/>
+            <path style="--sd:2.7s" d="M66 100 C 60 82, 74 70, 66 50 C 60 36, 70 26, 66 10"/>
+          </svg>
+        </div>
+        <span class="bean" style="top:12%;inset-inline-start:8%;--bdur:6.5s;--br:-18deg"></span>
+        <span class="bean" style="top:66%;inset-inline-start:4%;--bdur:8s;--bdl:1.2s;--br:22deg;width:20px;height:26px"></span>
+        <span class="bean" style="top:22%;inset-inline-end:6%;--bdur:7.2s;--bdl:.6s;--br:40deg;width:22px;height:29px"></span>
+        <span class="bean" style="bottom:8%;inset-inline-end:14%;--bdur:9s;--bdl:2s;--br:-30deg"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- marquee -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marqueeTrack">
+      <div class="marquee-item">
+        <span class="ar">تعال غريب، اطلع صديق</span><span class="dot"></span>
+        <span>Come as a Stranger</span><span class="dot"></span>
+        <span>Leave as a Friend</span><span class="dot"></span>
+        <span class="ar">قهوة، مخبز، كاترينج، لوجستك</span><span class="dot"></span>
+        <span>Since 2017</span><span class="dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHO WE ARE -->
+  <section class="section" id="who">
+    <div class="wrap">
+      <div class="section-head rv">
+        <span class="eyebrow" data-i18n="who.eyebrow">من نحن</span>
+        <h2 data-i18n="who.title">بدأنا بفنجان، وكبرنا لمنظومة</h2>
+        <hr class="gold-rule">
+        <p class="lead" data-i18n="who.lead">في 2017 فتحنا أول مقهى بروح بسيطة: كل غريب يدخل، يطلع صديق. اليوم صارت سترينجرز خمسة أقسام تخدم الضيافة السعودية من الحبة إلى الحفلة.</p>
+      </div>
+      <div class="stats-row rv">
+        <div class="stat-cell"><div class="stat-num"><span data-count="9">0</span></div><div class="stat-label" data-i18n="who.s1">سنوات من الضيافة</div></div>
+        <div class="stat-cell"><div class="stat-num"><span data-count="5">0</span></div><div class="stat-label" data-i18n="who.s2">أقسام متكاملة</div></div>
+        <div class="stat-cell"><div class="stat-num"><span data-count="40">0</span>+</div><div class="stat-label" data-i18n="who.s3">منتج طازج يومياً</div></div>
+        <div class="stat-cell"><div class="stat-num"><span data-count="3">0</span></div><div class="stat-label" data-i18n="who.s4">مدن نخدمها</div></div>
+      </div>
+      <div class="timeline-scroll rv" style="--d:120ms">
+        <div class="timeline-strip">
+          <div class="tl-node"><div class="tl-dot"></div><div class="tl-year">2017</div><h4 data-i18n="tl.1t">أول فنجان</h4><p data-i18n="tl.1p">افتتاح أول مقهى سترينجرز في الرياض.</p></div>
+          <div class="tl-node"><div class="tl-dot"></div><div class="tl-year">2019</div><h4 data-i18n="tl.2t">المخبز المركزي</h4><p data-i18n="tl.2p">إطلاق معمل سترينجرز بيكري للإنتاج اليومي.</p></div>
+          <div class="tl-node"><div class="tl-dot"></div><div class="tl-year">2021</div><h4 data-i18n="tl.3t">حلول الأعمال</h4><p data-i18n="tl.3p">بداية توريد B2B للمقاهي والفنادق.</p></div>
+          <div class="tl-node"><div class="tl-dot"></div><div class="tl-year">2023</div><h4 data-i18n="tl.4t">الكاترينج</h4><p data-i18n="tl.4p">باقات ضيافة للمناسبات والفعاليات.</p></div>
+          <div class="tl-node"><div class="tl-dot"></div><div class="tl-year">2025</div><h4 data-i18n="tl.5t">اللوجستك</h4><p data-i18n="tl.5p">أسطول خاص يربط الفروع والعملاء.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR COMPANIES -->
+  <section class="section marble-section" id="companies">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="comp.title">أقسام سترينجرز الخمسة</h2>
+        <hr class="gold-rule">
+        <p class="lead" data-i18n="comp.lead">كل قسم يشتغل بهويته، وكلها ترجع لنفس الروح.</p>
+      </div>
+      <div class="companies-grid">
+        <article class="company-card cc-coffee tilt rv">
+          <div class="card-img" style="background-image:url('assets/hero.jpg')"></div>
+          <div class="card-veil"></div>
+          <div class="card-body">
+            <span class="card-kind">Strangers Coffee</span>
+            <h3 data-i18n="comp.coffee.t">القهوة</h3>
+            <p data-i18n="comp.coffee.p">مقاهينا حيث بدأت القصة: تحميص مختار، مساحات جلوس، وعضوية خاصة.</p>
+            <a href="#/coffee" class="card-cta"><span data-i18n="comp.explore">استكشف</span> <span class="arr">&larr;</span></a>
+          </div>
+        </article>
+        <article class="company-card cc-bakery tilt rv" style="--d:80ms">
+          <div class="card-img" style="background-image:url('assets/almond-croissant.jpg')"></div>
+          <div class="card-veil"></div>
+          <div class="card-body">
+            <span class="card-kind">Strangers Bakery</span>
+            <h3 data-i18n="comp.bakery.t">المخبز</h3>
+            <p data-i18n="comp.bakery.p">معمل مركزي يخبز الكرواسون والدانش والكيك لكل الفروع والشركاء.</p>
+            <a href="#/bakery" class="card-cta"><span data-i18n="comp.explore">استكشف</span> <span class="arr">&larr;</span></a>
+          </div>
+        </article>
+        <article class="company-card cc-b2b tilt rv">
+          <div class="card-img" style="background-image:url('assets/coffee-jar.jpg')"></div>
+          <div class="card-veil"></div>
+          <div class="card-body">
+            <span class="card-kind">Strangers B2B</span>
+            <h3 data-i18n="comp.b2b.t">حلول الأعمال</h3>
+            <p data-i18n="comp.b2b.p">توريد منتظم للمقاهي والمطاعم والفنادق.</p>
+            <a href="#/b2b" class="card-cta"><span data-i18n="comp.explore">استكشف</span> <span class="arr">&larr;</span></a>
+          </div>
+        </article>
+        <article class="company-card cc-catering tilt rv" style="--d:80ms">
+          <div class="card-img" style="background-image:url('assets/chocolate-collection.jpg')"></div>
+          <div class="card-veil"></div>
+          <div class="card-body">
+            <span class="card-kind">Strangers Catering</span>
+            <h3 data-i18n="comp.catering.t">الكاترينج</h3>
+            <p data-i18n="comp.catering.p">ضيافة مناسبات بثلاث باقات فاخرة.</p>
+            <a href="#/catering" class="card-cta"><span data-i18n="comp.explore">استكشف</span> <span class="arr">&larr;</span></a>
+          </div>
+        </article>
+        <article class="company-card cc-logistic tilt rv" style="--d:160ms">
+          <svg class="route-mini" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <path class="route-path" d="M40 240 C 120 200, 140 120, 220 110 S 340 60, 370 40" style="stroke:rgba(184,149,90,.65)"/>
+            <circle class="city-dot" cx="40" cy="240" r="5"/>
+            <circle class="city-dot" cx="220" cy="110" r="5"/>
+            <circle class="city-dot" cx="370" cy="40" r="5"/>
+          </svg>
+          <div class="card-veil" style="background:linear-gradient(180deg,rgba(20,17,16,.1) 30%,rgba(20,17,16,.92) 100%)"></div>
+          <div class="card-body">
+            <span class="card-kind">Strangers Logistic</span>
+            <h3 data-i18n="comp.logistic.t">اللوجستك</h3>
+            <p data-i18n="comp.logistic.p">أسطول يوصل الطازج بين الفروع والعملاء.</p>
+            <a href="#/logistic" class="card-cta"><span data-i18n="comp.explore">استكشف</span> <span class="arr">&larr;</span></a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE STRIP -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="exp.title">تجربة سترينجرز</h2>
+        <hr class="gold-rule">
+        <p class="lead" data-i18n="exp.lead">اسحب لتشوف كيف تختلف التجربة مع كل ضيف.</p>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="exp-strip rv" id="expStrip">
+        <div class="exp-card"><div class="exp-num">01</div><h4 data-i18n="exp.1t">القهوة</h4><p data-i18n="exp.1p">اختصاصية تُحضّر أمامك، من الحبة إلى الكوب.</p></div>
+        <div class="exp-card"><div class="exp-num">02</div><h4 data-i18n="exp.2t">المخبوزات</h4><p data-i18n="exp.2p">كرواسون ودانش يطلع من الفرن على مدار اليوم.</p></div>
+        <div class="exp-card"><div class="exp-num">03</div><h4 data-i18n="exp.3t">العائلات</h4><p data-i18n="exp.3p">منطقة عائلية هادئة بمقاعد مريحة وخصوصية.</p></div>
+        <div class="exp-card"><div class="exp-num">04</div><h4 data-i18n="exp.4t">الطلاب</h4><p data-i18n="exp.4p">طاولات دراسة، كهرباء بكل مقعد، وأسعار جلسات عادلة.</p></div>
+        <div class="exp-card"><div class="exp-num">05</div><h4 data-i18n="exp.5t">الأعمال</h4><p data-i18n="exp.5p">غرفة اجتماعات تُحجز بالساعة مع خدمة ضيافة.</p></div>
+        <div class="exp-card"><div class="exp-num">06</div><h4 data-i18n="exp.6t">الكاترينج</h4><p data-i18n="exp.6p">نجهز مناسبتك بنفس جودة الفرع، عندك.</p></div>
+        <div class="exp-card"><div class="exp-num">07</div><h4 data-i18n="exp.7t">المجتمع</h4><p data-i18n="exp.7p">جلسات تذوق وورش تحميص شهرية للأعضاء.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LATEST -->
+  <section class="section marble-section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="latest.title">جديد سترينجرز</h2>
+        <hr class="gold-rule">
+      </div>
+      <div class="news-grid">
+        <article class="news-card nc-lg rv">
+          <div class="news-img" style="background-image:url('assets/tiramisu.jpg')"></div>
+          <div class="news-body">
+            <span class="news-date">2026/06</span>
+            <h4 data-i18n="latest.1t">موسم التيراميسو: وصفة إيطالية بلمسة سعودية</h4>
+            <p data-i18n="latest.1p">طبقات مسكربوني مع إسبريسو محمص في معملنا، متوفر بكل الفروع لنهاية الصيف.</p>
+          </div>
+        </article>
+        <article class="news-card nc-sm rv" style="--d:90ms">
+          <div class="news-img" style="background-image:url('assets/pistachio-danish.jpg')"></div>
+          <div class="news-body">
+            <span class="news-date">2026/05</span>
+            <h4 data-i18n="latest.2t">دانش الفستق ينضم للقائمة الدائمة</h4>
+            <p data-i18n="latest.2p">بعد أعلى تقييم في استفتاء الأعضاء.</p>
+          </div>
+        </article>
+        <article class="news-card nc-sm rv" style="--d:180ms">
+          <div class="news-img" style="background-image:url('assets/club-sandwich.jpg')"></div>
+          <div class="news-body">
+            <span class="news-date">2026/04</span>
+            <h4 data-i18n="latest.3t">قائمة الغداء الجديدة للفروع</h4>
+            <p data-i18n="latest.3p">خمسة ساندويتشات جديدة من مطبخنا المركزي.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- TALK TO STRANGERS -->
+  <section class="section" id="talk">
+    <div class="wrap" style="max-width:880px">
+      <div class="section-head rv" style="max-width:none;text-align:center;margin-inline:auto">
+        <h2 data-i18n="talk.title">كلم سترينجرز</h2>
+        <hr class="gold-rule" style="margin-inline:auto">
+        <p class="lead" style="margin-inline:auto" data-i18n="talk.lead">قول لنا وش تحتاج، وفريقنا يرد عليك خلال يوم عمل.</p>
+      </div>
+      <div class="form-card rv">
+        <form id="leadForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="lf-name" data-i18n="f.name">الاسم الكامل</label>
+              <input id="lf-name" name="name" type="text" autocomplete="name">
+              <span class="err" data-i18n="f.nameErr">اكتب الاسم من فضلك</span>
+            </div>
+            <div class="field">
+              <label for="lf-phone" data-i18n="f.phone">رقم الجوال</label>
+              <input id="lf-phone" name="phone" type="tel" inputmode="tel" placeholder="05xxxxxxxx" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="f.phoneErr">رقم جوال سعودي صحيح (يبدأ بـ 05)</span>
+            </div>
+            <div class="field">
+              <label for="lf-city" data-i18n="f.city">المدينة</label>
+              <input id="lf-city" name="city" type="text">
+              <span class="err" data-i18n="f.cityErr">اكتب المدينة</span>
+            </div>
+            <div class="field">
+              <label for="lf-org" data-i18n="f.org">الجهة أو الشركة (اختياري)</label>
+              <input id="lf-org" name="org" type="text">
+              <span class="err"></span>
+            </div>
+            <div class="field">
+              <label for="lf-service" data-i18n="f.service">نوع الخدمة</label>
+              <select id="lf-service" name="service">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="coffee">Strangers Coffee</option>
+                <option value="bakery">Strangers Bakery</option>
+                <option value="b2b">Strangers B2B</option>
+                <option value="catering">Strangers Catering</option>
+                <option value="logistic">Strangers Logistic</option>
+                <option value="membership" data-i18n="f.svcMem">العضوية والحجوزات</option>
+                <option value="partnership" data-i18n="f.svcPart">شراكة تجارية</option>
+                <option value="general" data-i18n="f.svcGen">استفسار عام</option>
+              </select>
+              <span class="err" data-i18n="f.serviceErr">اختر نوع الخدمة</span>
+            </div>
+            <div class="field">
+              <label for="lf-time" data-i18n="f.time">أفضل وقت للتواصل</label>
+              <select id="lf-time" name="time">
+                <option value="morning" data-i18n="f.morning">صباحاً (9 - 12)</option>
+                <option value="noon" data-i18n="f.noon">ظهراً (12 - 4)</option>
+                <option value="evening" data-i18n="f.evening">مساءً (4 - 9)</option>
+              </select>
+              <span class="err"></span>
+            </div>
+            <div class="field full">
+              <label for="lf-msg" data-i18n="f.msg">وصف الاحتياج</label>
+              <textarea id="lf-msg" name="message"></textarea>
+              <span class="err" data-i18n="f.msgErr">اكتب وصف مختصر لاحتياجك</span>
+            </div>
+            <div class="field full">
+              <button type="submit" class="btn btn-gold" style="width:100%" data-i18n="f.send">أرسل الطلب</button>
+            </div>
+          </div>
+        </form>
+        <div class="form-success" id="leadSuccess">
+          <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg></div>
+          <h3 data-i18n="f.okT">وصلنا طلبك</h3>
+          <p data-i18n="f.okP">بيتواصل معك فريق سترينجرز في الوقت اللي اخترته.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== ABOUT ==================================================== -->
+<section class="page" id="page-about">
+  <div class="page-hero marble-section">
+    <div class="wrap">
+      <span class="eyebrow rv" data-i18n="about.eyebrow">قصتنا</span>
+      <h1 class="rv" data-i18n="about.title">تسع سنوات من الغرباء اللي صاروا أصدقاء</h1>
+      <span class="latin-tag rv">About Strangers Company</span>
+    </div>
+  </div>
+  <section class="section">
+    <div class="wrap">
+      <div class="story-block">
+        <div class="sb-media rv"><img src="assets/hero.jpg" alt="مشهد تحضير القهوة في سترينجرز" loading="lazy"></div>
+        <div class="sb-body rv" style="--d:100ms">
+          <h2 data-i18n="about.s1t">البداية: طاولة واحدة وحلم كبير</h2>
+          <hr class="gold-rule">
+          <p data-i18n="about.s1p1">في شتاء 2017، فتحنا أول مقهى بمساحة صغيرة في الرياض. كانت الفكرة أبسط من خطة عمل: نسوي مكان يدخل له الغريب ويحس إنه معزوم، مو زبون.</p>
+          <p data-i18n="about.s1p2">الجملة اللي كتبناها على الباب صارت هويتنا: تعال غريب، اطلع صديق.</p>
+        </div>
+      </div>
+      <div class="story-block flip">
+        <div class="sb-media rv"><img src="assets/croissant-madame.jpg" alt="كرواسون مدام من مخبز سترينجرز" loading="lazy"></div>
+        <div class="sb-body rv" style="--d:100ms">
+          <h2 data-i18n="about.s2t">النمو: من مقهى إلى منظومة</h2>
+          <hr class="gold-rule">
+          <p data-i18n="about.s2p1">لما زاد الطلب على مخبوزاتنا، بنينا معملنا المركزي. ولما بدأت المقاهي الأخرى تطلب منتجاتنا، فتحنا قسم الأعمال. كل قسم جديد كان إجابة على سؤال عملائنا: ممكن نأخذ التجربة معنا؟</p>
+          <p data-i18n="about.s2p2">اليوم، خمسة أقسام تشتغل بتناغم واحد: القهوة، المخبز، الأعمال، الكاترينج، واللوجستك.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section marble-section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="about.vTitle">رؤيتنا ورسالتنا وقيمنا</h2>
+        <hr class="gold-rule">
+      </div>
+      <div class="values-grid">
+        <div class="value-card vc-dark vc-w6 rv"><h4 data-i18n="about.v1t">الرؤية</h4><p data-i18n="about.v1p">أن نكون بيت الضيافة السعودي الأول: علامة واحدة يثق فيها الفرد والشركة على حد سواء.</p></div>
+        <div class="value-card vc-gold vc-w6 rv" style="--d:80ms"><h4 data-i18n="about.v2t">الرسالة</h4><p data-i18n="about.v2p">نصنع لحظات ضيافة صادقة، بجودة معمل وروح بيت، من أول فنجان لآخر لقمة.</p></div>
+        <div class="value-card vc-w4 rv"><h4 data-i18n="about.v3t">الكرم</h4><p data-i18n="about.v3p">الضيف يُستقبل قبل أن يطلب.</p></div>
+        <div class="value-card vc-w4 rv" style="--d:80ms"><h4 data-i18n="about.v4t">الإتقان</h4><p data-i18n="about.v4p">وصفة مضبوطة تتكرر بنفس الجودة كل يوم.</p></div>
+        <div class="value-card vc-w4 rv" style="--d:160ms"><h4 data-i18n="about.v5t">القرب</h4><p data-i18n="about.v5p">نعرف ضيوفنا بأسمائهم، وشركاءنا باحتياجهم.</p></div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== COFFEE ==================================================== -->
+<section class="page" id="page-coffee">
+  <div class="page-hero dark-section">
+    <div class="dust" data-dust="10" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="eyebrow rv" style="color:var(--gold)">Strangers Coffee</span>
+      <h1 class="rv" data-i18n="coffee.title">القهوة اللي بدأت كل شي</h1>
+      <span class="latin-tag rv" data-i18n="coffee.tag">Specialty coffee, baked goods, and spaces made for staying</span>
+      <p class="lead rv" style="--d:120ms" data-i18n="coffee.lead">محامص مختارة، مخبوزات من معملنا، ومساحات مصممة للجلسة الطويلة: للطالب، للعائلة، ولاجتماع العمل.</p>
+      <div class="hero-ctas rv" style="--d:200ms;margin-top:1.8rem">
+        <a href="#/app" class="btn btn-gold" data-i18n="coffee.ctaApp">حمل التطبيق</a>
+        <a href="#seatmap" class="btn btn-ghost on-dark" data-i18n="coffee.ctaReserve">احجز مساحتك</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- bean journey -->
+  <section class="section dark-section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="coffee.jTitle">رحلة الحبة</h2>
+        <hr class="gold-rule">
+        <p class="lead" data-i18n="coffee.jLead">أربع محطات بين المزرعة وفنجانك.</p>
+      </div>
+      <div class="journey-grid">
+        <div class="journey-step rv"><span class="j-num">01</span>
+          <div class="j-icon"><svg viewBox="0 0 48 48"><path d="M14 34 a14 12 0 1 1 20 0 z"/><path d="M10 38 h28"/><path d="M24 10 v-4"/><path d="M16 12 l-3 -3"/><path d="M32 12 l3 -3"/></svg></div>
+          <h4 data-i18n="coffee.j1t">التحميص</h4><p data-i18n="coffee.j1p">دفعات صغيرة تُحمّص أسبوعياً بدرجات متوسطة تُبرز حلاوة الحبة.</p>
+        </div>
+        <div class="journey-step rv" style="--d:90ms"><span class="j-num">02</span>
+          <div class="j-icon"><svg viewBox="0 0 48 48"><path d="M12 14 h24 l-4 12 h-16 z"/><path d="M20 26 v8 a4 4 0 0 0 8 0 v-8"/><circle cx="24" cy="20" r="2.4"/></svg></div>
+          <h4 data-i18n="coffee.j2t">الطحن</h4><p data-i18n="coffee.j2p">نطحن عند الطلب فقط، بدرجة مضبوطة لكل طريقة تحضير.</p>
+        </div>
+        <div class="journey-step rv" style="--d:180ms"><span class="j-num">03</span>
+          <div class="j-icon"><svg viewBox="0 0 48 48"><path d="M14 10 h20 l-6 12 v10 h-8 v-10 z"/><path d="M20 32 v6 h8 v-6"/><path d="M24 16 v6"/></svg></div>
+          <h4 data-i18n="coffee.j3t">الاستخلاص</h4><p data-i18n="coffee.j3p">موازين وحرارة مضبوطة، عشان الكوب الأخير مثل الأول.</p>
+        </div>
+        <div class="journey-step rv" style="--d:270ms"><span class="j-num">04</span>
+          <div class="j-icon"><svg viewBox="0 0 48 48"><path d="M12 20 h20 v8 a10 10 0 0 1 -20 0 z"/><path d="M32 22 h4 a4 4 0 0 1 0 8 h-4"/><path d="M14 42 h16"/></svg></div>
+          <h4 data-i18n="coffee.j4t">التقديم</h4><p data-i18n="coffee.j4p">يوصلك باسمك، مع كلمة من الباريستا عن التحميصة.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- products -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="coffee.pTitle">من قائمة الفروع</h2>
+        <hr class="gold-rule">
+      </div>
+      <div class="product-feature">
+        <div class="pf-media rv"><img src="assets/pesto-croissant.jpg" alt="كرواسون بيستو" loading="lazy"></div>
+        <div class="pf-body rv" style="--d:100ms">
+          <h3 data-i18n="coffee.p1t">كرواسون البيستو</h3>
+          <p data-i18n="coffee.p1p">عجينة 72 ساعة من معملنا، بيستو ريحان طازج وجبنة تذوب على السخان. الأكثر طلباً مع القهوة السوداء.</p>
+          <span class="price">18 <span data-i18n="cur">ريال</span></span>
+        </div>
+      </div>
+      <div class="product-feature flip">
+        <div class="pf-media rv"><img src="assets/blueberry-cheesecake.jpg" alt="تشيز كيك التوت الأزرق" loading="lazy"></div>
+        <div class="pf-body rv" style="--d:100ms">
+          <h3 data-i18n="coffee.p2t">تشيز كيك التوت الأزرق</h3>
+          <p data-i18n="coffee.p2p">قاعدة بسكويت بالزبدة وطبقة كريمية خفيفة، تعلوها صلصة توت مطبوخة في مطبخنا.</p>
+          <span class="price">26 <span data-i18n="cur">ريال</span></span>
+        </div>
+      </div>
+      <div class="product-mosaic">
+        <div class="pm-item pm-a rv"><img src="assets/monte-cristo.jpg" alt="ساندويتش مونت كريستو" loading="lazy"><span class="pm-tag" data-i18n="coffee.m1">مونت كريستو · 32 ريال</span></div>
+        <div class="pm-item pm-b rv" style="--d:70ms"><img src="assets/icecream-oreo.jpg" alt="آيس كريم أوريو" loading="lazy"><span class="pm-tag" data-i18n="coffee.m2">آيس كريم أوريو · 14 ريال</span></div>
+        <div class="pm-item pm-c rv" style="--d:140ms"><img src="assets/lotus-cheesecake.jpg" alt="تشيز كيك لوتس" loading="lazy"><span class="pm-tag" data-i18n="coffee.m3">تشيز كيك لوتس · 26 ريال</span></div>
+        <div class="pm-item pm-d rv"><img src="assets/philly-steak.jpg" alt="ساندويتش فيلي ستيك" loading="lazy"><span class="pm-tag" data-i18n="coffee.m4">فيلي ستيك · 34 ريال</span></div>
+        <div class="pm-item pm-e rv" style="--d:70ms"><img src="assets/lemon-loaf.jpg" alt="كيكة الليمون" loading="lazy"><span class="pm-tag" data-i18n="coffee.m5">كيكة الليمون · 16 ريال</span></div>
+        <div class="pm-item pm-f rv" style="--d:140ms"><img src="assets/icecream-strawberry.jpg" alt="آيس كريم الفراولة" loading="lazy"><span class="pm-tag" data-i18n="coffee.m6">آيس كريم الفراولة · 14 ريال</span></div>
+      </div>
+      <div class="hero-ctas rv" style="justify-content:center;margin-top:2.6rem">
+        <a href="#/app" class="btn btn-dark" data-i18n="coffee.ctaOrder">اطلب الآن من التطبيق</a>
+        <button class="btn btn-ghost" id="joinMembershipBtn" data-i18n="coffee.ctaJoin">انضم للعضوية</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- seat map -->
+  <section class="section marble-section" id="seatmap">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="seat.title">خريطة المقاعد: ديمو الحجز</h2>
+        <hr class="gold-rule">
+        <p class="lead" data-i18n="seat.lead">اضغط على أي كرسي أو طاولة لتشوف تفاصيله وحالته الحية في فرع العليا.</p>
+      </div>
+      <div class="seatmap-wrap">
+        <div class="seatmap-panel rv">
+          <svg class="seatmap-svg" id="seatmapSvg" viewBox="0 0 760 470" role="group" aria-label="خريطة مقاعد الفرع"></svg>
+          <div class="seat-legend">
+            <span><i style="background:#5E7D5A"></i><span data-i18n="seat.avail">متاح</span></span>
+            <span><i style="background:#4A3322"></i><span data-i18n="seat.busy">مشغول</span></span>
+            <span><i style="background:#B8955A"></i><span data-i18n="seat.reserved">محجوز</span></span>
+            <span><i style="background:#B7AFA3"></i><span data-i18n="seat.cleaning">تنظيف</span></span>
+          </div>
+        </div>
+        <div class="seat-detail rv" style="--d:120ms" id="seatDetail">
+          <p class="sd-empty" data-i18n="seat.empty">اختر مقعداً من الخريطة لعرض تفاصيله</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- membership card -->
+  <section class="section dark-section" id="membership">
+    <div class="dust" data-dust="10" aria-hidden="true"></div>
+    <div class="wrap member-zone">
+      <div class="rv">
+        <span class="eyebrow" style="color:var(--gold)" data-i18n="mem.eyebrow">عضوية سترينجرز</span>
+        <h2 data-i18n="mem.title">بطاقتك، مفتاح البيت</h2>
+        <hr class="gold-rule">
+        <p class="lead" data-i18n="mem.lead">نقاط على كل طلب، حجز مقاعد قبل الجميع، ودعوات لجلسات التذوق الشهرية. مرر على البطاقة لتقلبها.</p>
+        <button class="btn btn-gold" style="margin-top:1.8rem" id="memJoinBtn" data-i18n="mem.cta">اطلب عضويتك</button>
+      </div>
+      <div class="member-stage rv" style="--d:150ms">
+        <div class="member-card" id="memberCard" role="button" tabindex="0" aria-label="بطاقة العضوية، اضغط للقلب">
+          <div class="mc-face mc-front">
+            <div class="mc-brand">
+              <svg viewBox="0 0 120 120" style="color:var(--gold)"><use href="#stampLogo"/></svg>
+              <span class="mc-tier">Gold Member</span>
+            </div>
+            <div>
+              <div class="mc-name">عبدالله المطيري</div>
+              <div class="mc-num">SC 2019 4471 0836</div>
+            </div>
+            <div class="mc-since">MEMBER SINCE 2021 · RIYADH</div>
+          </div>
+          <div class="mc-face mc-back">
+            <div class="mc-qr"><svg id="memberQr" viewBox="0 0 29 29"></svg></div>
+            <div class="mc-back-info">
+              <h4 data-i18n="mem.backT">امسح للدخول</h4>
+              <p data-i18n="mem.backP">البطاقة تفتح لك الحجز، الدفع، وتجميع النقاط في كل فروع سترينجرز.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== BAKERY ==================================================== -->
+<section class="page" id="page-bakery">
+  <div class="page-hero marble-section">
+    <div class="wrap">
+      <span class="eyebrow rv">Strangers Bakery</span>
+      <h1 class="rv" data-i18n="bakery.title">المعمل اللي يخبز للجميع</h1>
+      <span class="latin-tag rv" data-i18n="bakery.tag">One central bakery, every croissant identical</span>
+      <p class="lead rv" style="--d:120ms" data-i18n="bakery.lead">من معملنا المركزي في الرياض، نخبز يومياً لفروعنا ولشركائنا من المقاهي والفنادق: نفس العجينة، نفس المعيار، كل يوم.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="bakery.lTitle">خطوط الإنتاج</h2>
+        <hr class="gold-rule">
+      </div>
+      <div class="product-feature">
+        <div class="pf-media rv"><img src="assets/nutella-croissant.jpg" alt="كرواسون نوتيلا" loading="lazy"></div>
+        <div class="pf-body rv" style="--d:100ms">
+          <h3 data-i18n="bakery.l1t">خط الكرواسون والدانش</h3>
+          <p data-i18n="bakery.l1p">عجينة مورقة تتخمر 72 ساعة، تُرقّق وتُلف يدوياً، وتخرج من الأفران على ثلاث دفعات يومية: نوتيلا، لوز، فستق، ونكهات موسمية.</p>
+        </div>
+      </div>
+      <div class="product-feature flip">
+        <div class="pf-media rv"><img src="assets/passion-cheesecake.jpg" alt="تشيز كيك الباشن فروت" loading="lazy"></div>
+        <div class="pf-body rv" style="--d:100ms">
+          <h3 data-i18n="bakery.l2t">خط الحلى والكيك</h3>
+          <p data-i18n="bakery.l2p">تشيز كيك بخمس نكهات، تيراميسو، إكلير، وتارت. كل صينية تخرج بوزن وشكل موحد جاهزة للعرض المباشر.</p>
+        </div>
+      </div>
+      <div class="product-mosaic">
+        <div class="pm-item pm-a rv"><img src="assets/strawberry-danish.jpg" alt="دانش الفراولة" loading="lazy"><span class="pm-tag" data-i18n="bakery.m1">دانش الفراولة</span></div>
+        <div class="pm-item pm-b rv" style="--d:70ms"><img src="assets/eclair.jpg" alt="إكلير" loading="lazy"><span class="pm-tag" data-i18n="bakery.m2">إكلير الشوكولاتة</span></div>
+        <div class="pm-item pm-c rv" style="--d:140ms"><img src="assets/mini-tart.jpg" alt="ميني تارت" loading="lazy"><span class="pm-tag" data-i18n="bakery.m3">ميني تارت</span></div>
+        <div class="pm-item pm-d rv"><img src="assets/chicken-fajita-croissant.jpg" alt="كرواسون فاهيتا الدجاج" loading="lazy"><span class="pm-tag" data-i18n="bakery.m4">كرواسون الفاهيتا</span></div>
+        <div class="pm-item pm-e rv" style="--d:70ms"><img src="assets/blackberry-round.jpg" alt="حلى التوت الأسود" loading="lazy"><span class="pm-tag" data-i18n="bakery.m5">راوند التوت الأسود</span></div>
+        <div class="pm-item pm-f rv" style="--d:140ms"><img src="assets/blackberry-cheesecake.jpg" alt="تشيز كيك التوت الأسود" loading="lazy"><span class="pm-tag" data-i18n="bakery.m6">تشيز كيك التوت الأسود</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section marble-section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="bakery.qTitle">معايير الجودة</h2>
+        <hr class="gold-rule">
+      </div>
+      <div class="quality-cols">
+        <div class="q-item rv">
+          <div class="q-mark"><svg viewBox="0 0 24 24"><path d="M12 3 l7 4 v6 c0 4 -3 6.5 -7 8 c-4 -1.5 -7 -4 -7 -8 v-6 z"/><path d="M9 12 l2 2 l4 -4.5"/></svg></div>
+          <div><h4 data-i18n="bakery.q1t">سلامة غذائية موثقة</h4><p data-i18n="bakery.q1p">تشغيل وفق اشتراطات هيئة الغذاء والدواء، وسجل حرارة لكل مرحلة تبريد.</p></div>
+        </div>
+        <div class="q-item rv" style="--d:80ms">
+          <div class="q-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7 v5 l3.5 2"/></svg></div>
+          <div><h4 data-i18n="bakery.q2t">طازج خلال ساعات</h4><p data-i18n="bakery.q2p">من الفرن إلى رف الفرع أو باب الشريك في أقل من 4 ساعات عبر أسطولنا المبرد.</p></div>
+        </div>
+        <div class="q-item rv" style="--d:160ms">
+          <div class="q-mark"><svg viewBox="0 0 24 24"><path d="M4 17 l5 -5 l4 3 l7 -8"/><path d="M15 7 h5 v5"/></svg></div>
+          <div><h4 data-i18n="bakery.q3t">معايرة يومية</h4><p data-i18n="bakery.q3p">عينة من كل دفعة تُوزن وتُذاق قبل خروج الطلبية، والملاحظات ترجع لخط الإنتاج بنفس اليوم.</p></div>
+        </div>
+        <div class="q-item rv" style="--d:240ms">
+          <div class="q-mark"><svg viewBox="0 0 24 24"><path d="M6 4 h12 v6 a6 6 0 0 1 -12 0 z"/><path d="M9 20 h6"/><path d="M12 14 v6"/></svg></div>
+          <div><h4 data-i18n="bakery.q4t">مكونات مختارة</h4><p data-i18n="bakery.q4p">زبدة أوروبية، شوكولاتة بلجيكية، وفواكه موسمها: ما نستبدل المكون عشان التكلفة.</p></div>
+        </div>
+      </div>
+      <div class="hero-ctas rv" style="margin-top:3rem">
+        <a href="#/b2b" class="btn btn-gold" data-i18n="bakery.ctaSamples">اطلب عينات</a>
+        <a href="#/b2b" class="btn btn-ghost" data-i18n="bakery.ctaPartner">صِر شريكاً</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== B2B ==================================================== -->
+<section class="page" id="page-b2b">
+  <div class="page-hero dark-section">
+    <div class="dust" data-dust="8" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="eyebrow rv" style="color:var(--gold)">Strangers B2B</span>
+      <h1 class="rv" data-i18n="b2b.title">مخبزك المركزي، بدون ما تبني مخبزاً</h1>
+      <span class="latin-tag rv" data-i18n="b2b.tag">Wholesale supply for cafes, restaurants, and hotels</span>
+      <p class="lead rv" style="--d:120ms" data-i18n="b2b.lead">نورد المخبوزات والحلى وحبوب القهوة بجدولة ثابتة وجودة معمل، عشان تركز على ضيوفك.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="b2b.whoTitle">لمن هذه الخدمة</h2>
+        <hr class="gold-rule">
+      </div>
+      <div class="values-grid">
+        <div class="value-card vc-w6 rv"><h4 data-i18n="b2b.w1t">المقاهي المتخصصة</h4><p data-i18n="b2b.w1p">فيترينة كاملة من الكرواسون والحلى بدون مطبخ إنتاج، مع توريد صباحي قبل الافتتاح.</p></div>
+        <div class="value-card vc-dark vc-w6 rv" style="--d:80ms"><h4 data-i18n="b2b.w2t">المطاعم</h4><p data-i18n="b2b.w2p">خبز الساندويتش والبريوش بمقاسات مخصصة لقائمتك، بعقود شهرية مرنة.</p></div>
+        <div class="value-card vc-gold vc-w6 rv" style="--d:120ms"><h4 data-i18n="b2b.w3t">الفنادق</h4><p data-i18n="b2b.w3p">بوفيهات إفطار وضيافة غرف بكميات كبيرة وجودة ثابتة على مدار الأسبوع.</p></div>
+        <div class="value-card vc-w6 rv" style="--d:180ms"><h4 data-i18n="b2b.w4t">الجهات والشركات</h4><p data-i18n="b2b.w4p">ضيافة مكاتب واجتماعات دورية، بفوترة موحدة وتقارير استهلاك شهرية.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section marble-section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="b2b.flowTitle">رحلة طلبك من التسجيل للتسليم</h2>
+        <hr class="gold-rule">
+        <p class="lead" data-i18n="b2b.flowLead">تسع مراحل شفافة، تتابعها أولاً بأول. اضغط أي مرحلة أو استخدم الأزرار للتجربة.</p>
+      </div>
+      <div class="status-flow rv">
+        <div class="status-track" id="statusTrack"></div>
+        <div class="status-desc" id="statusDesc"></div>
+        <div class="status-nav">
+          <button class="btn btn-ghost" id="statusPrev" data-i18n="b2b.prev">السابق</button>
+          <button class="btn btn-dark" id="statusNext" data-i18n="b2b.next">المرحلة التالية</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="b2b-register">
+    <div class="wrap" style="max-width:920px">
+      <div class="section-head rv" style="text-align:center;margin-inline:auto">
+        <h2 data-i18n="b2b.regTitle">سجل منشأتك</h2>
+        <hr class="gold-rule" style="margin-inline:auto">
+        <p class="lead" style="margin-inline:auto" data-i18n="b2b.regLead">عبّي البيانات وبيتواصل معك مدير حسابات خلال يومي عمل مع عرض سعر مبدئي.</p>
+      </div>
+      <div class="form-card rv">
+        <form id="b2bForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="bf-company" data-i18n="b2b.fCompany">اسم المنشأة</label>
+              <input id="bf-company" name="company" type="text">
+              <span class="err" data-i18n="b2b.fCompanyErr">اكتب اسم المنشأة</span>
+            </div>
+            <div class="field">
+              <label for="bf-cr" data-i18n="b2b.fCr">رقم السجل التجاري</label>
+              <input id="bf-cr" name="cr" type="text" inputmode="numeric" placeholder="10xxxxxxxx" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="b2b.fCrErr">سجل تجاري من 10 أرقام</span>
+            </div>
+            <div class="field">
+              <label for="bf-vat" data-i18n="b2b.fVat">الرقم الضريبي</label>
+              <input id="bf-vat" name="vat" type="text" inputmode="numeric" placeholder="3xxxxxxxxxxxxxx" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="b2b.fVatErr">رقم ضريبي من 15 رقم يبدأ بـ 3</span>
+            </div>
+            <div class="field">
+              <label for="bf-activity" data-i18n="b2b.fActivity">النشاط</label>
+              <select id="bf-activity" name="activity">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="cafe" data-i18n="b2b.aCafe">مقهى</option>
+                <option value="restaurant" data-i18n="b2b.aRest">مطعم</option>
+                <option value="hotel" data-i18n="b2b.aHotel">فندق</option>
+                <option value="corporate" data-i18n="b2b.aCorp">جهة أو شركة</option>
+              </select>
+              <span class="err" data-i18n="b2b.fActivityErr">اختر النشاط</span>
+            </div>
+            <div class="field">
+              <label for="bf-branches" data-i18n="b2b.fBranches">عدد الفروع</label>
+              <input id="bf-branches" name="branches" type="number" min="1" max="500" value="1" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="b2b.fBranchesErr">أدخل عدداً صحيحاً</span>
+            </div>
+            <div class="field">
+              <label for="bf-contact" data-i18n="b2b.fContact">اسم المسؤول</label>
+              <input id="bf-contact" name="contact" type="text">
+              <span class="err" data-i18n="b2b.fContactErr">اكتب اسم المسؤول</span>
+            </div>
+            <div class="field">
+              <label for="bf-phone" data-i18n="f.phone">رقم الجوال</label>
+              <input id="bf-phone" name="phone" type="tel" inputmode="tel" placeholder="05xxxxxxxx" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="f.phoneErr">رقم جوال سعودي صحيح (يبدأ بـ 05)</span>
+            </div>
+            <div class="field">
+              <label for="bf-email" data-i18n="b2b.fEmail">البريد الإلكتروني</label>
+              <input id="bf-email" name="email" type="email" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="b2b.fEmailErr">بريد إلكتروني صحيح</span>
+            </div>
+            <div class="field">
+              <label for="bf-city" data-i18n="f.city">المدينة</label>
+              <input id="bf-city" name="city" type="text">
+              <span class="err" data-i18n="f.cityErr">اكتب المدينة</span>
+            </div>
+            <div class="field">
+              <label for="bf-products" data-i18n="b2b.fProducts">المنتجات المطلوبة</label>
+              <select id="bf-products" name="products">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="pastries" data-i18n="b2b.pPastries">كرواسون ودانش</option>
+                <option value="desserts" data-i18n="b2b.pDesserts">حلى وكيك</option>
+                <option value="sandwiches" data-i18n="b2b.pSandwiches">ساندويتشات وخبز</option>
+                <option value="beans" data-i18n="b2b.pBeans">حبوب قهوة محمصة</option>
+                <option value="mix" data-i18n="b2b.pMix">تشكيلة متنوعة</option>
+              </select>
+              <span class="err" data-i18n="b2b.fProductsErr">اختر المنتجات</span>
+            </div>
+            <div class="field full">
+              <label for="bf-qty" data-i18n="b2b.fQty">الكميات التقريبية والملاحظات</label>
+              <textarea id="bf-qty" name="quantities" placeholder=""></textarea>
+              <span class="err" data-i18n="b2b.fQtyErr">اكتب الكميات المتوقعة أسبوعياً</span>
+            </div>
+            <div class="field full">
+              <button type="submit" class="btn btn-gold" style="width:100%" data-i18n="b2b.fSend">أرسل طلب التسجيل</button>
+            </div>
+          </div>
+        </form>
+        <div class="form-success" id="b2bSuccess">
+          <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg></div>
+          <h3 data-i18n="b2b.okT">تم استلام طلب التسجيل</h3>
+          <p data-i18n="b2b.okP">مدير الحسابات بيتواصل معك خلال يومي عمل مع عرض السعر المبدئي.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== CATERING ==================================================== -->
+<section class="page" id="page-catering">
+  <div class="page-hero marble-section">
+    <div class="wrap">
+      <span class="eyebrow rv">Strangers Catering</span>
+      <h1 class="rv" data-i18n="cat.title">ضيافة مناسبتك، بمعيار سترينجرز</h1>
+      <span class="latin-tag rv" data-i18n="cat.tag">From board meetings to wedding halls</span>
+      <p class="lead rv" style="--d:120ms" data-i18n="cat.lead">من اجتماع مجلس إدارة لعشرة أشخاص إلى حفل زواج بخمسمئة ضيف: نجهز، نوصل، ونقدم بفريقنا.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head rv">
+        <h2 data-i18n="cat.pkgTitle">الباقات الثلاث</h2>
+        <hr class="gold-rule">
+      </div>
+      <div class="packages-grid">
+        <div class="pkg-card rv">
+          <span class="pkg-tier">Signature</span>
+          <h3 data-i18n="cat.pk1t">سيجنتشر</h3>
+          <div class="pkg-price">85 <small data-i18n="cat.per">ريال / ضيف</small></div>
+          <ul class="pkg-list">
+            <li data-i18n="cat.pk1a">ركن قهوة مختصة مع باريستا واحد</li>
+            <li data-i18n="cat.pk1b">تشكيلة مخبوزات وحلى (6 أصناف)</li>
+            <li data-i18n="cat.pk1c">تجهيز وتقديم لمدة 3 ساعات</li>
+            <li data-i18n="cat.pk1d">مناسب من 10 إلى 50 ضيف</li>
+          </ul>
+          <button class="btn btn-ghost pkg-pick" data-pkg="signature" data-i18n="cat.pick">اختر هذه الباقة</button>
+        </div>
+        <div class="pkg-card pkg-featured rv" style="--d:90ms">
+          <span class="pkg-badge" data-i18n="cat.popular">الأكثر طلباً</span>
+          <span class="pkg-tier">Prestige</span>
+          <h3 data-i18n="cat.pk2t">برستيج</h3>
+          <div class="pkg-price">145 <small data-i18n="cat.per" style="color:rgba(250,247,242,.6)">ريال / ضيف</small></div>
+          <ul class="pkg-list">
+            <li data-i18n="cat.pk2a">ركنان: قهوة مختصة وشاي مغربي</li>
+            <li data-i18n="cat.pk2b">12 صنفاً بينها ساندويتشات وحلى فاخر</li>
+            <li data-i18n="cat.pk2c">فريق تقديم كامل لمدة 5 ساعات</li>
+            <li data-i18n="cat.pk2d">تنسيق طاولات بهوية مناسبتك</li>
+            <li data-i18n="cat.pk2e">مناسب من 50 إلى 200 ضيف</li>
+          </ul>
+          <button class="btn btn-gold pkg-pick" data-pkg="prestige" data-i18n="cat.pick">اختر هذه الباقة</button>
+        </div>
+        <div class="pkg-card rv" style="--d:180ms">
+          <span class="pkg-tier">Royal</span>
+          <h3 data-i18n="cat.pk3t">رويال</h3>
+          <div class="pkg-price">240 <small data-i18n="cat.per">ريال / ضيف</small></div>
+          <ul class="pkg-list">
+            <li data-i18n="cat.pk3a">تجربة ضيافة كاملة بإشراف مدير فعاليات</li>
+            <li data-i18n="cat.pk3b">قائمة مصممة خصيصاً مع جلسة تذوق مسبقة</li>
+            <li data-i18n="cat.pk3c">أركان حية: تحميص، حلى، وآيس كريم</li>
+            <li data-i18n="cat.pk3d">تغطية المناسبة كاملة بلا حد ساعات</li>
+            <li data-i18n="cat.pk3e">من 200 ضيف وما فوق</li>
+          </ul>
+          <button class="btn btn-ghost pkg-pick" data-pkg="royal" data-i18n="cat.pick">اختر هذه الباقة</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section marble-section" id="catering-request">
+    <div class="wrap" style="max-width:920px">
+      <div class="section-head rv" style="text-align:center;margin-inline:auto">
+        <h2 data-i18n="cat.reqTitle">اطلب كاترينج</h2>
+        <hr class="gold-rule" style="margin-inline:auto">
+      </div>
+      <div class="form-card rv">
+        <form id="cateringForm" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="cf-type" data-i18n="cat.fType">نوع المناسبة</label>
+              <select id="cf-type" name="type">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="wedding" data-i18n="cat.tWedding">زواج</option>
+                <option value="corporate" data-i18n="cat.tCorp">فعالية شركة</option>
+                <option value="meeting" data-i18n="cat.tMeeting">اجتماع عمل</option>
+                <option value="family" data-i18n="cat.tFamily">مناسبة عائلية</option>
+                <option value="graduation" data-i18n="cat.tGrad">تخرج</option>
+              </select>
+              <span class="err" data-i18n="cat.fTypeErr">اختر نوع المناسبة</span>
+            </div>
+            <div class="field">
+              <label for="cf-date" data-i18n="cat.fDate">التاريخ</label>
+              <input id="cf-date" name="date" type="date">
+              <span class="err" data-i18n="cat.fDateErr">اختر تاريخاً قادماً</span>
+            </div>
+            <div class="field">
+              <label for="cf-time" data-i18n="cat.fTime">الوقت</label>
+              <input id="cf-time" name="time" type="time">
+              <span class="err" data-i18n="cat.fTimeErr">حدد الوقت</span>
+            </div>
+            <div class="field">
+              <label for="cf-loc" data-i18n="cat.fLoc">الموقع</label>
+              <input id="cf-loc" name="location" type="text">
+              <span class="err" data-i18n="cat.fLocErr">اكتب المدينة والحي أو القاعة</span>
+            </div>
+            <div class="field">
+              <label for="cf-guests" data-i18n="cat.fGuests">عدد الضيوف</label>
+              <input id="cf-guests" name="guests" type="number" min="10" max="2000" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="cat.fGuestsErr">من 10 ضيوف فما فوق</span>
+            </div>
+            <div class="field">
+              <label for="cf-pkg" data-i18n="cat.fPkg">الباقة</label>
+              <select id="cf-pkg" name="package">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="signature">Signature</option>
+                <option value="prestige">Prestige</option>
+                <option value="royal">Royal</option>
+                <option value="custom" data-i18n="cat.pCustom">أحتاج استشارة</option>
+              </select>
+              <span class="err" data-i18n="cat.fPkgErr">اختر الباقة</span>
+            </div>
+            <div class="field">
+              <label for="cf-budget" data-i18n="cat.fBudget">الميزانية التقريبية</label>
+              <select id="cf-budget" name="budget">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="lt10" data-i18n="cat.b1">أقل من 10 آلاف ريال</option>
+                <option value="10-30" data-i18n="cat.b2">10 إلى 30 ألف ريال</option>
+                <option value="30-80" data-i18n="cat.b3">30 إلى 80 ألف ريال</option>
+                <option value="gt80" data-i18n="cat.b4">أكثر من 80 ألف ريال</option>
+              </select>
+              <span class="err" data-i18n="cat.fBudgetErr">اختر نطاق الميزانية</span>
+            </div>
+            <div class="field">
+              <label for="cf-phone" data-i18n="f.phone">رقم الجوال</label>
+              <input id="cf-phone" name="phone" type="tel" inputmode="tel" placeholder="05xxxxxxxx" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="f.phoneErr">رقم جوال سعودي صحيح (يبدأ بـ 05)</span>
+            </div>
+            <div class="field full">
+              <label for="cf-notes" data-i18n="cat.fNotes">ملاحظات إضافية (اختياري)</label>
+              <textarea id="cf-notes" name="notes"></textarea>
+              <span class="err"></span>
+            </div>
+            <div class="field full">
+              <button type="submit" class="btn btn-gold" style="width:100%" data-i18n="cat.fSend">أرسل طلب الكاترينج</button>
+            </div>
+          </div>
+        </form>
+        <div class="form-success" id="cateringSuccess">
+          <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg></div>
+          <h3 data-i18n="cat.okT">وصلنا طلب مناسبتك</h3>
+          <p data-i18n="cat.okP">منسق الفعاليات بيتصل بك خلال 24 ساعة لتأكيد التفاصيل وجلسة التذوق.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== LOGISTIC ==================================================== -->
+<section class="page" id="page-logistic">
+  <div class="page-hero dark-section" style="padding-bottom:0">
+    <div class="dust" data-dust="8" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="eyebrow rv" style="color:var(--gold)">Strangers Logistic</span>
+      <h1 class="rv" data-i18n="log.title">الذراع اللي توصل الطازج بوقته</h1>
+      <span class="latin-tag rv" data-i18n="log.tag">Cold-chain fleet connecting bakery, branches, and clients</span>
+      <p class="lead rv" style="--d:120ms" data-i18n="log.lead">أسطول مبرد خاص ينقل إنتاج المعمل للفروع وشركاء B2B وفعاليات الكاترينج، بجدولة تبدأ قبل الفجر.</p>
+    </div>
+    <div class="wrap rv" style="--d:200ms;padding-block:3rem">
+      <svg class="route-map" viewBox="0 0 900 380" aria-label="خريطة مسارات التوصيل">
+        <path class="route-path" id="routeLine" d="M110 300 C 220 250, 300 140, 450 150 S 690 220, 800 90"/>
+        <circle class="city-dot" cx="110" cy="300" r="7"/>
+        <text class="city-label" x="110" y="335" text-anchor="middle">المعمل المركزي</text>
+        <circle class="city-dot" cx="450" cy="150" r="7"/>
+        <text class="city-label" x="450" y="120" text-anchor="middle">فروع الرياض</text>
+        <circle class="city-dot" cx="640" cy="196" r="7"/>
+        <text class="city-label" x="640" y="232" text-anchor="middle">شركاء B2B</text>
+        <circle class="city-dot" cx="800" cy="90" r="7"/>
+        <text class="city-label" x="800" y="60" text-anchor="middle">فعاليات الكاترينج</text>
+        <g id="truckMarker">
+          <circle class="truck-dot" r="9"/>
+          <circle r="16" fill="none" stroke="rgba(184,149,90,.4)" stroke-width="1.6">
+            <animate attributeName="r" values="10;20;10" dur="2.4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values=".8;0;.8" dur="2.4s" repeatCount="indefinite"/>
+          </circle>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <section class="section dark-section" style="padding-top:1rem">
+    <div class="wrap">
+      <div class="fleet-grid">
+        <div class="fleet-card rv"><div class="f-num">14</div><h4 data-i18n="log.f1t">مركبة مبردة</h4><p data-i18n="log.f1p">فانات تبريد مزدوج تحافظ على سلسلة البرودة من الرصيف للرصيف.</p></div>
+        <div class="fleet-card rv" style="--d:90ms"><div class="f-num">2</div><h4 data-i18n="log.f2t">جولة توصيل يومياً</h4><p data-i18n="log.f2p">جولة فجرية قبل افتتاح الفروع وجولة ظهرية لتعزيز الرفوف.</p></div>
+        <div class="fleet-card rv" style="--d:180ms"><div class="f-num">3</div><h4 data-i18n="log.f3t">مدن مخدومة</h4><p data-i18n="log.f3p">الرياض والخرج حالياً، والدمام على الخارطة هذا العام.</p></div>
+      </div>
+      <div class="values-grid" style="margin-top:2.5rem">
+        <div class="value-card vc-w6 rv" style="background:rgba(250,247,242,.05);border-color:var(--line-dark)"><h4 style="color:var(--bg)" data-i18n="log.s1t">نقل بين الفروع</h4><p style="color:rgba(250,247,242,.6)" data-i18n="log.s1p">موازنة المخزون بين الفروع خلال اليوم عشان ما ينفد صنف قبل الإغلاق.</p></div>
+        <div class="value-card vc-w6 rv" style="--d:90ms;background:rgba(250,247,242,.05);border-color:var(--line-dark)"><h4 style="color:var(--bg)" data-i18n="log.s2t">دعم B2B والكاترينج</h4><p style="color:rgba(250,247,242,.6)" data-i18n="log.s2p">توصيل طلبات الشركاء بجدولة ملزمة، وتجهيز مواقع الفعاليات قبل الضيوف بساعات.</p></div>
+      </div>
+      <div class="hero-ctas rv" style="margin-top:2.8rem">
+        <a href="#/contact" class="btn btn-gold" data-i18n="log.cta">اسأل عن مناطق الخدمة</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== NEWS ==================================================== -->
+<section class="page" id="page-news">
+  <div class="page-hero marble-section">
+    <div class="wrap">
+      <span class="eyebrow rv" data-i18n="news.eyebrow">أخبار وفعاليات</span>
+      <h1 class="rv" data-i18n="news.title">وش يصير في سترينجرز</h1>
+      <span class="latin-tag rv">News and Events</span>
+    </div>
+  </div>
+  <section class="section">
+    <div class="wrap">
+      <div class="news-grid">
+        <article class="news-card nc-lg rv">
+          <div class="news-img" style="background-image:url('assets/coffee-jar.jpg')"></div>
+          <div class="news-body">
+            <span class="news-date">2026/07</span>
+            <h4 data-i18n="news.1t">إطلاق تحميصة الصيف: حبوب إثيوبية بنوتة توت</h4>
+            <p data-i18n="news.1p">تحميصة موسمية محدودة متوفرة للشرب في الفروع وللبيع بالجرة، ولشركاء B2B بطلب مسبق.</p>
+          </div>
+        </article>
+        <article class="news-card nc-sm rv" style="--d:80ms">
+          <div class="news-img" style="background-image:url('assets/italian-sandwich.jpg')"></div>
+          <div class="news-body">
+            <span class="news-date">2026/06</span>
+            <h4 data-i18n="news.2t">ورشة تذوق شهرية للأعضاء</h4>
+            <p data-i18n="news.2p">أول خميس من كل شهر، بفرع حطين. الحجز من التطبيق.</p>
+          </div>
+        </article>
+        <article class="news-card nc-sm rv" style="--d:160ms">
+          <div class="news-img" style="background-image:url('assets/turkey-club.jpg')"></div>
+          <div class="news-body">
+            <span class="news-date">2026/05</span>
+            <h4 data-i18n="news.3t">سترينجرز في معرض القهوة الدولي بالرياض</h4>
+            <p data-i18n="news.3p">جناحنا قدم تجربة رحلة الحبة لأكثر من ثلاثة آلاف زائر خلال أربعة أيام.</p>
+          </div>
+        </article>
+        <article class="news-card nc-sm rv" style="--d:240ms">
+          <div class="news-img" style="background-image:url('assets/eclair.jpg')"></div>
+          <div class="news-body">
+            <span class="news-date">2026/03</span>
+            <h4 data-i18n="news.4t">توسعة المعمل: خط إنتاج ثالث</h4>
+            <p data-i18n="news.4p">الخط الجديد يرفع طاقة الإنتاج اليومية استعداداً لدخول الدمام.</p>
+          </div>
+        </article>
+        <article class="news-card nc-sm rv" style="--d:320ms">
+          <div class="news-img" style="background-image:url('assets/strawberry-danish.jpg')"></div>
+          <div class="news-body">
+            <span class="news-date">2026/02</span>
+            <h4 data-i18n="news.5t">شراكة مع مزارع فراولة محلية</h4>
+            <p data-i18n="news.5p">فراولة الدانش والتشيز كيك صارت توصلنا من مزارع الخرج صباح كل يوم.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== CONTACT ==================================================== -->
+<section class="page" id="page-contact">
+  <div class="page-hero marble-section">
+    <div class="wrap">
+      <span class="eyebrow rv" data-i18n="contact.eyebrow">تواصل معنا</span>
+      <h1 class="rv" data-i18n="contact.title">أبواب سترينجرز مفتوحة</h1>
+      <span class="latin-tag rv">Contact and Branches</span>
+    </div>
+  </div>
+  <section class="section">
+    <div class="wrap">
+      <div class="contact-info-row rv">
+        <div class="ci-cell"><div class="ci-label" data-i18n="contact.phone">الهاتف الموحد</div><div class="ci-val mono">920 034 217</div></div>
+        <div class="ci-cell"><div class="ci-label" data-i18n="contact.email">البريد</div><div class="ci-val mono">hello@strangers.sa</div></div>
+        <div class="ci-cell"><div class="ci-label" data-i18n="contact.hours">ساعات العمل</div><div class="ci-val" style="direction:inherit;text-align:start" data-i18n="contact.hoursVal">يومياً 6 صباحاً حتى 12 منتصف الليل</div></div>
+      </div>
+      <div class="section-head rv">
+        <h2 data-i18n="contact.brTitle">الفروع</h2>
+        <hr class="gold-rule">
+      </div>
+      <div class="branches-grid">
+        <div class="branch-card rv"><span class="b-city">RIYADH</span><h4 data-i18n="contact.br1t">فرع العليا</h4><p data-i18n="contact.br1p">شارع العليا العام، مقابل برج المملكة. الفرع الأول والأكبر، فيه غرفة الاجتماعات ومنطقة العائلات.</p></div>
+        <div class="branch-card rv" style="--d:90ms"><span class="b-city">RIYADH</span><h4 data-i18n="contact.br2t">فرع حطين</h4><p data-i18n="contact.br2p">بوليفارد حطين. فرع الجلسات الخارجية ومقر ورشة التذوق الشهرية.</p></div>
+        <div class="branch-card rv" style="--d:180ms"><span class="b-city">AL KHARJ</span><h4 data-i18n="contact.br3t">فرع الخرج</h4><p data-i18n="contact.br3p">طريق الملك عبدالله. أحدث فروعنا، بتصميم المخبز المفتوح.</p></div>
+      </div>
+      <div class="hero-ctas rv" style="margin-top:2.8rem">
+        <a href="#/" class="btn btn-gold" id="contactToTalk" data-i18n="contact.cta">أرسل طلب تواصل</a>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== APP ==================================================== -->
+<section class="page" id="page-app">
+  <div class="page-hero dark-section" style="padding-bottom:clamp(3.5rem,7vw,5rem)">
+    <div class="dust" data-dust="12" aria-hidden="true"></div>
+    <div class="wrap phone-zone">
+      <div>
+        <span class="eyebrow rv" style="color:var(--gold)" data-i18n="app.eyebrow">تطبيق سترينجرز</span>
+        <h1 class="rv" data-i18n="app.title">الفرع كله في جيبك</h1>
+        <span class="latin-tag rv" data-i18n="app.tag">Order, reserve, and collect points from one app</span>
+        <p class="lead rv" style="--d:120ms" data-i18n="app.lead">اطلب قبل لا توصل، احجز مقعدك أو غرفة الاجتماعات، وامسح بطاقتك عند الكاشير لتجمع النقاط.</p>
+        <div class="store-badges rv" style="--d:200ms">
+          <a href="#/app" class="store-badge" id="appStoreBtn">
+            <svg viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+            <span class="sb-txt"><small>Download on the</small><b>App Store</b></span>
+          </a>
+          <a href="#/app" class="store-badge" id="playStoreBtn">
+            <svg viewBox="0 0 24 24"><path d="M3.6 2.3 13.5 12 3.6 21.7c-.36-.2-.6-.58-.6-1.05V3.35c0-.47.24-.85.6-1.05zM14.9 13.4l2.4 2.36-9.9 5.64 7.5-8zM19.8 9.9c.7.4 1.2.94 1.2 2.1 0 1.16-.5 1.7-1.2 2.1l-2.7 1.54-2.7-2.64 2.7-2.64 2.7 1.54zM7.4 2.6l9.9 5.64-2.4 2.36-7.5-8z"/></svg>
+            <span class="sb-txt"><small>GET IT ON</small><b>Google Play</b></span>
+          </a>
+        </div>
+      </div>
+      <div class="phone-stage rv" style="--d:150ms" id="phoneStage">
+        <div class="phone-3d" id="phone3d">
+          <div class="phone-screen">
+            <div class="phone-notch"></div>
+            <div class="ps-head">
+              <div><div class="ps-hi" data-i18n="app.psHi">مساء الخير</div><div class="ps-name">عبدالله المطيري</div></div>
+              <svg viewBox="0 0 120 120" style="color:var(--gold)"><use href="#stampLogo"/></svg>
+            </div>
+            <div class="ps-card">
+              <span class="ps-tier">Gold Member</span>
+              <div class="ps-num">SC 2019 4471 0836</div>
+              <div class="ps-qr"><svg id="phoneQr" viewBox="0 0 29 29"></svg></div>
+            </div>
+            <div class="ps-actions">
+              <button type="button"><svg viewBox="0 0 24 24"><path d="M5 8 h14 l-1.5 11 h-11 z"/><path d="M9 8 a3 3 0 0 1 6 0"/></svg><span data-i18n="app.psOrder">اطلب</span></button>
+              <button type="button"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 3 v5 M16 3 v5 M4 11 h16"/></svg><span data-i18n="app.psReserve">احجز</span></button>
+              <button type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5 v4.5 l3 2"/></svg><span data-i18n="app.psSession">جلستي</span></button>
+            </div>
+            <div class="ps-session"><span data-i18n="app.psPoints">رصيد النقاط</span><b>1,240</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
+  <div class="dust" data-dust="8" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#/" class="brand-lockup">
+          <svg viewBox="0 0 120 120" style="color:var(--gold);width:64px;height:64px"><use href="#stampLogo"/></svg>
+          <span class="brand-name" style="color:var(--bg)">Strangers<small style="color:rgba(250,247,242,.55)" data-i18n="brand.sub">شركة سترينجرز</small></span>
+        </a>
+        <p data-i18n="footer.about">منظومة ضيافة سعودية متكاملة منذ 2017: قهوة، مخبز، حلول أعمال، كاترينج، ولوجستك.</p>
+      </div>
+      <div>
+        <h5 data-i18n="footer.companies">الأقسام</h5>
+        <a href="#/coffee" data-i18n="nav.coffee">القهوة</a>
+        <a href="#/bakery" data-i18n="nav.bakery">المخبز</a>
+        <a href="#/b2b" data-i18n="nav.b2b">أعمال B2B</a>
+        <a href="#/catering" data-i18n="nav.catering">الكاترينج</a>
+        <a href="#/logistic" data-i18n="nav.logistic">اللوجستك</a>
+      </div>
+      <div>
+        <h5 data-i18n="footer.company">الشركة</h5>
+        <a href="#/about" data-i18n="nav.about">من نحن</a>
+        <a href="#/news" data-i18n="nav.news">الأخبار</a>
+        <a href="#/contact" data-i18n="nav.contact">تواصل</a>
+        <a href="#/app" data-i18n="nav.app">التطبيق</a>
+      </div>
+      <div>
+        <h5 data-i18n="footer.contact">تواصل</h5>
+        <a href="tel:920034217" class="mono" dir="ltr" style="text-align:end">920 034 217</a>
+        <a href="mailto:hello@strangers.sa" class="mono" dir="ltr" style="text-align:end">hello@strangers.sa</a>
+        <a href="#/contact" data-i18n="footer.branches">مواقع الفروع</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="footer.rights">جميع الحقوق محفوظة لشركة سترينجرز 2026</span>
+      <span class="latin">COME AS A STRANGER · LEAVE AS A FRIEND · ESTD 2017</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var $ = function(s,c){return (c||document).querySelector(s)};
+var $$ = function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))};
+
+/* ================= i18n ================= */
+var AR = {}; // captured from DOM
+$$("[data-i18n]").forEach(function(el){
+  var k = el.getAttribute("data-i18n");
+  if(!(k in AR)) AR[k] = el.textContent;
+});
+
+var EN = {
+  "brand.sub":"Strangers Company",
+  "nav.home":"Home","nav.about":"About","nav.coffee":"Coffee","nav.bakery":"Bakery","nav.b2b":"B2B","nav.catering":"Catering","nav.logistic":"Logistic","nav.news":"News","nav.contact":"Contact","nav.app":"App",
+  "hero.eyebrow":"Strangers Company · Since 2017",
+  "hero.title":"One Brand. Multiple Experiences.",
+  "hero.tagline":"تعال غريب، اطلع صديق",
+  "hero.sub":"From a single cup of coffee to a full Saudi hospitality system: cafe, central bakery, B2B supply, catering, and logistics.",
+  "hero.cta":"Explore the World of Strangers","hero.cta2":"Talk to Us",
+  "who.eyebrow":"Who We Are","who.title":"We started with a cup, and grew into a system",
+  "who.lead":"In 2017 we opened our first cafe with a simple spirit: every stranger who walks in leaves as a friend. Today Strangers runs five divisions serving Saudi hospitality from bean to banquet.",
+  "who.s1":"Years of hospitality","who.s2":"Integrated divisions","who.s3":"Fresh products daily","who.s4":"Cities served",
+  "tl.1t":"The first cup","tl.1p":"Our first cafe opens in Riyadh.",
+  "tl.2t":"Central bakery","tl.2p":"Strangers Bakery starts daily production.",
+  "tl.3t":"Business solutions","tl.3p":"B2B supply for cafes and hotels begins.",
+  "tl.4t":"Catering","tl.4p":"Premium packages for events and occasions.",
+  "tl.5t":"Logistics","tl.5p":"A private fleet connects branches and clients.",
+  "comp.title":"The five divisions of Strangers","comp.lead":"Each division runs with its own identity, all sharing one spirit.","comp.explore":"Explore",
+  "comp.coffee.t":"Coffee","comp.coffee.p":"Where the story began: curated roasts, seating spaces, and a private membership.",
+  "comp.bakery.t":"Bakery","comp.bakery.p":"A central lab baking croissants, danishes, and cakes for every branch and partner.",
+  "comp.b2b.t":"Business Solutions","comp.b2b.p":"Scheduled supply for cafes, restaurants, and hotels.",
+  "comp.catering.t":"Catering","comp.catering.p":"Event hospitality in three premium packages.",
+  "comp.logistic.t":"Logistic","comp.logistic.p":"A fleet moving fresh goods between branches and clients.",
+  "exp.title":"The Strangers Experience","exp.lead":"Drag to see how the experience shifts with every guest.",
+  "exp.1t":"Coffee","exp.1p":"Specialty brews prepared in front of you, bean to cup.",
+  "exp.2t":"Bakes","exp.2p":"Croissants and danishes out of the oven all day long.",
+  "exp.3t":"Families","exp.3p":"A calm family zone with comfortable, private seating.",
+  "exp.4t":"Students","exp.4p":"Study tables, power at every seat, fair session pricing.",
+  "exp.5t":"Business","exp.5p":"A meeting room bookable by the hour with full service.",
+  "exp.6t":"Catering","exp.6p":"Your occasion, served at branch quality, at your place.",
+  "exp.7t":"Community","exp.7p":"Monthly tasting sessions and roasting workshops for members.",
+  "latest.title":"Latest From Strangers",
+  "latest.1t":"Tiramisu season: an Italian recipe with a Saudi touch","latest.1p":"Mascarpone layers with espresso roasted in our lab, in all branches until the end of summer.",
+  "latest.2t":"Pistachio danish joins the permanent menu","latest.2p":"After topping the members vote.",
+  "latest.3t":"A new lunch menu for the branches","latest.3p":"Five new sandwiches from our central kitchen.",
+  "talk.title":"Talk to Strangers","talk.lead":"Tell us what you need and our team replies within one business day.",
+  "f.name":"Full name","f.nameErr":"Please enter your name",
+  "f.phone":"Mobile number","f.phoneErr":"Valid Saudi mobile (starts with 05)",
+  "f.city":"City","f.cityErr":"Please enter your city",
+  "f.org":"Organization (optional)",
+  "f.service":"Service type","f.pick":"Select","f.svcMem":"Membership and reservations","f.svcPart":"Commercial partnership","f.svcGen":"General inquiry","f.serviceErr":"Select a service",
+  "f.time":"Best time to reach you","f.morning":"Morning (9 - 12)","f.noon":"Noon (12 - 4)","f.evening":"Evening (4 - 9)",
+  "f.msg":"Describe your need","f.msgErr":"Write a short description",
+  "f.send":"Send request","f.okT":"Request received","f.okP":"The Strangers team will contact you at your chosen time.",
+  "about.eyebrow":"Our Story","about.title":"Nine years of strangers becoming friends",
+  "about.s1t":"The beginning: one table and a big dream",
+  "about.s1p1":"In the winter of 2017 we opened our first small cafe in Riyadh. The idea was simpler than a business plan: build a place where a stranger walks in and feels invited, not billed.",
+  "about.s1p2":"The line we wrote on the door became our identity: come as a stranger, leave as a friend.",
+  "about.s2t":"The growth: from cafe to system",
+  "about.s2p1":"As demand for our bakes grew, we built our central lab. When other cafes started asking for our products, we opened the business division. Every new arm answered one question from our clients: can we take the experience with us?",
+  "about.s2p2":"Today, five divisions work in one rhythm: coffee, bakery, business, catering, and logistics.",
+  "about.vTitle":"Vision, mission, and values",
+  "about.v1t":"Vision","about.v1p":"To be Saudi Arabia's first house of hospitality: one brand trusted by individuals and companies alike.",
+  "about.v2t":"Mission","about.v2p":"We craft honest hospitality moments with lab-grade quality and a homelike soul, from the first cup to the last bite.",
+  "about.v3t":"Generosity","about.v3p":"The guest is welcomed before they order.",
+  "about.v4t":"Precision","about.v4p":"A calibrated recipe repeated at the same quality daily.",
+  "about.v5t":"Closeness","about.v5p":"We know our guests by name and our partners by need.",
+  "coffee.title":"The coffee that started it all",
+  "coffee.tag":"قهوة مختصة، مخبوزات، ومساحات مصممة للبقاء",
+  "coffee.lead":"Curated roasters, bakes from our own lab, and spaces built for the long sit: students, families, and business meetings.",
+  "coffee.ctaApp":"Download the App","coffee.ctaReserve":"Reserve Your Space",
+  "coffee.jTitle":"The bean's journey","coffee.jLead":"Four stops between the farm and your cup.",
+  "coffee.j1t":"Roasting","coffee.j1p":"Small weekly batches at medium profiles that reveal the bean's sweetness.",
+  "coffee.j2t":"Grinding","coffee.j2p":"Ground to order only, dialed in for every brew method.",
+  "coffee.j3t":"Extraction","coffee.j3p":"Scales and temperature under control, so the last cup matches the first.",
+  "coffee.j4t":"Serving","coffee.j4p":"Delivered with your name and a word from the barista about the roast.",
+  "coffee.pTitle":"From the branch menu",
+  "coffee.p1t":"Pesto croissant","coffee.p1p":"A 72-hour dough from our lab, fresh basil pesto and melting cheese. Most ordered with black coffee.","cur":"SAR",
+  "coffee.p2t":"Blueberry cheesecake","coffee.p2p":"A buttery biscuit base and a light cream layer, topped with blueberry sauce cooked in our kitchen.",
+  "coffee.m1":"Monte Cristo · SAR 32","coffee.m2":"Oreo ice cream · SAR 14","coffee.m3":"Lotus cheesecake · SAR 26","coffee.m4":"Philly steak · SAR 34","coffee.m5":"Lemon loaf · SAR 16","coffee.m6":"Strawberry ice cream · SAR 14",
+  "coffee.ctaOrder":"Order Now from the App","coffee.ctaJoin":"Join Membership",
+  "seat.title":"Seat map: booking demo","seat.lead":"Tap any chair or table to see its details and live status at the Olaya branch.",
+  "seat.avail":"Available","seat.busy":"Occupied","seat.reserved":"Reserved","seat.cleaning":"Cleaning",
+  "seat.empty":"Pick a seat from the map to view its details",
+  "mem.eyebrow":"Strangers Membership","mem.title":"Your card, the key to the house",
+  "mem.lead":"Points on every order, seat booking before everyone else, and invitations to monthly tastings. Hover the card to flip it.",
+  "mem.cta":"Request your membership","mem.backT":"Scan to enter","mem.backP":"The card unlocks booking, payment, and points across all Strangers branches.",
+  "bakery.title":"The lab that bakes for everyone","bakery.tag":"مخبز مركزي واحد، وكل كرواسون متطابق",
+  "bakery.lead":"From our central lab in Riyadh we bake daily for our branches and for partner cafes and hotels: same dough, same standard, every day.",
+  "bakery.lTitle":"Production lines",
+  "bakery.l1t":"Croissant and danish line","bakery.l1p":"Laminated dough proofed for 72 hours, rolled by hand, and baked in three daily rounds: Nutella, almond, pistachio, and seasonal flavors.",
+  "bakery.l2t":"Desserts and cakes line","bakery.l2p":"Cheesecake in five flavors, tiramisu, eclairs, and tarts. Every tray leaves at a uniform weight and shape, display ready.",
+  "bakery.m1":"Strawberry danish","bakery.m2":"Chocolate eclair","bakery.m3":"Mini tart","bakery.m4":"Fajita croissant","bakery.m5":"Blackberry round","bakery.m6":"Blackberry cheesecake",
+  "bakery.qTitle":"Quality standards",
+  "bakery.q1t":"Documented food safety","bakery.q1p":"Operated to SFDA requirements with a temperature log at every cooling stage.",
+  "bakery.q2t":"Fresh within hours","bakery.q2p":"From oven to branch shelf or partner door in under 4 hours via our chilled fleet.",
+  "bakery.q3t":"Daily calibration","bakery.q3p":"A sample of every batch is weighed and tasted before dispatch, and notes return to the line same day.",
+  "bakery.q4t":"Chosen ingredients","bakery.q4p":"European butter, Belgian chocolate, and fruit in season: we never swap an ingredient to cut cost.",
+  "bakery.ctaSamples":"Request Samples","bakery.ctaPartner":"Become a Partner",
+  "b2b.title":"Your central bakery, without building one","b2b.tag":"توريد بالجملة للمقاهي والمطاعم والفنادق",
+  "b2b.lead":"We supply bakes, desserts, and roasted beans on a fixed schedule with lab-grade quality, so you focus on your guests.",
+  "b2b.whoTitle":"Who this service is for",
+  "b2b.w1t":"Specialty cafes","b2b.w1p":"A full pastry display without a production kitchen, delivered before you open.",
+  "b2b.w2t":"Restaurants","b2b.w2p":"Sandwich bread and brioche in custom sizes for your menu, on flexible monthly contracts.",
+  "b2b.w3t":"Hotels","b2b.w3p":"Breakfast buffets and room hospitality at volume, with steady quality all week.",
+  "b2b.w4t":"Corporates","b2b.w4p":"Office and meeting hospitality with unified billing and monthly consumption reports.",
+  "b2b.flowTitle":"Your order's journey from signup to delivery","b2b.flowLead":"Nine transparent stages you can track. Click any stage or use the buttons to try it.",
+  "b2b.prev":"Previous","b2b.next":"Next stage",
+  "b2b.regTitle":"Register your business","b2b.regLead":"Fill in the details and an account manager will reach you within two business days with an initial quote.",
+  "b2b.fCompany":"Business name","b2b.fCompanyErr":"Enter the business name",
+  "b2b.fCr":"Commercial registration no.","b2b.fCrErr":"A 10-digit CR number",
+  "b2b.fVat":"VAT number","b2b.fVatErr":"A 15-digit VAT number starting with 3",
+  "b2b.fActivity":"Activity","b2b.aCafe":"Cafe","b2b.aRest":"Restaurant","b2b.aHotel":"Hotel","b2b.aCorp":"Corporate","b2b.fActivityErr":"Select the activity",
+  "b2b.fBranches":"Number of branches","b2b.fBranchesErr":"Enter a valid number",
+  "b2b.fContact":"Contact person","b2b.fContactErr":"Enter the contact name",
+  "b2b.fEmail":"Email","b2b.fEmailErr":"A valid email address",
+  "b2b.fProducts":"Requested products","b2b.pPastries":"Croissants and danishes","b2b.pDesserts":"Desserts and cakes","b2b.pSandwiches":"Sandwiches and bread","b2b.pBeans":"Roasted coffee beans","b2b.pMix":"Mixed selection","b2b.fProductsErr":"Select the products",
+  "b2b.fQty":"Approximate quantities and notes","b2b.fQtyErr":"Write your expected weekly quantities",
+  "b2b.fSend":"Send registration request",
+  "b2b.okT":"Registration received","b2b.okP":"Your account manager will contact you within two business days with an initial quote.",
+  "cat.title":"Your occasion, at the Strangers standard","cat.tag":"من اجتماعات مجالس الإدارة إلى قاعات الأفراح",
+  "cat.lead":"From a ten-person board meeting to a five-hundred-guest wedding: we prepare, deliver, and serve with our own team.",
+  "cat.pkgTitle":"The three packages","cat.per":"SAR / guest","cat.pick":"Choose this package","cat.popular":"Most requested",
+  "cat.pk1t":"Signature","cat.pk1a":"Specialty coffee corner with one barista","cat.pk1b":"Bakes and desserts selection (6 items)","cat.pk1c":"Setup and service for 3 hours","cat.pk1d":"Great for 10 to 50 guests",
+  "cat.pk2t":"Prestige","cat.pk2a":"Two corners: specialty coffee and Moroccan tea","cat.pk2b":"12 items including sandwiches and fine desserts","cat.pk2c":"A full service team for 5 hours","cat.pk2d":"Table styling in your event identity","cat.pk2e":"Great for 50 to 200 guests",
+  "cat.pk3t":"Royal","cat.pk3a":"A complete hospitality experience led by an events manager","cat.pk3b":"A custom menu with a prior tasting session","cat.pk3c":"Live stations: roasting, desserts, and ice cream","cat.pk3d":"Full event coverage with no hour cap","cat.pk3e":"200 guests and above",
+  "cat.reqTitle":"Request catering",
+  "cat.fType":"Occasion type","cat.tWedding":"Wedding","cat.tCorp":"Corporate event","cat.tMeeting":"Business meeting","cat.tFamily":"Family occasion","cat.tGrad":"Graduation","cat.fTypeErr":"Select the occasion type",
+  "cat.fDate":"Date","cat.fDateErr":"Pick an upcoming date","cat.fTime":"Time","cat.fTimeErr":"Set the time",
+  "cat.fLoc":"Location","cat.fLocErr":"City and district or venue",
+  "cat.fGuests":"Guest count","cat.fGuestsErr":"10 guests or more",
+  "cat.fPkg":"Package","cat.pCustom":"I need a consultation","cat.fPkgErr":"Select a package",
+  "cat.fBudget":"Approximate budget","cat.b1":"Under SAR 10k","cat.b2":"SAR 10k to 30k","cat.b3":"SAR 30k to 80k","cat.b4":"Above SAR 80k","cat.fBudgetErr":"Select a budget range",
+  "cat.fNotes":"Extra notes (optional)","cat.fSend":"Send catering request",
+  "cat.okT":"Your event request is in","cat.okP":"Our events coordinator will call you within 24 hours to confirm details and the tasting session.",
+  "log.title":"The arm that delivers fresh, on time","log.tag":"أسطول مبرد يربط المعمل والفروع والعملاء",
+  "log.lead":"A private chilled fleet moving lab production to branches, B2B partners, and catering events, on schedules that start before dawn.",
+  "log.f1t":"Chilled vehicles","log.f1p":"Dual-zone cooling vans keeping the cold chain intact curb to curb.",
+  "log.f2t":"Delivery rounds daily","log.f2p":"A dawn round before branches open and a midday round to restock shelves.",
+  "log.f3t":"Cities served","log.f3p":"Riyadh and Al Kharj today, with Dammam on the map this year.",
+  "log.s1t":"Inter-branch transfer","log.s1p":"Stock balancing between branches during the day so no item runs out before closing.",
+  "log.s2t":"B2B and catering support","log.s2p":"Partner deliveries on binding schedules, and event sites prepared hours before the guests.",
+  "log.cta":"Ask about service areas",
+  "news.eyebrow":"News and Events","news.title":"What's happening at Strangers",
+  "news.1t":"Summer roast launch: Ethiopian beans with a berry note","news.1p":"A limited seasonal roast, served in branches, sold by the jar, and available to B2B partners on pre-order.",
+  "news.2t":"A monthly tasting workshop for members","news.2p":"First Thursday of every month at the Hittin branch. Book from the app.",
+  "news.3t":"Strangers at the Riyadh International Coffee Expo","news.3p":"Our stand walked over three thousand visitors through the bean's journey in four days.",
+  "news.4t":"Lab expansion: a third production line","news.4p":"The new line raises daily capacity ahead of our Dammam entry.",
+  "news.5t":"A partnership with local strawberry farms","news.5p":"The strawberries in our danish and cheesecake now arrive from Al Kharj farms every morning.",
+  "contact.eyebrow":"Contact Us","contact.title":"Strangers' doors are open",
+  "contact.phone":"Unified phone","contact.email":"Email","contact.hours":"Working hours","contact.hoursVal":"Daily, 6 am to midnight",
+  "contact.brTitle":"Branches",
+  "contact.br1t":"Olaya Branch","contact.br1p":"Olaya main street, opposite Kingdom Tower. Our first and largest branch, home to the meeting room and family zone.",
+  "contact.br2t":"Hittin Branch","contact.br2p":"Hittin Boulevard. The outdoor-seating branch and host of the monthly tasting workshop.",
+  "contact.br3t":"Al Kharj Branch","contact.br3p":"King Abdullah Road. Our newest branch, built around an open bakery.",
+  "contact.cta":"Send a contact request",
+  "app.eyebrow":"The Strangers App","app.title":"The whole branch, in your pocket",
+  "app.tag":"اطلب واحجز واجمع نقاطك من تطبيق واحد",
+  "app.lead":"Order before you arrive, book your seat or the meeting room, and scan your card at the till to collect points.",
+  "app.psHi":"Good evening","app.psOrder":"Order","app.psReserve":"Reserve","app.psSession":"My session","app.psPoints":"Points balance",
+  "footer.about":"An integrated Saudi hospitality system since 2017: coffee, bakery, business solutions, catering, and logistics.",
+  "footer.companies":"Divisions","footer.company":"Company","footer.contact":"Contact","footer.branches":"Branch locations",
+  "footer.rights":"All rights reserved, Strangers Company 2026"
+};
+
+/* dynamic (JS-rendered) strings */
+var DYN = {
+  ar:{
+    zones:{main:"الصالة الرئيسية",family:"منطقة العائلات F-01",meeting:"غرفة الاجتماعات M-01",window:"جلسات النافذة"},
+    states:{available:"متاح",busy:"مشغول",reserved:"محجوز",cleaning:"تنظيف"},
+    kind:{chair:"كرسي",table:"طاولة",room:"غرفة اجتماعات",familyArea:"جلسة عائلية"},
+    rows:{zone:"المنطقة",kind:"النوع",min:"الحد الأدنى",dur:"مدة الجلسة",power:"كهرباء",quiet:"مستوى الهدوء"},
+    hour:"ساعة قابلة للتمديد",yes:"متوفرة بكل مقعد",
+    quiet:{high:"هادئ",mid:"متوسط",low:"اجتماعي"},
+    book:"احجز عبر التطبيق",sar:"ريال",
+    toastBook:"الحجز الفعلي يتم من تطبيق سترينجرز. هذا ديمو تفاعلي.",
+    toastMem:"سجلنا اهتمامك بالعضوية، عبّي نموذج التواصل ونرسل لك الدعوة.",
+    toastPkg:"تم اختيار الباقة، أكمل نموذج الطلب تحت.",
+    toastStore:"التطبيق قيد الإطلاق: سجل اهتمامك من نموذج التواصل.",
+    statuses:[
+      ["طلب جديد","استلمنا طلبك وسجلناه برقم متابعة."],
+      ["قيد المراجعة","فريق الحسابات يراجع البيانات والسجل التجاري."],
+      ["معتمد","تم اعتماد الشراكة وتوقيع الاتفاقية."],
+      ["مجدول","تحددت أيام التوريد وكمياته الأسبوعية."],
+      ["قيد الإنتاج","المعمل يجهز طلبيتك ضمن دفعة اليوم."],
+      ["فحص الجودة","عينة من الدفعة تُوزن وتُذاق قبل الخروج."],
+      ["جاهز للإرسال","الطلبية مغلفة ومبردة على رصيف الشحن."],
+      ["في الطريق","مركبة مبردة في طريقها لموقعك."],
+      ["تم التسليم","استلمت طلبيتك، وفاتورتك في بريدك."]
+    ]
+  },
+  en:{
+    zones:{main:"Main hall",family:"Family zone F-01",meeting:"Meeting room M-01",window:"Window seats"},
+    states:{available:"Available",busy:"Occupied",reserved:"Reserved",cleaning:"Cleaning"},
+    kind:{chair:"Chair",table:"Table",room:"Meeting room",familyArea:"Family lounge"},
+    rows:{zone:"Zone",kind:"Type",min:"Minimum spend",dur:"Session length",power:"Power",quiet:"Noise level"},
+    hour:"One extendable hour",yes:"At every seat",
+    quiet:{high:"Quiet",mid:"Moderate",low:"Social"},
+    book:"Book via the app",sar:"SAR",
+    toastBook:"Real booking happens in the Strangers app. This is an interactive demo.",
+    toastMem:"Interest noted. Fill the contact form and we will send your invitation.",
+    toastPkg:"Package selected. Complete the request form below.",
+    toastStore:"The app is launching soon: register interest via the contact form.",
+    statuses:[
+      ["New Request","We received and logged your request with a tracking number."],
+      ["Under Review","The accounts team reviews your details and CR."],
+      ["Approved","Partnership approved and agreement signed."],
+      ["Scheduled","Supply days and weekly quantities are set."],
+      ["In Production","The lab prepares your order in today's batch."],
+      ["Quality Check","A batch sample is weighed and tasted before release."],
+      ["Ready for Dispatch","Packed and chilled on the loading dock."],
+      ["Out for Delivery","A chilled vehicle is on the way to you."],
+      ["Delivered","Order received, invoice in your inbox."]
+    ]
+  }
+};
+
+var lang = localStorage.getItem("strangers_lang") || "ar";
+function t(){ return DYN[lang]; }
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  $("#langToggle").textContent = lang === "ar" ? "EN" : "عربي";
+  $$("[data-i18n]").forEach(function(el){
+    var k = el.getAttribute("data-i18n");
+    if(lang === "en" && EN[k] !== undefined) el.textContent = EN[k];
+    else if(AR[k] !== undefined) el.textContent = AR[k];
+  });
+  document.title = lang === "ar" ? "Strangers Company | شركة سترينجرز" : "Strangers Company | One Brand, Multiple Experiences";
+  renderStatusFlow();
+  renderSeatDetail(selectedSeat);
+}
+$("#langToggle").addEventListener("click",function(){
+  lang = lang === "ar" ? "en" : "ar";
+  localStorage.setItem("strangers_lang",lang);
+  applyLang();
+});
+
+/* ================= TOAST ================= */
+var toastTimer = null;
+function toast(msg){
+  var el = $("#toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove("show"); },3400);
+}
+
+/* ================= ROUTER ================= */
+var ROUTES = {"":"home","/":"home","/about":"about","/coffee":"coffee","/bakery":"bakery","/b2b":"b2b","/catering":"catering","/logistic":"logistic","/news":"news","/contact":"contact","/app":"app"};
+var DARK_HERO = {home:1,coffee:1,b2b:1,logistic:1,app:1};
+var currentRoute = "home";
+function route(){
+  var h = location.hash || "#/";
+  if(h.charAt(1) !== "/"){ return; } /* in-page anchor, let the browser scroll */
+  var path = h.slice(1);
+  var name = ROUTES[path];
+  if(!name){ name = "home"; }
+  currentRoute = name;
+  $$(".page").forEach(function(p){ p.classList.remove("current"); });
+  var page = $("#page-"+name);
+  if(page) page.classList.add("current");
+  $$("[data-route]").forEach(function(a){
+    a.classList.toggle("active", a.getAttribute("data-route") === name);
+  });
+  var header = $("#siteHeader");
+  header.classList.toggle("on-dark", !!DARK_HERO[name]);
+  closeSheet();
+  window.scrollTo({top:0,behavior:"instant" in window ? "instant" : "auto"});
+  if(name === "logistic") startTruck(); else stopTruck();
+}
+window.addEventListener("hashchange",route);
+
+/* ================= HEADER (sentinel, no scroll listener) ================= */
+var sentinel = document.createElement("div");
+sentinel.style.cssText = "position:absolute;top:0;height:90px;width:1px;pointer-events:none;";
+document.body.prepend(sentinel);
+new IntersectionObserver(function(entries){
+  $("#siteHeader").classList.toggle("scrolled", !entries[0].isIntersecting);
+},{threshold:0}).observe(sentinel);
+
+/* ================= MOBILE SHEET ================= */
+function closeSheet(){
+  $("#mobileSheet").classList.remove("open");
+  $("#menuBtn").classList.remove("open");
+  $("#menuBtn").setAttribute("aria-expanded","false");
+}
+$("#menuBtn").addEventListener("click",function(){
+  var open = !$("#mobileSheet").classList.contains("open");
+  $("#mobileSheet").classList.toggle("open",open);
+  this.classList.toggle("open",open);
+  this.setAttribute("aria-expanded",String(open));
+});
+$("#mobileSheet").addEventListener("click",function(e){ if(e.target === this) closeSheet(); });
+$$("#sheetPanel a").forEach(function(a){ a.addEventListener("click",closeSheet); });
+
+/* ================= REVEALS ================= */
+var revealIO = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(en.isIntersecting){ en.target.classList.add("in"); revealIO.unobserve(en.target); }
+  });
+},{threshold:.12,rootMargin:"0px 0px -8% 0px"});
+$$(".rv").forEach(function(el){ revealIO.observe(el); });
+
+/* ================= COUNTERS ================= */
+var countIO = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if(!en.isIntersecting) return;
+    countIO.unobserve(en.target);
+    var el = en.target, target = parseInt(el.getAttribute("data-count"),10);
+    if(REDUCED){ el.textContent = target; return; }
+    var t0 = performance.now(), dur = 1400;
+    (function step(now){
+      var p = Math.min((now - t0)/dur,1);
+      el.textContent = Math.round(target * (1 - Math.pow(1-p,3)));
+      if(p < 1) requestAnimationFrame(step);
+    })(t0);
+  });
+},{threshold:.6});
+$$("[data-count]").forEach(function(el){ countIO.observe(el); });
+
+/* ================= MARQUEE ================= */
+(function(){
+  var track = $("#marqueeTrack");
+  if(!track) return;
+  var base = track.innerHTML + track.innerHTML + track.innerHTML;
+  track.innerHTML = base + base;
+})();
+
+/* ================= GOLD DUST ================= */
+$$("[data-dust]").forEach(function(zone){
+  var n = parseInt(zone.getAttribute("data-dust"),10) || 8;
+  for(var i=0;i<n;i++){
+    var d = document.createElement("i");
+    d.style.top = (Math.random()*100)+"%";
+    d.style.insetInlineStart = (Math.random()*100)+"%";
+    d.style.setProperty("--dur",(8+Math.random()*8)+"s");
+    d.style.setProperty("--dl",(Math.random()*8)+"s");
+    d.style.setProperty("--dx",((Math.random()*40)-20)+"px");
+    d.style.setProperty("--dy",(-(14+Math.random()*30))+"px");
+    zone.appendChild(d);
+  }
+});
+
+/* ================= 3D CUP ================= */
+(function(){
+  var body = $("#cupBody"), stage = $("#cupStage"), scene = $("#cupScene");
+  if(!body) return;
+  var SLATS = 26;
+  for(var i=0;i<SLATS;i++){
+    var s = document.createElement("div");
+    s.className = "cup-slat";
+    s.style.setProperty("--a",(i*(360/SLATS))+"deg");
+    var shade = 0.86 + 0.14*Math.cos(i*(Math.PI*2/SLATS));
+    s.style.filter = "brightness("+shade.toFixed(2)+")";
+    body.appendChild(s);
+  }
+  var handle = document.createElement("div");
+  handle.className = "cup-handle";
+  body.appendChild(handle);
+  if(REDUCED || !window.matchMedia("(hover:hover)").matches) return;
+  stage.addEventListener("pointermove",function(e){
+    var r = stage.getBoundingClientRect();
+    var x = (e.clientX - r.left)/r.width - .5;
+    var y = (e.clientY - r.top)/r.height - .5;
+    scene.style.animationPlayState = "paused";
+    scene.style.transform = "rotateX("+(-12 - y*26)+"deg) rotateY("+(x*70)+"deg)";
+  });
+  stage.addEventListener("pointerleave",function(){
+    scene.style.animationPlayState = "running";
+    scene.style.transform = "";
+  });
+})();
+
+/* ================= 3D TILT CARDS ================= */
+if(!REDUCED && window.matchMedia("(hover:hover)").matches){
+  $$(".tilt").forEach(function(el){
+    el.addEventListener("pointermove",function(e){
+      var r = el.getBoundingClientRect();
+      var x = (e.clientX - r.left)/r.width - .5;
+      var y = (e.clientY - r.top)/r.height - .5;
+      el.style.transform = "perspective(900px) rotateY("+(x*6)+"deg) rotateX("+(-y*6)+"deg) translateY(-4px)";
+    });
+    el.addEventListener("pointerleave",function(){ el.style.transform = ""; });
+  });
+}
+
+/* ================= PHONE 3D ================= */
+(function(){
+  var stage = $("#phoneStage"), phone = $("#phone3d");
+  if(!stage || REDUCED || !window.matchMedia("(hover:hover)").matches) return;
+  stage.addEventListener("pointermove",function(e){
+    var r = stage.getBoundingClientRect();
+    var x = (e.clientX - r.left)/r.width - .5;
+    var y = (e.clientY - r.top)/r.height - .5;
+    phone.style.setProperty("--ry",(x*22).toFixed(1));
+    phone.style.setProperty("--rx",(-y*16).toFixed(1));
+  });
+  stage.addEventListener("pointerleave",function(){
+    phone.style.setProperty("--ry",0);
+    phone.style.setProperty("--rx",0);
+  });
+})();
+
+/* ================= QR (deterministic decorative) ================= */
+function drawQr(id,seed){
+  var svg = document.getElementById(id);
+  if(!svg) return;
+  var N = 29, s = seed, cells = "";
+  function rnd(){ s = (s*1103515245 + 12345) & 0x7fffffff; return s/0x7fffffff; }
+  function finder(cx,cy){
+    cells += '<rect x="'+cx+'" y="'+cy+'" width="7" height="7" fill="#141110"/>';
+    cells += '<rect x="'+(cx+1)+'" y="'+(cy+1)+'" width="5" height="5" fill="#FAF7F2"/>';
+    cells += '<rect x="'+(cx+2)+'" y="'+(cy+2)+'" width="3" height="3" fill="#141110"/>';
+  }
+  for(var yy=0;yy<N;yy++){
+    for(var xx=0;xx<N;xx++){
+      var inFinder = (xx<8 && yy<8)||(xx>N-9 && yy<8)||(xx<8 && yy>N-9);
+      if(inFinder) continue;
+      if(rnd() > .55) cells += '<rect x="'+xx+'" y="'+yy+'" width="1" height="1" fill="#141110"/>';
+    }
+  }
+  finder(0,0); finder(N-7,0); finder(0,N-7);
+  svg.innerHTML = '<rect width="29" height="29" fill="#FAF7F2"/>'+cells;
+}
+drawQr("memberQr",20194471);
+drawQr("phoneQr",20194471);
+
+/* ================= MEMBER CARD flip (tap/keyboard) ================= */
+(function(){
+  var card = $("#memberCard");
+  if(!card) return;
+  function flip(){ card.classList.toggle("flipped"); }
+  card.addEventListener("click",flip);
+  card.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); flip(); } });
+})();
+
+/* ================= EXPERIENCE STRIP drag ================= */
+(function(){
+  var strip = $("#expStrip");
+  if(!strip) return;
+  var down = false, startX = 0, startScroll = 0;
+  strip.addEventListener("pointerdown",function(e){
+    down = true; startX = e.clientX; startScroll = strip.scrollLeft;
+    strip.classList.add("dragging");
+  });
+  window.addEventListener("pointermove",function(e){
+    if(!down) return;
+    strip.scrollLeft = startScroll - (e.clientX - startX);
+  });
+  window.addEventListener("pointerup",function(){ down = false; strip.classList.remove("dragging"); });
+})();
+
+/* ================= SEAT MAP ================= */
+var SEAT_STATES = {available:"#5E7D5A",busy:"#4A3322",reserved:"#B8955A",cleaning:"#B7AFA3"};
+var SEATS = [
+  {id:"S-101",kind:"chair",zone:"window",state:"available",quiet:"mid",x:70,y:80},
+  {id:"S-102",kind:"chair",zone:"window",state:"busy",quiet:"mid",x:130,y:80},
+  {id:"S-103",kind:"chair",zone:"window",state:"available",quiet:"mid",x:190,y:80},
+  {id:"S-104",kind:"chair",zone:"window",state:"cleaning",quiet:"mid",x:250,y:80},
+  {id:"S-105",kind:"chair",zone:"main",state:"available",quiet:"high",x:70,y:180},
+  {id:"S-106",kind:"chair",zone:"main",state:"reserved",quiet:"high",x:130,y:180},
+  {id:"S-107",kind:"chair",zone:"main",state:"available",quiet:"high",x:190,y:180},
+  {id:"S-108",kind:"chair",zone:"main",state:"busy",quiet:"high",x:250,y:180},
+  {id:"S-109",kind:"chair",zone:"main",state:"available",quiet:"high",x:70,y:250},
+  {id:"S-110",kind:"chair",zone:"main",state:"available",quiet:"high",x:130,y:250},
+  {id:"S-111",kind:"chair",zone:"main",state:"busy",quiet:"high",x:190,y:250},
+  {id:"S-112",kind:"chair",zone:"main",state:"reserved",quiet:"high",x:250,y:250},
+  {id:"T-201",kind:"table",zone:"main",state:"available",quiet:"mid",x:360,y:100},
+  {id:"T-202",kind:"table",zone:"main",state:"busy",quiet:"mid",x:360,y:200},
+  {id:"T-203",kind:"table",zone:"main",state:"reserved",quiet:"mid",x:360,y:300},
+  {id:"T-204",kind:"table",zone:"main",state:"available",quiet:"mid",x:490,y:100},
+  {id:"T-205",kind:"table",zone:"main",state:"available",quiet:"mid",x:490,y:200},
+  {id:"T-206",kind:"table",zone:"main",state:"cleaning",quiet:"mid",x:490,y:300},
+  {id:"M-01",kind:"room",zone:"meeting",state:"reserved",quiet:"high",x:625,y:95},
+  {id:"F-01",kind:"familyArea",zone:"family",state:"available",quiet:"low",x:625,y:305}
+];
+var selectedSeat = null;
+(function(){
+  var svg = $("#seatmapSvg");
+  if(!svg) return;
+  var s = "";
+  s += '<rect x="10" y="10" width="740" height="450" rx="22" fill="#F4EDE1" stroke="rgba(74,51,34,.15)"/>';
+  s += '<rect x="30" y="40" width="290" height="90" rx="14" fill="rgba(184,149,90,.07)"/>';
+  s += '<rect x="560" y="35" width="170" height="140" rx="14" fill="rgba(74,51,34,.08)" stroke="rgba(74,51,34,.2)" stroke-dasharray="5 4"/>';
+  s += '<rect x="560" y="235" width="170" height="150" rx="14" fill="rgba(184,149,90,.1)" stroke="rgba(184,149,90,.4)" stroke-dasharray="5 4"/>';
+  s += '<rect x="30" y="395" width="500" height="45" rx="10" fill="#141110"/>';
+  s += '<text x="280" y="424" text-anchor="middle" fill="#B8955A" font-family="IBM Plex Mono" font-size="14" letter-spacing="3">BAR / COUNTER</text>';
+  SEATS.forEach(function(seat,idx){
+    var c = SEAT_STATES[seat.state];
+    var shape = "";
+    if(seat.kind === "chair"){
+      shape = '<circle class="seat-shape" cx="'+seat.x+'" cy="'+seat.y+'" r="19" fill="'+c+'" stroke="rgba(20,17,16,.2)" stroke-width="1.5"/>' +
+              '<text x="'+seat.x+'" y="'+(seat.y+4)+'" text-anchor="middle" fill="#FAF7F2" font-family="IBM Plex Mono" font-size="9">'+seat.id.slice(2)+'</text>';
+    } else if(seat.kind === "table"){
+      shape = '<rect class="seat-shape" x="'+(seat.x-42)+'" y="'+(seat.y-26)+'" width="84" height="52" rx="12" fill="'+c+'" stroke="rgba(20,17,16,.2)" stroke-width="1.5"/>' +
+              '<text x="'+seat.x+'" y="'+(seat.y+4)+'" text-anchor="middle" fill="#FAF7F2" font-family="IBM Plex Mono" font-size="11">'+seat.id+'</text>';
+    } else {
+      var w = 150, h = seat.kind === "room" ? 120 : 130, yy = seat.kind === "room" ? 45 : 245;
+      shape = '<rect class="seat-shape" x="'+(seat.x-w/2)+'" y="'+yy+'" width="'+w+'" height="'+h+'" rx="12" fill="'+c+'" opacity=".88" stroke="rgba(20,17,16,.2)" stroke-width="1.5"/>' +
+              '<text x="'+seat.x+'" y="'+(yy+h/2+5)+'" text-anchor="middle" fill="#FAF7F2" font-family="IBM Plex Mono" font-size="15">'+seat.id+'</text>';
+    }
+    s += '<g class="seat" data-idx="'+idx+'" role="button" tabindex="0" aria-label="'+seat.id+'">'+shape+'</g>';
+  });
+  svg.innerHTML = s;
+  svg.addEventListener("click",function(e){
+    var g = e.target.closest(".seat");
+    if(!g) return;
+    selectSeat(parseInt(g.getAttribute("data-idx"),10));
+  });
+  svg.addEventListener("keydown",function(e){
+    if(e.key!=="Enter" && e.key!==" ") return;
+    var g = e.target.closest(".seat");
+    if(!g) return;
+    e.preventDefault();
+    selectSeat(parseInt(g.getAttribute("data-idx"),10));
+  });
+})();
+function selectSeat(idx){
+  selectedSeat = SEATS[idx];
+  $$(".seat").forEach(function(g){ g.classList.remove("selected"); });
+  var g = $('.seat[data-idx="'+idx+'"]');
+  if(g) g.classList.add("selected");
+  renderSeatDetail(selectedSeat);
+}
+function seatMin(seat){
+  if(seat.kind === "chair") return 13;
+  if(seat.kind === "table") return 40;
+  if(seat.kind === "room") return 120;
+  return 60;
+}
+function renderSeatDetail(seat){
+  var box = $("#seatDetail");
+  if(!box) return;
+  var d = t();
+  if(!seat){
+    box.innerHTML = '<p class="sd-empty">'+(lang==="en"?EN["seat.empty"]:AR["seat.empty"])+'</p>';
+    return;
+  }
+  var stateColors = {available:"#5E7D5A",busy:"#4A3322",reserved:"#B8955A",cleaning:"#8A8378"};
+  var html = '';
+  html += '<div class="sd-id">'+seat.id+'</div>';
+  html += '<span class="sd-state" style="background:'+stateColors[seat.state]+'1f;color:'+stateColors[seat.state]+';border:1px solid '+stateColors[seat.state]+'55">'+d.states[seat.state]+'</span>';
+  html += '<div class="sd-rows">';
+  html += '<div class="row"><span>'+d.rows.zone+'</span><b>'+d.zones[seat.zone]+'</b></div>';
+  html += '<div class="row"><span>'+d.rows.kind+'</span><b>'+d.kind[seat.kind]+'</b></div>';
+  html += '<div class="row"><span>'+d.rows.min+'</span><b class="mono">'+seatMin(seat)+' '+d.sar+'</b></div>';
+  html += '<div class="row"><span>'+d.rows.dur+'</span><b>'+d.hour+'</b></div>';
+  html += '<div class="row"><span>'+d.rows.power+'</span><b>'+d.yes+'</b></div>';
+  html += '<div class="row"><span>'+d.rows.quiet+'</span><b>'+d.quiet[seat.quiet]+'</b></div>';
+  html += '</div>';
+  html += '<button class="btn btn-gold" id="seatBookBtn">'+d.book+'</button>';
+  box.innerHTML = html;
+  $("#seatBookBtn").addEventListener("click",function(){ toast(t().toastBook); });
+}
+
+/* ================= B2B STATUS FLOW ================= */
+var statusIdx = 2;
+function renderStatusFlow(){
+  var track = $("#statusTrack"), desc = $("#statusDesc");
+  if(!track) return;
+  var list = t().statuses;
+  track.innerHTML = "";
+  list.forEach(function(st,i){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "status-chip" + (i < statusIdx ? " done" : "") + (i === statusIdx ? " active" : "");
+    b.innerHTML = '<span class="s-idx">'+String(i+1).padStart(2,"0")+'</span><span>'+st[0]+'</span>';
+    b.addEventListener("click",function(){ statusIdx = i; renderStatusFlow(); });
+    track.appendChild(b);
+  });
+  desc.innerHTML = '<h4>'+list[statusIdx][0]+'</h4><p>'+list[statusIdx][1]+'</p>';
+}
+(function(){
+  var prev = $("#statusPrev"), next = $("#statusNext");
+  if(!prev) return;
+  prev.addEventListener("click",function(){ if(statusIdx>0){ statusIdx--; renderStatusFlow(); } });
+  next.addEventListener("click",function(){ if(statusIdx<8){ statusIdx++; renderStatusFlow(); } });
+})();
+
+/* ================= LOGISTIC TRUCK ================= */
+var truckRaf = null;
+function startTruck(){
+  if(REDUCED) return;
+  var path = document.getElementById("routeLine");
+  var marker = document.getElementById("truckMarker");
+  if(!path || !marker) return;
+  var len = path.getTotalLength(), t0 = performance.now();
+  cancelAnimationFrame(truckRaf);
+  (function step(now){
+    var p = ((now - t0)/9000) % 1;
+    var pt = path.getPointAtLength(p*len);
+    marker.setAttribute("transform","translate("+pt.x+","+pt.y+")");
+    truckRaf = requestAnimationFrame(step);
+  })(t0);
+}
+function stopTruck(){ cancelAnimationFrame(truckRaf); }
+
+/* ================= FORMS ================= */
+function saveRecord(key,data){
+  try{
+    var arr = JSON.parse(localStorage.getItem(key) || "[]");
+    data._ts = new Date().toISOString();
+    arr.push(data);
+    localStorage.setItem(key,JSON.stringify(arr));
+  }catch(e){ /* storage unavailable: continue, UX unaffected */ }
+}
+function fieldOf(input){ return input.closest(".field"); }
+function setValid(input,ok){
+  fieldOf(input).classList.toggle("invalid",!ok);
+  return ok;
+}
+function collect(form){
+  var data = {};
+  $$("input,select,textarea",form).forEach(function(el){ if(el.name) data[el.name] = el.value.trim(); });
+  return data;
+}
+var PHONE_RE = /^05\d{8}$/;
+
+function bindForm(formId,successId,storageKey,validate){
+  var form = $("#"+formId);
+  if(!form) return;
+  form.addEventListener("submit",function(e){
+    e.preventDefault();
+    var ok = validate(form);
+    if(!ok){
+      var firstBad = $(".field.invalid input, .field.invalid select, .field.invalid textarea",form);
+      if(firstBad) firstBad.focus();
+      return;
+    }
+    saveRecord(storageKey,collect(form));
+    form.style.display = "none";
+    $("#"+successId).classList.add("show");
+    toast(lang === "en" ? "Request saved. Our team will reach out." : "وصلنا طلبك، بيتواصل معك فريق سترينجرز.");
+  });
+  $$("input,select,textarea",form).forEach(function(el){
+    el.addEventListener("input",function(){ fieldOf(el).classList.remove("invalid"); });
+  });
+}
+
+bindForm("leadForm","leadSuccess","strangers_leads",function(f){
+  var ok = true;
+  ok = setValid($("#lf-name"), $("#lf-name").value.trim().length >= 2) && ok;
+  ok = setValid($("#lf-phone"), PHONE_RE.test($("#lf-phone").value.trim())) && ok;
+  ok = setValid($("#lf-city"), $("#lf-city").value.trim().length >= 2) && ok;
+  ok = setValid($("#lf-service"), $("#lf-service").value !== "") && ok;
+  ok = setValid($("#lf-msg"), $("#lf-msg").value.trim().length >= 5) && ok;
+  return ok;
+});
+
+bindForm("b2bForm","b2bSuccess","strangers_b2b",function(f){
+  var ok = true;
+  ok = setValid($("#bf-company"), $("#bf-company").value.trim().length >= 2) && ok;
+  ok = setValid($("#bf-cr"), /^\d{10}$/.test($("#bf-cr").value.trim())) && ok;
+  ok = setValid($("#bf-vat"), /^3\d{14}$/.test($("#bf-vat").value.trim())) && ok;
+  ok = setValid($("#bf-activity"), $("#bf-activity").value !== "") && ok;
+  var br = parseInt($("#bf-branches").value,10);
+  ok = setValid($("#bf-branches"), br >= 1 && br <= 500) && ok;
+  ok = setValid($("#bf-contact"), $("#bf-contact").value.trim().length >= 2) && ok;
+  ok = setValid($("#bf-phone"), PHONE_RE.test($("#bf-phone").value.trim())) && ok;
+  ok = setValid($("#bf-email"), /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($("#bf-email").value.trim())) && ok;
+  ok = setValid($("#bf-city"), $("#bf-city").value.trim().length >= 2) && ok;
+  ok = setValid($("#bf-products"), $("#bf-products").value !== "") && ok;
+  ok = setValid($("#bf-qty"), $("#bf-qty").value.trim().length >= 3) && ok;
+  return ok;
+});
+
+bindForm("cateringForm","cateringSuccess","strangers_catering",function(f){
+  var ok = true;
+  ok = setValid($("#cf-type"), $("#cf-type").value !== "") && ok;
+  var dv = $("#cf-date").value;
+  var today = new Date(); today.setHours(0,0,0,0);
+  ok = setValid($("#cf-date"), !!dv && new Date(dv) >= today) && ok;
+  ok = setValid($("#cf-time"), $("#cf-time").value !== "") && ok;
+  ok = setValid($("#cf-loc"), $("#cf-loc").value.trim().length >= 3) && ok;
+  var g = parseInt($("#cf-guests").value,10);
+  ok = setValid($("#cf-guests"), g >= 10 && g <= 2000) && ok;
+  ok = setValid($("#cf-pkg"), $("#cf-pkg").value !== "") && ok;
+  ok = setValid($("#cf-budget"), $("#cf-budget").value !== "") && ok;
+  ok = setValid($("#cf-phone"), PHONE_RE.test($("#cf-phone").value.trim())) && ok;
+  return ok;
+});
+
+/* ================= SMALL INTERACTIONS ================= */
+$$(".pkg-pick").forEach(function(b){
+  b.addEventListener("click",function(){
+    var sel = $("#cf-pkg");
+    if(sel) sel.value = b.getAttribute("data-pkg");
+    toast(t().toastPkg);
+    var target = $("#catering-request");
+    if(target) target.scrollIntoView({behavior:REDUCED?"auto":"smooth"});
+  });
+});
+(function(){
+  var join1 = $("#joinMembershipBtn"), join2 = $("#memJoinBtn");
+  if(join1) join1.addEventListener("click",function(){
+    var m = $("#membership");
+    if(m) m.scrollIntoView({behavior:REDUCED?"auto":"smooth"});
+  });
+  if(join2) join2.addEventListener("click",function(){ toast(t().toastMem); });
+  var c2t = $("#contactToTalk");
+  if(c2t) c2t.addEventListener("click",function(){
+    setTimeout(function(){
+      var talk = $("#talk");
+      if(talk) talk.scrollIntoView({behavior:REDUCED?"auto":"smooth"});
+    },120);
+  });
+  ["appStoreBtn","playStoreBtn"].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener("click",function(e){ e.preventDefault(); toast(t().toastStore); });
+  });
+})();
+
+/* ================= BOOT ================= */
+applyLang();
+route();
+renderStatusFlow();
+})();
+</script>
+</body>
+</html>

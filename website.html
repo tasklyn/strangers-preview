@@ -816,6 +816,97 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
 .sb-media img{width:100%;height:clamp(300px,38vw,440px);object-fit:cover}
 .sb-body p{color:var(--brown-soft);margin-top:.9rem;max-width:52ch}
 
+/* ============ MENU PAGE ============ */
+.menu-filters{
+  display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:clamp(2rem,4vw,3rem);
+  position:sticky;top:68px;z-index:40;
+  padding-block:.9rem;
+  background:linear-gradient(180deg,var(--bg) 72%,transparent);
+}
+.menu-tab{
+  display:inline-flex;align-items:center;gap:.5rem;
+  border:1.5px solid var(--line);border-radius:999px;
+  padding:.55rem 1.15rem;min-height:44px;
+  font-size:.85rem;font-weight:600;color:var(--brown-soft);
+  background:var(--bg);white-space:nowrap;
+  transition:transform .3s var(--ease-spring),border-color .3s,color .3s,background .3s;
+}
+.menu-tab .mt-en{font-family:var(--font-latin);font-style:italic;font-size:.78rem;opacity:.7}
+html[lang="en"] .menu-tab .mt-en{display:none}
+.menu-tab:hover{border-color:var(--gold);color:var(--gold-deep);transform:translateY(-2px)}
+.menu-tab.active{background:var(--dark);border-color:var(--dark);color:var(--bg);box-shadow:var(--shadow-warm)}
+.menu-tab.active .mt-en{color:var(--gold)}
+.menu-count{font-family:var(--font-mono);font-size:.72rem;color:var(--brown-soft);margin-bottom:1.4rem;letter-spacing:.05em}
+
+.menu-cat-head{
+  grid-column:1/-1;display:flex;align-items:baseline;gap:1rem;
+  margin-top:1.2rem;padding-bottom:.4rem;border-bottom:1px solid var(--line);
+}
+.menu-cat-head:first-child{margin-top:0}
+.menu-cat-head h3{font-size:clamp(1.2rem,2.4vw,1.7rem)}
+.menu-cat-head .mch-en{font-family:var(--font-latin);font-style:italic;color:var(--gold-deep);font-size:1rem}
+html[lang="en"] .menu-cat-head .mch-en{display:none}
+
+.menu-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:1.25rem;grid-auto-flow:row dense}
+.menu-card{
+  position:relative;border-radius:var(--radius);overflow:hidden;
+  display:flex;flex-direction:column;min-height:150px;
+  transition:transform .4s var(--ease-spring),box-shadow .4s,border-color .3s;
+}
+.menu-card:hover{transform:translateY(-6px)}
+.mc-w12{grid-column:span 12}
+.mc-w8{grid-column:span 8}
+.mc-w6{grid-column:span 6}
+.mc-w4{grid-column:span 4}
+.mc-w3{grid-column:span 3}
+
+/* photo-led card */
+.menu-card.mc-photo{min-height:300px;justify-content:flex-end;background:var(--surface)}
+.menu-card.mc-photo .mc-img{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 1.1s var(--ease-out)}
+.menu-card.mc-photo:hover .mc-img{transform:scale(1.05)}
+.menu-card.mc-photo .mc-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,17,16,0) 30%,rgba(20,17,16,.9) 100%)}
+.menu-card.mc-photo:hover{box-shadow:var(--shadow-warm)}
+.menu-card.mc-photo .mc-inner{position:relative;padding:1.5rem;color:var(--bg)}
+.menu-card.mc-photo .mc-name{color:var(--bg)}
+.menu-card.mc-photo .mc-en{color:var(--gold)}
+.menu-card.mc-photo .mc-desc{color:rgba(250,247,242,.78)}
+.menu-card.mc-photo .mc-price{color:var(--bg)}
+
+/* text card */
+.menu-card.mc-text{
+  background:var(--bg);border:1px solid var(--line);padding:1.4rem 1.5rem;
+}
+.menu-card.mc-text::before{
+  content:"";position:absolute;inset-inline-start:0;top:1.4rem;bottom:1.4rem;width:2px;
+  background:var(--gold);border-radius:2px;opacity:.55;transition:opacity .3s,height .3s;
+}
+.menu-card.mc-text:hover{border-color:var(--gold);box-shadow:var(--shadow-warm)}
+.menu-card.mc-text:hover::before{opacity:1}
+.menu-card.mc-text .mc-inner{padding-inline-start:.7rem;display:flex;flex-direction:column;height:100%}
+
+.mc-inner{display:flex;flex-direction:column;gap:.15rem}
+.mc-name{font-size:1.05rem;font-weight:600;color:var(--ink);line-height:1.4}
+.mc-en{font-family:var(--font-latin);font-style:italic;font-size:.86rem;color:var(--gold-deep);margin-bottom:.35rem}
+html[lang="en"] .mc-en{font-style:normal}
+.mc-desc{font-size:.84rem;color:var(--brown-soft);line-height:1.6;margin-bottom:.7rem}
+.mc-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
+.mc-price{font-family:var(--font-mono);font-size:1.02rem;font-weight:500;color:var(--gold-deep);white-space:nowrap}
+.menu-card.mc-photo .mc-price{color:var(--gold)}
+.mc-price small{font-size:.68rem;color:inherit;opacity:.75;font-family:var(--font-ar)}
+.mc-badges{display:flex;gap:.4rem;flex-wrap:wrap}
+.mc-badge{
+  font-size:.66rem;font-weight:700;border-radius:999px;padding:.24rem .7rem;letter-spacing:.02em;
+  border:1px solid transparent;
+}
+.mc-badge.b-new{background:var(--gold);color:var(--dark)}
+.mc-badge.b-best{background:var(--gold-faint);color:var(--gold-deep);border-color:rgba(184,149,90,.4)}
+.mc-badge.b-veg{background:rgba(94,125,90,.14);color:#4C6A48;border-color:rgba(94,125,90,.35)}
+.mc-badge.b-season{background:rgba(74,51,34,.1);color:var(--brown);border-color:rgba(74,51,34,.25)}
+.menu-card.mc-photo .mc-badge.b-best{background:rgba(184,149,90,.24);color:var(--gold);border-color:rgba(184,149,90,.5)}
+.menu-card.mc-photo .mc-badge.b-veg{background:rgba(94,125,90,.28);color:#B9D6A8;border-color:rgba(94,125,90,.5)}
+.menu-card.mc-photo .mc-badge.b-season{background:rgba(250,247,242,.14);color:var(--bg);border-color:rgba(250,247,242,.3)}
+.menu-card.is-hidden,.menu-cat-head.is-hidden{display:none}
+
 /* ============ REDUCED MOTION ============ */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important}
@@ -842,6 +933,11 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
   .seat-detail{position:static}
   .fleet-grid,.branches-grid,.contact-info-row{grid-template-columns:1fr 1fr}
   .pm-a,.pm-b,.pm-c,.pm-d,.pm-e,.pm-f{grid-column:span 6;min-height:220px}
+  .menu-grid{grid-template-columns:repeat(6,1fr)}
+  .mc-w12,.mc-w8{grid-column:span 6}
+  .mc-w6{grid-column:span 6}
+  .mc-w4{grid-column:span 3}
+  .mc-w3{grid-column:span 3}
 }
 @media (max-width:768px){
   .hero-grid,.member-zone,.phone-zone,.product-feature,.story-block,.quality-cols{grid-template-columns:1fr}
@@ -861,6 +957,10 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
   .pm-a,.pm-b,.pm-c,.pm-d,.pm-e,.pm-f{grid-column:span 12;min-height:210px}
   .member-stage{margin-top:1.5rem}
   .footer-bottom{justify-content:center;text-align:center}
+  .menu-grid{grid-template-columns:1fr}
+  .mc-w12,.mc-w8,.mc-w6,.mc-w4,.mc-w3{grid-column:span 1}
+  .menu-card.mc-photo{min-height:250px}
+  .menu-filters{top:60px}
 }
 </style>
 </head>
@@ -905,6 +1005,7 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
       <a href="#/" data-route="home" data-i18n="nav.home">الرئيسية</a>
       <a href="#/about" data-route="about" data-i18n="nav.about">من نحن</a>
       <a href="#/coffee" data-route="coffee" data-i18n="nav.coffee">القهوة</a>
+      <a href="#/menu" data-route="menu" data-i18n="nav.menu">المنيو</a>
       <a href="#/bakery" data-route="bakery" data-i18n="nav.bakery">المخبز</a>
       <a href="#/b2b" data-route="b2b" data-i18n="nav.b2b">أعمال B2B</a>
       <a href="#/catering" data-route="catering" data-i18n="nav.catering">الكاترينج</a>
@@ -927,6 +1028,7 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
     <a href="#/" data-route="home" data-i18n="nav.home">الرئيسية</a>
     <a href="#/about" data-route="about" data-i18n="nav.about">من نحن</a>
     <a href="#/coffee" data-route="coffee" data-i18n="nav.coffee">القهوة</a>
+    <a href="#/menu" data-route="menu" data-i18n="nav.menu">المنيو</a>
     <a href="#/bakery" data-route="bakery" data-i18n="nav.bakery">المخبز</a>
     <a href="#/b2b" data-route="b2b" data-i18n="nav.b2b">أعمال B2B</a>
     <a href="#/catering" data-route="catering" data-i18n="nav.catering">الكاترينج</a>
@@ -1168,6 +1270,11 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
               <span class="err" data-i18n="f.phoneErr">رقم جوال سعودي صحيح (يبدأ بـ 05)</span>
             </div>
             <div class="field">
+              <label for="lf-email" data-i18n="f.email">البريد الإلكتروني (اختياري)</label>
+              <input id="lf-email" name="email" type="email" dir="ltr" style="text-align:end">
+              <span class="err" data-i18n="f.emailErr">بريد إلكتروني صحيح</span>
+            </div>
+            <div class="field">
               <label for="lf-city" data-i18n="f.city">المدينة</label>
               <input id="lf-city" name="city" type="text">
               <span class="err" data-i18n="f.cityErr">اكتب المدينة</span>
@@ -1188,6 +1295,7 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
                 <option value="logistic">Strangers Logistic</option>
                 <option value="membership" data-i18n="f.svcMem">العضوية والحجوزات</option>
                 <option value="partnership" data-i18n="f.svcPart">شراكة تجارية</option>
+                <option value="franchise" data-i18n="f.svcFran">امتياز تجاري (فرنشايز)</option>
                 <option value="general" data-i18n="f.svcGen">استفسار عام</option>
               </select>
               <span class="err" data-i18n="f.serviceErr">اختر نوع الخدمة</span>
@@ -1205,6 +1313,11 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
               <label for="lf-msg" data-i18n="f.msg">وصف الاحتياج</label>
               <textarea id="lf-msg" name="message"></textarea>
               <span class="err" data-i18n="f.msgErr">اكتب وصف مختصر لاحتياجك</span>
+            </div>
+            <div class="field full">
+              <label for="lf-notes" data-i18n="f.notes">ملاحظات إضافية (اختياري)</label>
+              <textarea id="lf-notes" name="notes" style="min-height:80px"></textarea>
+              <span class="err"></span>
             </div>
             <div class="field full">
               <button type="submit" class="btn btn-gold" style="width:100%" data-i18n="f.send">أرسل الطلب</button>
@@ -1279,7 +1392,8 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
       <span class="latin-tag rv" data-i18n="coffee.tag">Specialty coffee, baked goods, and spaces made for staying</span>
       <p class="lead rv" style="--d:120ms" data-i18n="coffee.lead">محامص مختارة، مخبوزات من معملنا، ومساحات مصممة للجلسة الطويلة: للطالب، للعائلة، ولاجتماع العمل.</p>
       <div class="hero-ctas rv" style="--d:200ms;margin-top:1.8rem">
-        <a href="#/app" class="btn btn-gold" data-i18n="coffee.ctaApp">حمل التطبيق</a>
+        <a href="#/menu" class="btn btn-gold" data-i18n="coffee.ctaMenu">استعرض المنيو</a>
+        <a href="#/app" class="btn btn-ghost on-dark" data-i18n="coffee.ctaApp">حمل التطبيق</a>
         <a href="#seatmap" class="btn btn-ghost on-dark" data-i18n="coffee.ctaReserve">احجز مساحتك</a>
       </div>
     </div>
@@ -1346,7 +1460,8 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
         <div class="pm-item pm-f rv" style="--d:140ms"><img src="assets/icecream-strawberry.jpg" alt="آيس كريم الفراولة" loading="lazy"><span class="pm-tag" data-i18n="coffee.m6">آيس كريم الفراولة · 14 ريال</span></div>
       </div>
       <div class="hero-ctas rv" style="justify-content:center;margin-top:2.6rem">
-        <a href="#/app" class="btn btn-dark" data-i18n="coffee.ctaOrder">اطلب الآن من التطبيق</a>
+        <a href="#/menu" class="btn btn-dark" data-i18n="coffee.ctaFullMenu">استعرض المنيو الكامل</a>
+        <a href="#/app" class="btn btn-ghost" data-i18n="coffee.ctaOrder">اطلب الآن من التطبيق</a>
         <button class="btn btn-ghost" id="joinMembershipBtn" data-i18n="coffee.ctaJoin">انضم للعضوية</button>
       </div>
     </div>
@@ -1409,6 +1524,29 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================== MENU ==================================================== -->
+<section class="page" id="page-menu">
+  <div class="page-hero marble-section">
+    <div class="wrap">
+      <span class="eyebrow rv" data-i18n="menu.eyebrow">قائمة سترينجرز</span>
+      <h1 class="rv" data-i18n="menu.title">المنيو الكامل، من الفنجان للقمة الأخيرة</h1>
+      <span class="latin-tag rv" data-i18n="menu.tag">Coffee, bakes, meals, and desserts — all in one menu</span>
+      <p class="lead rv" style="--d:120ms" data-i18n="menu.lead">قهوة مختصة، مشروبات باردة، وجبات، كرواسون، كيك، وحلويات؛ كلها من معملنا المركزي بنفس المعيار. الأسعار بالريال السعودي وتشمل الضريبة.</p>
+    </div>
+  </div>
+  <section class="section">
+    <div class="wrap">
+      <div class="menu-filters rv" id="menuFilters" role="tablist" aria-label="أقسام المنيو"></div>
+      <div class="menu-count mono" id="menuCount" aria-live="polite"></div>
+      <div class="menu-grid" id="menuGrid"></div>
+      <div class="hero-ctas rv" style="justify-content:center;margin-top:3rem">
+        <a href="#/app" class="btn btn-gold" data-i18n="menu.ctaOrder">اطلب من التطبيق</a>
+        <a href="#/catering" class="btn btn-ghost" data-i18n="menu.ctaCater">منيو الكاترينج</a>
       </div>
     </div>
   </section>
@@ -1595,6 +1733,11 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
               <span class="err" data-i18n="f.cityErr">اكتب المدينة</span>
             </div>
             <div class="field">
+              <label for="bf-address" data-i18n="b2b.fAddress">عنوان التسليم</label>
+              <input id="bf-address" name="address" type="text">
+              <span class="err" data-i18n="b2b.fAddressErr">اكتب حي وشارع موقع التسليم</span>
+            </div>
+            <div class="field">
               <label for="bf-products" data-i18n="b2b.fProducts">المنتجات المطلوبة</label>
               <select id="bf-products" name="products">
                 <option value="" data-i18n="f.pick">اختر الخدمة</option>
@@ -1605,6 +1748,40 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
                 <option value="mix" data-i18n="b2b.pMix">تشكيلة متنوعة</option>
               </select>
               <span class="err" data-i18n="b2b.fProductsErr">اختر المنتجات</span>
+            </div>
+            <div class="field">
+              <label for="bf-rate" data-i18n="b2b.fRate">معدل الطلب</label>
+              <select id="bf-rate" name="rate">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="daily" data-i18n="b2b.rDaily">يومي</option>
+                <option value="weekly" data-i18n="b2b.rWeekly">أسبوعي (2-3 مرات)</option>
+                <option value="biweekly" data-i18n="b2b.rBiweekly">كل أسبوعين</option>
+                <option value="monthly" data-i18n="b2b.rMonthly">شهري</option>
+                <option value="ondemand" data-i18n="b2b.rOnDemand">عند الطلب</option>
+              </select>
+              <span class="err" data-i18n="b2b.fRateErr">اختر معدل الطلب</span>
+            </div>
+            <div class="field">
+              <label for="bf-payment" data-i18n="b2b.fPayment">طريقة الدفع المفضلة</label>
+              <select id="bf-payment" name="payment">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="transfer" data-i18n="b2b.payTransfer">تحويل بنكي</option>
+                <option value="credit" data-i18n="b2b.payCredit">آجل (فاتورة شهرية)</option>
+                <option value="prepaid" data-i18n="b2b.payPrepaid">دفع مقدم</option>
+                <option value="mada" data-i18n="b2b.payMada">مدى / شبكة عند التسليم</option>
+              </select>
+              <span class="err" data-i18n="b2b.fPaymentErr">اختر طريقة الدفع</span>
+            </div>
+            <div class="field">
+              <label for="bf-delivery" data-i18n="b2b.fDelivery">مواعيد التوصيل المفضلة</label>
+              <select id="bf-delivery" name="delivery">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="dawn" data-i18n="b2b.dDawn">فجراً (قبل الافتتاح)</option>
+                <option value="morning" data-i18n="b2b.dMorning">صباحاً (7 - 11)</option>
+                <option value="noon" data-i18n="b2b.dNoon">ظهراً (11 - 3)</option>
+                <option value="evening" data-i18n="b2b.dEvening">مساءً (3 - 8)</option>
+              </select>
+              <span class="err" data-i18n="b2b.fDeliveryErr">اختر موعد التوصيل</span>
             </div>
             <div class="field full">
               <label for="bf-qty" data-i18n="b2b.fQty">الكميات التقريبية والملاحظات</label>
@@ -1714,9 +1891,14 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
               <span class="err" data-i18n="cat.fDateErr">اختر تاريخاً قادماً</span>
             </div>
             <div class="field">
-              <label for="cf-time" data-i18n="cat.fTime">الوقت</label>
+              <label for="cf-time" data-i18n="cat.fTime">وقت البداية</label>
               <input id="cf-time" name="time" type="time">
-              <span class="err" data-i18n="cat.fTimeErr">حدد الوقت</span>
+              <span class="err" data-i18n="cat.fTimeErr">حدد وقت البداية</span>
+            </div>
+            <div class="field">
+              <label for="cf-endtime" data-i18n="cat.fEndTime">وقت النهاية</label>
+              <input id="cf-endtime" name="endTime" type="time">
+              <span class="err" data-i18n="cat.fEndTimeErr">حدد وقت النهاية بعد البداية</span>
             </div>
             <div class="field">
               <label for="cf-loc" data-i18n="cat.fLoc">الموقع</label>
@@ -1738,6 +1920,18 @@ html[dir="ltr"] .toast.show{transform:translate(-50%,0)}
                 <option value="custom" data-i18n="cat.pCustom">أحتاج استشارة</option>
               </select>
               <span class="err" data-i18n="cat.fPkgErr">اختر الباقة</span>
+            </div>
+            <div class="field">
+              <label for="cf-products" data-i18n="cat.fProducts">المنتجات المطلوبة</label>
+              <select id="cf-products" name="products">
+                <option value="" data-i18n="f.pick">اختر الخدمة</option>
+                <option value="coffee" data-i18n="cat.prCoffee">ركن قهوة مختصة</option>
+                <option value="bakes" data-i18n="cat.prBakes">مخبوزات وكرواسون</option>
+                <option value="desserts" data-i18n="cat.prDesserts">حلى وكيك</option>
+                <option value="savory" data-i18n="cat.prSavory">ساندويتشات ومالح</option>
+                <option value="full" data-i18n="cat.prFull">تشكيلة كاملة</option>
+              </select>
+              <span class="err" data-i18n="cat.fProductsErr">اختر المنتجات</span>
             </div>
             <div class="field">
               <label for="cf-budget" data-i18n="cat.fBudget">الميزانية التقريبية</label>
@@ -2021,7 +2215,12 @@ $$("[data-i18n]").forEach(function(el){
 
 var EN = {
   "brand.sub":"Strangers Company",
-  "nav.home":"Home","nav.about":"About","nav.coffee":"Coffee","nav.bakery":"Bakery","nav.b2b":"B2B","nav.catering":"Catering","nav.logistic":"Logistic","nav.news":"News","nav.contact":"Contact","nav.app":"App",
+  "nav.home":"Home","nav.about":"About","nav.coffee":"Coffee","nav.menu":"Menu","nav.bakery":"Bakery","nav.b2b":"B2B","nav.catering":"Catering","nav.logistic":"Logistic","nav.news":"News","nav.contact":"Contact","nav.app":"App",
+  "menu.eyebrow":"Strangers Menu","menu.title":"The full menu, from the cup to the last bite",
+  "menu.tag":"قهوة، مخبوزات، وجبات، وحلويات — كلها في منيو واحد",
+  "menu.lead":"Specialty coffee, cold drinks, meals, croissants, cakes, and desserts; all from our central lab at one standard. Prices in Saudi riyals, VAT included.",
+  "menu.ctaOrder":"Order from the App","menu.ctaCater":"Catering Menu",
+  "menu.all":"All","menu.count":"items","menu.empty":"No items in this section.",
   "hero.eyebrow":"Strangers Company · Since 2017",
   "hero.title":"One Brand. Multiple Experiences.",
   "hero.tagline":"تعال غريب، اطلع صديق",
@@ -2056,11 +2255,13 @@ var EN = {
   "talk.title":"Talk to Strangers","talk.lead":"Tell us what you need and our team replies within one business day.",
   "f.name":"Full name","f.nameErr":"Please enter your name",
   "f.phone":"Mobile number","f.phoneErr":"Valid Saudi mobile (starts with 05)",
+  "f.email":"Email (optional)","f.emailErr":"A valid email address",
   "f.city":"City","f.cityErr":"Please enter your city",
   "f.org":"Organization (optional)",
-  "f.service":"Service type","f.pick":"Select","f.svcMem":"Membership and reservations","f.svcPart":"Commercial partnership","f.svcGen":"General inquiry","f.serviceErr":"Select a service",
+  "f.service":"Service type","f.pick":"Select","f.svcMem":"Membership and reservations","f.svcPart":"Commercial partnership","f.svcFran":"Franchise","f.svcGen":"General inquiry","f.serviceErr":"Select a service",
   "f.time":"Best time to reach you","f.morning":"Morning (9 - 12)","f.noon":"Noon (12 - 4)","f.evening":"Evening (4 - 9)",
   "f.msg":"Describe your need","f.msgErr":"Write a short description",
+  "f.notes":"Extra notes (optional)",
   "f.send":"Send request","f.okT":"Request received","f.okP":"The Strangers team will contact you at your chosen time.",
   "about.eyebrow":"Our Story","about.title":"Nine years of strangers becoming friends",
   "about.s1t":"The beginning: one table and a big dream",
@@ -2078,6 +2279,7 @@ var EN = {
   "coffee.title":"The coffee that started it all",
   "coffee.tag":"قهوة مختصة، مخبوزات، ومساحات مصممة للبقاء",
   "coffee.lead":"Curated roasters, bakes from our own lab, and spaces built for the long sit: students, families, and business meetings.",
+  "coffee.ctaMenu":"Explore the Menu","coffee.ctaFullMenu":"Explore the Full Menu",
   "coffee.ctaApp":"Download the App","coffee.ctaReserve":"Reserve Your Space",
   "coffee.jTitle":"The bean's journey","coffee.jLead":"Four stops between the farm and your cup.",
   "coffee.j1t":"Roasting","coffee.j1p":"Small weekly batches at medium profiles that reveal the bean's sweetness.",
@@ -2088,7 +2290,7 @@ var EN = {
   "coffee.p1t":"Pesto croissant","coffee.p1p":"A 72-hour dough from our lab, fresh basil pesto and melting cheese. Most ordered with black coffee.","cur":"SAR",
   "coffee.p2t":"Blueberry cheesecake","coffee.p2p":"A buttery biscuit base and a light cream layer, topped with blueberry sauce cooked in our kitchen.",
   "coffee.m1":"Monte Cristo · SAR 32","coffee.m2":"Oreo ice cream · SAR 14","coffee.m3":"Lotus cheesecake · SAR 26","coffee.m4":"Philly steak · SAR 34","coffee.m5":"Lemon loaf · SAR 16","coffee.m6":"Strawberry ice cream · SAR 14",
-  "coffee.ctaOrder":"Order Now from the App","coffee.ctaJoin":"Join Membership",
+  "coffee.ctaOrder":"Order from the App","coffee.ctaJoin":"Join Membership",
   "seat.title":"Seat map: booking demo","seat.lead":"Tap any chair or table to see its details and live status at the Olaya branch.",
   "seat.avail":"Available","seat.busy":"Occupied","seat.reserved":"Reserved","seat.cleaning":"Cleaning",
   "seat.empty":"Pick a seat from the map to view its details",
@@ -2124,7 +2326,11 @@ var EN = {
   "b2b.fBranches":"Number of branches","b2b.fBranchesErr":"Enter a valid number",
   "b2b.fContact":"Contact person","b2b.fContactErr":"Enter the contact name",
   "b2b.fEmail":"Email","b2b.fEmailErr":"A valid email address",
+  "b2b.fAddress":"Delivery address","b2b.fAddressErr":"Enter the district and street of the delivery point",
   "b2b.fProducts":"Requested products","b2b.pPastries":"Croissants and danishes","b2b.pDesserts":"Desserts and cakes","b2b.pSandwiches":"Sandwiches and bread","b2b.pBeans":"Roasted coffee beans","b2b.pMix":"Mixed selection","b2b.fProductsErr":"Select the products",
+  "b2b.fRate":"Order frequency","b2b.rDaily":"Daily","b2b.rWeekly":"Weekly (2-3 times)","b2b.rBiweekly":"Every two weeks","b2b.rMonthly":"Monthly","b2b.rOnDemand":"On demand","b2b.fRateErr":"Select an order frequency",
+  "b2b.fPayment":"Preferred payment method","b2b.payTransfer":"Bank transfer","b2b.payCredit":"Credit (monthly invoice)","b2b.payPrepaid":"Prepaid","b2b.payMada":"Mada / card on delivery","b2b.fPaymentErr":"Select a payment method",
+  "b2b.fDelivery":"Preferred delivery times","b2b.dDawn":"Dawn (before opening)","b2b.dMorning":"Morning (7 - 11)","b2b.dNoon":"Midday (11 - 3)","b2b.dEvening":"Evening (3 - 8)","b2b.fDeliveryErr":"Select a delivery time",
   "b2b.fQty":"Approximate quantities and notes","b2b.fQtyErr":"Write your expected weekly quantities",
   "b2b.fSend":"Send registration request",
   "b2b.okT":"Registration received","b2b.okP":"Your account manager will contact you within two business days with an initial quote.",
@@ -2136,10 +2342,12 @@ var EN = {
   "cat.pk3t":"Royal","cat.pk3a":"A complete hospitality experience led by an events manager","cat.pk3b":"A custom menu with a prior tasting session","cat.pk3c":"Live stations: roasting, desserts, and ice cream","cat.pk3d":"Full event coverage with no hour cap","cat.pk3e":"200 guests and above",
   "cat.reqTitle":"Request catering",
   "cat.fType":"Occasion type","cat.tWedding":"Wedding","cat.tCorp":"Corporate event","cat.tMeeting":"Business meeting","cat.tFamily":"Family occasion","cat.tGrad":"Graduation","cat.fTypeErr":"Select the occasion type",
-  "cat.fDate":"Date","cat.fDateErr":"Pick an upcoming date","cat.fTime":"Time","cat.fTimeErr":"Set the time",
+  "cat.fDate":"Date","cat.fDateErr":"Pick an upcoming date","cat.fTime":"Start time","cat.fTimeErr":"Set the start time",
+  "cat.fEndTime":"End time","cat.fEndTimeErr":"Set an end time after the start",
   "cat.fLoc":"Location","cat.fLocErr":"City and district or venue",
   "cat.fGuests":"Guest count","cat.fGuestsErr":"10 guests or more",
   "cat.fPkg":"Package","cat.pCustom":"I need a consultation","cat.fPkgErr":"Select a package",
+  "cat.fProducts":"Requested items","cat.prCoffee":"Specialty coffee corner","cat.prBakes":"Bakes and croissants","cat.prDesserts":"Desserts and cakes","cat.prSavory":"Sandwiches and savory","cat.prFull":"Full selection","cat.fProductsErr":"Select the items",
   "cat.fBudget":"Approximate budget","cat.b1":"Under SAR 10k","cat.b2":"SAR 10k to 30k","cat.b3":"SAR 30k to 80k","cat.b4":"Above SAR 80k","cat.fBudgetErr":"Select a budget range",
   "cat.fNotes":"Extra notes (optional)","cat.fSend":"Send catering request",
   "cat.okT":"Your event request is in","cat.okP":"Our events coordinator will call you within 24 hours to confirm details and the tasting session.",
@@ -2240,6 +2448,7 @@ function applyLang(){
   document.title = lang === "ar" ? "Strangers Company | شركة سترينجرز" : "Strangers Company | One Brand, Multiple Experiences";
   renderStatusFlow();
   renderSeatDetail(selectedSeat);
+  renderMenu();
 }
 $("#langToggle").addEventListener("click",function(){
   lang = lang === "ar" ? "en" : "ar";
@@ -2258,7 +2467,7 @@ function toast(msg){
 }
 
 /* ================= ROUTER ================= */
-var ROUTES = {"":"home","/":"home","/about":"about","/coffee":"coffee","/bakery":"bakery","/b2b":"b2b","/catering":"catering","/logistic":"logistic","/news":"news","/contact":"contact","/app":"app"};
+var ROUTES = {"":"home","/":"home","/about":"about","/coffee":"coffee","/menu":"menu","/bakery":"bakery","/b2b":"b2b","/catering":"catering","/logistic":"logistic","/news":"news","/contact":"contact","/app":"app"};
 var DARK_HERO = {home:1,coffee:1,b2b:1,logistic:1,app:1};
 var currentRoute = "home";
 function route(){
@@ -2649,10 +2858,13 @@ function bindForm(formId,successId,storageKey,validate){
   });
 }
 
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 bindForm("leadForm","leadSuccess","strangers_leads",function(f){
   var ok = true;
   ok = setValid($("#lf-name"), $("#lf-name").value.trim().length >= 2) && ok;
   ok = setValid($("#lf-phone"), PHONE_RE.test($("#lf-phone").value.trim())) && ok;
+  var em = $("#lf-email").value.trim();
+  ok = setValid($("#lf-email"), em === "" || EMAIL_RE.test(em)) && ok;
   ok = setValid($("#lf-city"), $("#lf-city").value.trim().length >= 2) && ok;
   ok = setValid($("#lf-service"), $("#lf-service").value !== "") && ok;
   ok = setValid($("#lf-msg"), $("#lf-msg").value.trim().length >= 5) && ok;
@@ -2669,9 +2881,13 @@ bindForm("b2bForm","b2bSuccess","strangers_b2b",function(f){
   ok = setValid($("#bf-branches"), br >= 1 && br <= 500) && ok;
   ok = setValid($("#bf-contact"), $("#bf-contact").value.trim().length >= 2) && ok;
   ok = setValid($("#bf-phone"), PHONE_RE.test($("#bf-phone").value.trim())) && ok;
-  ok = setValid($("#bf-email"), /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($("#bf-email").value.trim())) && ok;
+  ok = setValid($("#bf-email"), EMAIL_RE.test($("#bf-email").value.trim())) && ok;
   ok = setValid($("#bf-city"), $("#bf-city").value.trim().length >= 2) && ok;
+  ok = setValid($("#bf-address"), $("#bf-address").value.trim().length >= 4) && ok;
   ok = setValid($("#bf-products"), $("#bf-products").value !== "") && ok;
+  ok = setValid($("#bf-rate"), $("#bf-rate").value !== "") && ok;
+  ok = setValid($("#bf-payment"), $("#bf-payment").value !== "") && ok;
+  ok = setValid($("#bf-delivery"), $("#bf-delivery").value !== "") && ok;
   ok = setValid($("#bf-qty"), $("#bf-qty").value.trim().length >= 3) && ok;
   return ok;
 });
@@ -2683,10 +2899,13 @@ bindForm("cateringForm","cateringSuccess","strangers_catering",function(f){
   var today = new Date(); today.setHours(0,0,0,0);
   ok = setValid($("#cf-date"), !!dv && new Date(dv) >= today) && ok;
   ok = setValid($("#cf-time"), $("#cf-time").value !== "") && ok;
+  var st = $("#cf-time").value, et = $("#cf-endtime").value;
+  ok = setValid($("#cf-endtime"), et !== "" && (st === "" || et > st)) && ok;
   ok = setValid($("#cf-loc"), $("#cf-loc").value.trim().length >= 3) && ok;
   var g = parseInt($("#cf-guests").value,10);
   ok = setValid($("#cf-guests"), g >= 10 && g <= 2000) && ok;
   ok = setValid($("#cf-pkg"), $("#cf-pkg").value !== "") && ok;
+  ok = setValid($("#cf-products"), $("#cf-products").value !== "") && ok;
   ok = setValid($("#cf-budget"), $("#cf-budget").value !== "") && ok;
   ok = setValid($("#cf-phone"), PHONE_RE.test($("#cf-phone").value.trim())) && ok;
   return ok;
@@ -2722,8 +2941,156 @@ $$(".pkg-pick").forEach(function(b){
   });
 })();
 
+/* ================= MENU ================= */
+var IMG = "assets/";
+var MENU_CATS = [
+  {key:"all",     ar:"الكل",             en:"All"},
+  {key:"hot",     ar:"المشروبات الساخنة", en:"Hot Coffee"},
+  {key:"iced",    ar:"الباردة بالقهوة",   en:"Iced Coffee"},
+  {key:"cold",    ar:"الباردة بدون قهوة", en:"Cold Drinks"},
+  {key:"meals",   ar:"الوجبات",          en:"Meals"},
+  {key:"croissant",ar:"الكرواسون",        en:"Croissants"},
+  {key:"cakes",   ar:"الكيك",            en:"Cakes"},
+  {key:"desserts",ar:"الحلويات",         en:"Desserts"}
+];
+var MENU_BADGES = {
+  new:   {ar:"جديد",        en:"New",        cls:"b-new"},
+  best:  {ar:"الأكثر طلباً", en:"Bestseller", cls:"b-best"},
+  veg:   {ar:"نباتي",       en:"Vegetarian", cls:"b-veg"},
+  season:{ar:"موسمي",       en:"Seasonal",   cls:"b-season"}
+};
+var MENU = [
+  /* ---- HOT COFFEE ---- */
+  {cat:"hot",ar:"إسبريسو",en:"Espresso",dAr:"لقطة مركزة من تحميصتنا الأسبوعية، قلب كل مشروباتنا.",dEn:"A concentrated shot of our weekly roast, the heart of every drink.",price:12,badge:"best",span:"w4"},
+  {cat:"hot",ar:"أمريكانو",en:"Americano",dAr:"إسبريسو ممدود بالماء الساخن، صافٍ وطويل النفس.",dEn:"Espresso lengthened with hot water, clean and long.",price:15,span:"w4"},
+  {cat:"hot",ar:"فلات وايت",en:"Flat White",dAr:"ثنائي لقطة مع حليب مخملي رقيق الرغوة.",dEn:"A double shot with silky, thin micro-foam milk.",price:17,span:"w4"},
+  {cat:"hot",ar:"كابتشينو",en:"Cappuccino",dAr:"توازن كلاسيكي بين اللقطة والحليب والرغوة.",dEn:"The classic balance of shot, milk, and foam.",price:17,span:"w4"},
+  {cat:"hot",ar:"لاتيه",en:"Latte",dAr:"حليب دافئ ناعم على لقطة، برسمة باريستا.",dEn:"Smooth steamed milk over a shot, with barista art.",price:18,span:"w4"},
+  {cat:"hot",ar:"سبانيش لاتيه",en:"Spanish Latte",dAr:"لاتيه بحليب مكثف محلى، حلاوة دافئة متوازنة.",dEn:"A latte with sweetened condensed milk, warm and balanced.",price:20,badge:"best",span:"w4"},
+  {cat:"hot",ar:"موكا",en:"Mocha",dAr:"إسبريسو وشوكولاتة بلجيكية وحليب مخملي.",dEn:"Espresso, Belgian chocolate, and velvety milk.",price:21,span:"w6"},
+  {cat:"hot",ar:"هوت شوكلت",en:"Hot Chocolate",dAr:"شوكولاتة ذائبة كاملة الدسم بدون قهوة.",dEn:"Full, melted chocolate with no coffee.",price:20,span:"w3"},
+  {cat:"hot",ar:"مشروبات ساخنة سيجنتشر",en:"Signature Hot Drinks",dAr:"توليفات موسمية من الباريستا: توابل، عسل، وتحميصات مختارة.",dEn:"Seasonal barista creations: spices, honey, and select roasts.",price:24,img:"coffee-jar.jpg",badge:"new",span:"w6"},
+  /* ---- ICED COFFEE ---- */
+  {cat:"iced",ar:"آيس أمريكانو",en:"Iced Americano",dAr:"أمريكانو على ثلج، منعش وصافي.",dEn:"Americano over ice, crisp and clean.",price:16,span:"w4"},
+  {cat:"iced",ar:"آيس لاتيه",en:"Iced Latte",dAr:"لقطة على حليب بارد وثلج، سلس وطويل.",dEn:"A shot over cold milk and ice, smooth and long.",price:19,span:"w4"},
+  {cat:"iced",ar:"آيس سبانيش لاتيه",en:"Iced Spanish Latte",dAr:"النسخة الباردة الأكثر طلباً، حلاوة حليب مكثف.",dEn:"Our most-ordered iced drink, sweetened condensed milk.",price:22,badge:"best",span:"w4"},
+  {cat:"iced",ar:"كولد برو",en:"Cold Brew",dAr:"منقوع 18 ساعة على البارد، جسم ناعم ونكهة عميقة.",dEn:"Steeped cold for 18 hours, smooth body and deep flavor.",price:23,img:"coffee-jar.jpg",badge:"best",span:"w6"},
+  {cat:"iced",ar:"آيس موكا",en:"Iced Mocha",dAr:"موكا الشوكولاتة على ثلج مع رذاذ كاكاو.",dEn:"Chocolate mocha over ice with a cocoa dusting.",price:22,span:"w3"},
+  {cat:"iced",ar:"آيس سيجنتشر",en:"Signature Iced Coffee",dAr:"توليفة باردة خاصة تتغير مع الموسم.",dEn:"A special cold blend that changes with the season.",price:25,badge:"new",span:"w3"},
+  /* ---- COLD (NON-COFFEE) ---- */
+  {cat:"cold",ar:"ماتشا",en:"Matcha",dAr:"شاي أخضر ياباني مخفوق مع حليب على ثلج.",dEn:"Japanese green tea whisked with milk over ice.",price:22,badge:"veg",span:"w4"},
+  {cat:"cold",ar:"ريفريشر",en:"Refreshers",dAr:"مشروبات فواكه منعشة خفيفة بدون كافيين.",dEn:"Light, refreshing fruit drinks, caffeine free.",price:19,badge:"new",span:"w4"},
+  {cat:"cold",ar:"موهيتو",en:"Mojito",dAr:"نعناع وليمون وسودا، انتعاش سعودي صيفي.",dEn:"Mint, lime, and soda, a summer refresher.",price:18,span:"w4"},
+  {cat:"cold",ar:"ميلك شيك",en:"Milkshakes",dAr:"آيس كريم مخفوق كثيف بنكهات مختارة.",dEn:"Thick blended ice cream in select flavors.",price:24,img:"icecream-strawberry.jpg",badge:"best",span:"w6"},
+  {cat:"cold",ar:"مشروبات الشوكولاتة",en:"Chocolate Drinks",dAr:"شوكولاتة باردة كثيفة بلمسة كريمة.",dEn:"Thick cold chocolate with a cream touch.",price:21,span:"w3"},
+  {cat:"cold",ar:"مشروبات موسمية",en:"Seasonal Drinks",dAr:"نكهات محدودة تتبدل مع كل موسم.",dEn:"Limited flavors that rotate every season.",price:23,badge:"season",span:"w3"},
+  {cat:"cold",ar:"باردة سيجنتشر",en:"Signature Cold Drinks",dAr:"ابتكارات باردة من فريقنا، حصرية للفروع.",dEn:"Cold creations from our team, branch exclusive.",price:25,badge:"new",span:"w6"},
+  /* ---- MEALS ---- */
+  {cat:"meals",ar:"فطور",en:"Breakfast",dAr:"بيض وأجبان وعسل مع خبز معملنا الطازج.",dEn:"Eggs, cheeses, and honey with our fresh house bread.",price:32,span:"w6"},
+  {cat:"meals",ar:"ساندويتشات",en:"Sandwiches",dAr:"كلوب ساندويتش وخيارات مشوية على خبزنا.",dEn:"Club sandwich and grilled options on our own bread.",price:34,img:"club-sandwich.jpg",badge:"best",span:"w6"},
+  {cat:"meals",ar:"ميني ساندويتش",en:"Mini Sandwiches",dAr:"لقيمات ساندويتش للمشاركة أو وجبة خفيفة.",dEn:"Bite-size sandwiches for sharing or a light bite.",price:22,img:"turkey-club.jpg",span:"w6"},
+  {cat:"meals",ar:"سلطات",en:"Salads",dAr:"خضار طازجة وصلصات خفيفة تُحضّر يومياً.",dEn:"Fresh greens and light dressings, prepared daily.",price:28,badge:"veg",span:"w6"},
+  {cat:"meals",ar:"وجبات خفيفة",en:"Light Meals",dAr:"أطباق سريعة متوازنة تناسب فترة العمل.",dEn:"Quick, balanced plates that suit the work break.",price:30,img:"italian-sandwich.jpg",span:"w6"},
+  {cat:"meals",ar:"وجبات الطلاب",en:"Student Meals",dAr:"قيمة مشبعة بسعر عادل، مع مقعد وكهرباء.",dEn:"Filling value at a fair price, with a seat and power.",price:25,img:"philly-steak.jpg",badge:"best",span:"w6"},
+  {cat:"meals",ar:"أطباق العائلة",en:"Family Sharing",dAr:"طبق مشاركة كبير يكفي من 3 إلى 4 أشخاص.",dEn:"A large sharing platter for 3 to 4 people.",price:89,img:"monte-cristo.jpg",span:"w12"},
+  /* ---- CROISSANTS ---- */
+  {cat:"croissant",ar:"كرواسون مالح",en:"Savory Croissant",dAr:"بيستو وجبن ذائب على عجينة 72 ساعة.",dEn:"Pesto and melting cheese on a 72-hour dough.",price:19,img:"pesto-croissant.jpg",span:"w6"},
+  {cat:"croissant",ar:"كرواسون حلو",en:"Sweet Croissant",dAr:"نوتيلا أو حشوات حلوة على طبقات مورقة.",dEn:"Nutella or sweet fillings on flaky layers.",price:18,img:"nutella-croissant.jpg",span:"w6"},
+  {cat:"croissant",ar:"كرواسون ساندويتش",en:"Croissant Sandwiches",dAr:"كرواسون محشو دجاج فاهيتا أو لحم بارد.",dEn:"Croissant filled with chicken fajita or cold cuts.",price:26,img:"chicken-fajita-croissant.jpg",span:"w6"},
+  {cat:"croissant",ar:"كرواسون سيجنتشر",en:"Signature Croissant",dAr:"كرواسون مدام: بيض وجبن وصلصة بيضاء.",dEn:"Croissant Madame: egg, cheese, and white sauce.",price:24,img:"croissant-madame.jpg",badge:"best",span:"w6"},
+  {cat:"croissant",ar:"كرواسون موسمي",en:"Seasonal Croissant",dAr:"لوز وفستق ونكهات محدودة تتغير بالموسم.",dEn:"Almond, pistachio, and limited seasonal flavors.",price:22,img:"almond-croissant.jpg",badge:"season",span:"w12"},
+  /* ---- CAKES ---- */
+  {cat:"cakes",ar:"كيك الشوكولاتة",en:"Chocolate Cake",dAr:"طبقات شوكولاتة بلجيكية غنية وطرية.",dEn:"Rich, moist layers of Belgian chocolate.",price:27,img:"chocolate-collection.jpg",badge:"best",span:"w6"},
+  {cat:"cakes",ar:"كيك الفواكه",en:"Fruit Cake",dAr:"إسفنجة خفيفة بطبقة توت وفواكه موسمها.",dEn:"A light sponge topped with berries and seasonal fruit.",price:26,img:"blueberry-cheesecake.jpg",span:"w6"},
+  {cat:"cakes",ar:"كيك الجزر",en:"Carrot Cake",dAr:"جزر وقرفة وجوز مع كريمة الجبن.",dEn:"Carrot, cinnamon, and walnut with cream cheese.",price:24,badge:"veg",span:"w4"},
+  {cat:"cakes",ar:"تشيز كيك",en:"Cheesecake",dAr:"لوتس، توت، وباشن فروت على قاعدة بسكويت.",dEn:"Lotus, berry, and passion fruit on a biscuit base.",price:26,img:"lotus-cheesecake.jpg",badge:"best",span:"w8"},
+  {cat:"cakes",ar:"كيك سيجنتشر",en:"Signature Cake",dAr:"تيراميسو بطبقات مسكربوني وإسبريسو معملنا.",dEn:"Tiramisu with mascarpone layers and our espresso.",price:29,img:"tiramisu.jpg",badge:"new",span:"w6"},
+  {cat:"cakes",ar:"كيك المناسبات",en:"Celebration Cake",dAr:"كيك مخصص لمناسباتك بطلب مسبق قبل 48 ساعة.",dEn:"A custom cake for your occasion, ordered 48 hours ahead.",price:180,from:true,span:"w6"},
+  /* ---- DESSERTS ---- */
+  {cat:"desserts",ar:"تارت",en:"Tarts",dAr:"قشرة زبدة هشة بحشوات فواكه وكريمة.",dEn:"Crisp butter shells with fruit and cream fillings.",price:18,img:"mini-tart.jpg",span:"w6"},
+  {cat:"desserts",ar:"مافن",en:"Muffins",dAr:"كيك طري بحبيبات شوكولاتة أو توت.",dEn:"Soft cake studded with chocolate chips or berries.",price:14,span:"w3"},
+  {cat:"desserts",ar:"كيك إنجليزي",en:"English Cake",dAr:"كيكة ليمون أو فواكه على الطريقة الإنجليزية.",dEn:"Lemon or fruit loaf in the English style.",price:16,img:"lemon-loaf.jpg",span:"w3"},
+  {cat:"desserts",ar:"سينابون",en:"Cinnabon",dAr:"لفائف قرفة دافئة بكريمة الجبن.",dEn:"Warm cinnamon rolls with cream cheese glaze.",price:19,badge:"best",span:"w4"},
+  {cat:"desserts",ar:"كريب",en:"Crepes",dAr:"كريب رقيق بحشوات حلوة تُحضّر عند الطلب.",dEn:"Thin crepes with sweet fillings, made to order.",price:26,span:"w4"},
+  {cat:"desserts",ar:"وافل",en:"Waffles",dAr:"وافل مقرمش مع صوصات وآيس كريم.",dEn:"Crisp waffles with sauces and ice cream.",price:27,span:"w4"},
+  {cat:"desserts",ar:"أصابع الحلى",en:"Dessert Sticks",dAr:"إكلير وأصابع حلى بكريمات مختارة.",dEn:"Eclairs and dessert sticks with select creams.",price:20,img:"eclair.jpg",span:"w6"},
+  {cat:"desserts",ar:"كاسات الحلى",en:"Dessert Cups",dAr:"طبقات حلى فردية في كاسة أنيقة.",dEn:"Individual layered desserts in an elegant cup.",price:22,span:"w3"},
+  {cat:"desserts",ar:"آيس كريم",en:"Ice Cream",dAr:"سكوبات كريمية بنكهات أوريو وفراولة والمزيد.",dEn:"Creamy scoops in Oreo, strawberry, and more.",price:14,img:"icecream-oreo.jpg",badge:"best",span:"w6"},
+  {cat:"desserts",ar:"حلويات موسمية",en:"Seasonal Desserts",dAr:"دانش وحلى محدود يتبدل مع كل موسم.",dEn:"Danishes and limited desserts that rotate each season.",price:23,img:"strawberry-danish.jpg",badge:"season",span:"w3"}
+];
+var menuFilter = "all";
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+function renderMenuFilters(){
+  var box = $("#menuFilters");
+  if(!box) return;
+  box.innerHTML = "";
+  MENU_CATS.forEach(function(c){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "menu-tab" + (c.key === menuFilter ? " active" : "");
+    b.setAttribute("data-cat",c.key);
+    b.setAttribute("role","tab");
+    b.setAttribute("aria-selected", c.key === menuFilter ? "true" : "false");
+    var name = lang === "en" ? c.en : c.ar;
+    var sub = lang === "en" ? "" : '<span class="mt-en">'+esc(c.en)+'</span>';
+    b.innerHTML = '<span>'+esc(name)+'</span>'+sub;
+    b.addEventListener("click",function(){ menuFilter = c.key; renderMenu(); });
+    box.appendChild(b);
+  });
+}
+function menuBadgeHtml(key){
+  var b = MENU_BADGES[key];
+  if(!b) return "";
+  return '<span class="mc-badge '+b.cls+'">'+(lang==="en"?b.en:b.ar)+'</span>';
+}
+function menuCardHtml(it){
+  var name = lang === "en" ? it.en : it.ar;
+  var subEn = lang === "en" ? "" : '<span class="mc-en">'+esc(it.en)+'</span>';
+  var desc = lang === "en" ? it.dEn : it.dAr;
+  var unit = lang === "en" ? "SAR" : "ريال";
+  var pre = it.from ? (lang==="en" ? "from " : "من ") : "";
+  var priceHtml = '<span class="mc-price">'+pre+it.price+' <small>'+unit+'</small></span>';
+  var badges = it.badge ? '<div class="mc-badges">'+menuBadgeHtml(it.badge)+'</div>' : '<div class="mc-badges"></div>';
+  var span = "mc-" + (it.span || "w4");
+  var inner =
+    '<div class="mc-inner">'+
+      '<div class="mc-name">'+esc(name)+'</div>'+subEn+
+      (desc ? '<div class="mc-desc">'+esc(desc)+'</div>' : '')+
+      '<div class="mc-foot">'+priceHtml+badges+'</div>'+
+    '</div>';
+  if(it.img){
+    return '<article class="menu-card mc-photo '+span+'" data-cat="'+it.cat+'">'+
+      '<div class="mc-img" style="background-image:url(\''+IMG+it.img+'\')"></div>'+
+      '<div class="mc-veil"></div>'+inner+
+    '</article>';
+  }
+  return '<article class="menu-card mc-text '+span+'" data-cat="'+it.cat+'">'+inner+'</article>';
+}
+function renderMenu(){
+  var grid = $("#menuGrid");
+  if(!grid) return;
+  renderMenuFilters();
+  var html = "", shown = 0;
+  MENU_CATS.forEach(function(c){
+    if(c.key === "all") return;
+    if(menuFilter !== "all" && menuFilter !== c.key) return;
+    var items = MENU.filter(function(it){ return it.cat === c.key; });
+    if(!items.length) return;
+    var headName = lang === "en" ? c.en : c.ar;
+    var headEn = lang === "en" ? "" : '<span class="mch-en">'+esc(c.en)+'</span>';
+    html += '<div class="menu-cat-head"><h3>'+esc(headName)+'</h3>'+headEn+'</div>';
+    items.forEach(function(it){ html += menuCardHtml(it); shown++; });
+  });
+  grid.innerHTML = html;
+  var cnt = $("#menuCount");
+  if(cnt){
+    cnt.textContent = lang === "en" ? (shown + " items") : (shown + " صنف");
+  }
+}
+
 /* ================= BOOT ================= */
 applyLang();
+renderMenu();
 route();
 renderStatusFlow();
 })();

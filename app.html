@@ -1726,7 +1726,7 @@ document.addEventListener('submit',function(e){
   mark('email',email.length>0 && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email));
   mark('city',!city);
   $('#agreeErr').style.display=agree?'none':'block';if(!agree)ok=false;
-  if(ok){go('otp')}
+  if(ok){go('home')}
 });
 
 /* OTP interactions */

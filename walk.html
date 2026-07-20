@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سترينجرز · تجربة المشي</title>
+<meta name="description" content="امشِ داخل كوفي سترينجرز: تجربة ثلاثية الأبعاد تأخذك من الباب للبار للمخبز والصالة. تعال غريب، اطلع صديق.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --warm-white:#FAF7F2; --beige:#EFE6D8; --sand:#E4D6C0;
+  --espresso:#2A1D14; --coffee:#4A3322; --brown-soft:#7A6552;
+  --gold:#B8955A; --gold-deep:#9C7D45; --gold-soft:#D8BE93;
+  --line:rgba(42,29,20,.12);
+  --font-disp:"Fraunces",Georgia,serif;
+  --font-ar:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,monospace;
+  --spring:cubic-bezier(.34,1.4,.4,1);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font-ar); color:var(--espresso); background:var(--warm-white);
+  -webkit-font-smoothing:antialiased; overflow-x:hidden; line-height:1.6;
+}
+h1,h2,h3,h4{font-family:var(--font-disp);font-weight:600;line-height:1.08;letter-spacing:-.01em}
+.mono{font-family:var(--font-mono)}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+/* ===== 3D stage ===== */
+#stage{position:fixed;inset:0;z-index:1}
+#stage canvas{display:block;width:100%;height:100%}
+.vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+  box-shadow:inset 0 0 220px 40px rgba(42,29,20,.28);
+  background:radial-gradient(120% 120% at 50% 40%,transparent 55%,rgba(42,29,20,.18) 100%)}
+.grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.05;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.scroll-spacer{position:relative;z-index:0;height:900vh;pointer-events:none}
+
+/* ===== top nav ===== */
+.topbar{position:fixed;z-index:20;inset-inline:0;top:0;display:flex;align-items:center;gap:.9rem;
+  padding:.7rem clamp(.9rem,3vw,2rem);
+  background:linear-gradient(180deg,rgba(250,247,242,.86),rgba(250,247,242,0));
+  backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.brand{display:flex;align-items:center;gap:.55rem;font-family:var(--font-disp);font-weight:600;font-size:1.05rem;flex-shrink:0}
+.brand .seal{width:30px;height:30px}
+.stations-nav{display:flex;gap:.15rem;margin-inline:auto;overflow-x:auto;scrollbar-width:none;max-width:64vw}
+.stations-nav::-webkit-scrollbar{display:none}
+.stations-nav button{font-family:var(--font-ar);font-size:.78rem;color:var(--brown-soft);background:none;border:0;
+  padding:.42rem .62rem;border-radius:20px;cursor:pointer;white-space:nowrap;transition:color .25s,background .25s}
+.stations-nav button:hover{color:var(--espresso)}
+.stations-nav button.on{color:var(--warm-white);background:var(--coffee)}
+.lang-btn{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.06em;border:1px solid var(--line);
+  background:rgba(255,255,255,.5);color:var(--coffee);padding:.42rem .7rem;border-radius:20px;cursor:pointer;flex-shrink:0;transition:.25s}
+.lang-btn:hover{border-color:var(--gold);color:var(--gold-deep)}
+
+/* progress dots */
+.progress{position:fixed;z-index:20;inset-inline-end:clamp(.7rem,2.4vw,1.7rem);top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:.85rem;align-items:center}
+.progress .dot{width:9px;height:9px;border-radius:50%;background:rgba(42,29,20,.22);border:0;cursor:pointer;padding:0;
+  transition:.3s var(--spring);position:relative}
+.progress .dot.on{background:var(--gold);transform:scale(1.5)}
+.progress .dot::after{content:attr(data-t);position:absolute;inset-inline-end:150%;top:50%;transform:translateY(-50%);
+  font-family:var(--font-mono);font-size:.66rem;color:var(--coffee);background:rgba(250,247,242,.9);
+  padding:.15rem .45rem;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:.2s}
+.progress .dot:hover::after{opacity:1}
+@media (max-width:720px){.progress{display:none}}
+
+/* ===== panels ===== */
+.panels{position:fixed;inset:0;z-index:15;pointer-events:none}
+.panel{position:absolute;inset-inline:0;bottom:clamp(1rem,4vh,3.5vh);margin-inline:auto;width:min(720px,92vw);
+  background:linear-gradient(180deg,rgba(250,247,242,.94),rgba(239,230,216,.92));
+  border:1px solid rgba(184,149,90,.4);border-radius:22px;
+  box-shadow:0 24px 70px -24px rgba(42,29,20,.5),inset 0 1px 0 rgba(255,255,255,.6);
+  backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);
+  padding:clamp(1.3rem,3vw,2rem);max-height:82vh;overflow:auto;pointer-events:auto;
+  opacity:0;transform:translateY(46px) scale(.97);transition:opacity .55s var(--ease),transform .65s var(--spring);
+  will-change:transform,opacity}
+.panel.show{opacity:1;transform:translateY(0) scale(1)}
+.panel::-webkit-scrollbar{width:8px}
+.panel::-webkit-scrollbar-thumb{background:rgba(184,149,90,.5);border-radius:8px}
+.eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.22em;color:var(--gold-deep);text-transform:uppercase;display:block;margin-bottom:.5rem}
+.panel h2{font-size:clamp(1.5rem,4vw,2.3rem);margin-bottom:.35rem}
+.latin{font-family:var(--font-disp);font-style:italic;font-weight:500;color:var(--brown-soft);font-size:1rem;display:block;margin-bottom:.7rem}
+.panel p{color:var(--coffee);font-size:.96rem;max-width:60ch}
+.gold-rule{width:56px;height:3px;background:var(--gold);border:0;border-radius:2px;margin:.5rem 0 1rem}
+.center{text-align:center}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;font-family:var(--font-ar);font-weight:600;
+  font-size:.92rem;padding:.72rem 1.35rem;border-radius:40px;cursor:pointer;border:1px solid transparent;
+  transition:transform .2s var(--spring),box-shadow .25s,background .25s,color .25s;white-space:nowrap}
+.btn:active{transform:translateY(1px) scale(.98)}
+.btn-gold{background:var(--gold);color:#231708;box-shadow:0 10px 24px -10px rgba(184,149,90,.9)}
+.btn-gold:hover{background:var(--gold-deep);box-shadow:0 14px 30px -10px rgba(156,125,69,.9);transform:translateY(-2px)}
+.btn-dark{background:var(--coffee);color:var(--warm-white)}
+.btn-dark:hover{background:var(--espresso);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.4);color:var(--coffee);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-deep)}
+.cta-row{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.1rem}
+
+/* station 0 hero */
+#p0{text-align:center;bottom:auto;top:50%;transform:translateY(-42%) scale(.97)}
+#p0.show{transform:translateY(-50%) scale(1)}
+#p0 h2{font-size:clamp(2rem,6vw,3.4rem)}
+.since{font-family:var(--font-mono);letter-spacing:.28em;font-size:.8rem;color:var(--gold-deep);margin-top:.4rem}
+.hint{margin-top:1.1rem;font-size:.82rem;color:var(--brown-soft);opacity:0;transition:opacity .8s;font-family:var(--font-mono);letter-spacing:.08em}
+.hint.vis{opacity:.9}
+
+/* counters */
+.counters{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin:1rem 0}
+.counters .c{background:rgba(255,255,255,.45);border:1px solid var(--line);border-radius:14px;padding:.8rem .6rem;text-align:center}
+.counters .num{font-family:var(--font-disp);font-size:clamp(1.5rem,4vw,2rem);color:var(--gold-deep);display:block}
+.counters .lbl{font-size:.72rem;color:var(--brown-soft)}
+/* divisions */
+.divs{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.55rem;margin-top:.6rem}
+.divs .d{background:rgba(74,51,34,.06);border:1px solid var(--line);border-radius:12px;padding:.65rem .7rem;transition:.25s}
+.divs .d:hover{background:var(--coffee);color:var(--warm-white);transform:translateY(-3px)}
+.divs .d b{font-family:var(--font-disp);font-size:.98rem;display:block}
+.divs .d span{font-size:.72rem;color:var(--brown-soft)}
+.divs .d:hover span{color:var(--sand)}
+
+/* menu */
+.tabs{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.4rem;margin-bottom:.8rem;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{font-family:var(--font-ar);font-size:.8rem;color:var(--brown-soft);background:rgba(255,255,255,.5);
+  border:1px solid var(--line);border-radius:30px;padding:.4rem .8rem;cursor:pointer;white-space:nowrap;transition:.22s}
+.tab:hover{border-color:var(--gold)}
+.tab.on{background:var(--coffee);color:var(--warm-white);border-color:var(--coffee)}
+.menu-list{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+@media(max-width:560px){.menu-list{grid-template-columns:1fr}}
+.mrow{display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;padding:.55rem .3rem;border-bottom:1px solid var(--line)}
+.mrow .mn{font-family:var(--font-disp);font-size:1rem}
+.mrow .md{font-size:.74rem;color:var(--brown-soft);display:block;line-height:1.35;max-width:34ch}
+.mrow .mp{font-family:var(--font-mono);color:var(--gold-deep);font-size:.92rem;white-space:nowrap}
+.mrow .mp small{font-size:.62rem;color:var(--brown-soft)}
+.badge{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.05em;padding:.1rem .4rem;border-radius:20px;vertical-align:middle;margin-inline-start:.35rem}
+.b-best{background:rgba(184,149,90,.2);color:var(--gold-deep)}
+.b-new{background:rgba(74,51,34,.12);color:var(--coffee)}
+.b-veg{background:rgba(94,125,90,.18);color:#4f6a48}
+.b-season{background:rgba(122,101,82,.15);color:var(--brown-soft)}
+.menu-count{font-family:var(--font-mono);font-size:.72rem;color:var(--brown-soft);margin-bottom:.5rem}
+
+/* bakery products */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin:.4rem 0 .2rem}
+.prod{border-radius:14px;overflow:hidden;position:relative;background:var(--sand);aspect-ratio:1/1;transition:.35s var(--spring)}
+.prod img{width:100%;height:100%;object-fit:cover;transition:transform 1s var(--ease)}
+.prod:hover{transform:translateY(-4px)}
+.prod:hover img{transform:scale(1.07)}
+.prod span{position:absolute;inset-inline:0;bottom:0;padding:.5rem .6rem;color:var(--warm-white);font-size:.78rem;
+  background:linear-gradient(0deg,rgba(42,29,20,.85),transparent)}
+
+/* forms */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.5rem}
+@media(max-width:560px){.form-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:.28rem}
+.field.full{grid-column:1/-1}
+.field label{font-size:.76rem;color:var(--coffee);font-weight:500}
+.field input,.field select{font-family:var(--font-ar);font-size:.9rem;padding:.6rem .7rem;border-radius:10px;
+  border:1px solid var(--line);background:rgba(255,255,255,.7);color:var(--espresso)}
+.field input:focus,.field select:focus{outline:2px solid var(--gold-soft);border-color:var(--gold)}
+.field .err{font-size:.7rem;color:#a23b2e;display:none}
+.field.bad .err{display:block}
+.field.bad input,.field.bad select{border-color:#a23b2e}
+.note{font-size:.74rem;color:var(--brown-soft);margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap}
+.note b{color:var(--gold-deep);font-family:var(--font-mono)}
+.ok-msg{display:none;margin-top:.7rem;padding:.6rem .8rem;border-radius:10px;background:rgba(94,125,90,.14);
+  color:#4f6a48;font-size:.84rem}
+.ok-msg.show{display:block}
+
+/* seat map */
+.seatwrap{margin-top:.9rem;background:rgba(74,51,34,.05);border:1px solid var(--line);border-radius:14px;padding:.8rem}
+.seatwrap h4{font-size:1rem;margin-bottom:.15rem}
+.seatwrap .sub{font-size:.74rem;color:var(--brown-soft);margin-bottom:.6rem}
+.seatgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.4rem}
+.seat{font-family:var(--font-mono);font-size:.7rem;padding:.5rem .2rem;border-radius:9px;border:1px solid var(--line);
+  cursor:pointer;text-align:center;transition:.2s;background:rgba(255,255,255,.5)}
+.seat.free{color:#4f6a48;border-color:rgba(94,125,90,.4)}
+.seat.busy{color:#a23b2e;border-color:rgba(162,59,46,.35);background:rgba(162,59,46,.06)}
+.seat.soon{color:var(--gold-deep);border-color:rgba(184,149,90,.5)}
+.seat.sel{outline:2px solid var(--gold);transform:translateY(-2px)}
+.seat-detail{font-size:.76rem;color:var(--coffee);margin-top:.55rem;min-height:1.2em}
+
+/* membership card */
+.member{margin-top:.9rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.card3d{width:min(300px,80vw);aspect-ratio:1.6/1;perspective:1100px;cursor:pointer;flex-shrink:0}
+.card3d .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .9s var(--spring)}
+.card3d.flip .inner{transform:rotateY(180deg)}
+.card3d .face{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;overflow:hidden;
+  box-shadow:0 14px 34px -14px rgba(42,29,20,.6)}
+.card3d .front{background:linear-gradient(135deg,#3a2817,#241708);color:var(--gold-soft);padding:1rem;display:flex;flex-direction:column;justify-content:space-between}
+.card3d .front .tier{font-family:var(--font-mono);letter-spacing:.2em;font-size:.68rem;color:var(--gold)}
+.card3d .front .nm{font-family:var(--font-disp);font-size:1.2rem;color:var(--warm-white)}
+.card3d .front .no{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.16em;color:var(--gold-soft)}
+.card3d .front .shine{position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(216,190,147,.25) 50%,transparent 60%)}
+.card3d .back{background:linear-gradient(135deg,#2f2013,#3f2c1a);transform:rotateY(180deg);display:flex;align-items:center;justify-content:center;gap:.7rem;color:var(--gold-soft);padding:1rem}
+.card3d .back canvas{border-radius:6px;background:var(--warm-white);padding:5px}
+.member .mtext{font-size:.8rem;color:var(--coffee);max-width:24ch}
+.member .mtext b{color:var(--gold-deep)}
+
+/* story values */
+.values{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;margin-top:.7rem}
+.values .v{background:rgba(255,255,255,.4);border:1px solid var(--line);border-radius:12px;padding:.7rem}
+.values .v b{font-family:var(--font-disp);display:block;margin-bottom:.15rem}
+.values .v span{font-size:.76rem;color:var(--brown-soft)}
+.tagbig{font-family:var(--font-disp);font-size:clamp(1.3rem,4vw,2rem);color:var(--coffee);margin-top:1rem;text-align:center;font-style:italic}
+
+/* branches + app */
+.branches{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;margin:.4rem 0 .9rem}
+@media(max-width:600px){.branches{grid-template-columns:1fr}}
+.branch{background:rgba(255,255,255,.4);border:1px solid var(--line);border-radius:12px;padding:.7rem;transition:.25s}
+.branch:hover{border-color:var(--gold);transform:translateY(-3px)}
+.branch .bc{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.14em;color:var(--gold-deep)}
+.branch h4{font-size:1rem;margin:.2rem 0}
+.branch p{font-size:.76rem;color:var(--brown-soft)}
+.appbtns{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.4rem}
+.storebtn{display:flex;align-items:center;gap:.5rem;background:var(--espresso);color:var(--warm-white);padding:.55rem .9rem;border-radius:12px;transition:.25s}
+.storebtn:hover{background:var(--coffee);transform:translateY(-2px)}
+.storebtn small{display:block;font-size:.6rem;opacity:.7;line-height:1}
+.storebtn b{font-family:var(--font-disp);font-size:.9rem;line-height:1.1}
+
+/* preloader */
+#pre{position:fixed;inset:0;z-index:60;background:radial-gradient(120% 120% at 50% 35%,#12100d,#0b0906);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.3rem;transition:opacity .9s ease,visibility .9s}
+#pre.gone{opacity:0;visibility:hidden}
+#pre .cupwrap{width:120px;height:120px}
+#pre .pct{font-family:var(--font-mono);color:var(--gold-soft);letter-spacing:.2em;font-size:.9rem}
+#pre .plabel{font-family:var(--font-disp);color:var(--warm-white);font-size:1.2rem;font-style:italic}
+#pre .stampsvg{width:100%;height:100%}
+#pre .stampsvg path,#pre .stampsvg circle{stroke:var(--gold);fill:none;stroke-width:2;
+  stroke-dasharray:var(--len,300);stroke-dashoffset:var(--len,300);animation:draw 2.4s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* fallback flow layout */
+body.fallback #stage,body.fallback .vignette,body.fallback .grain,body.fallback .scroll-spacer,body.fallback .progress{display:none}
+body.fallback{overflow-y:auto}
+body.fallback .panels{position:static;pointer-events:auto}
+body.fallback .panel{position:static;opacity:1;transform:none;width:min(760px,92vw);margin:1.4rem auto;max-height:none;overflow:visible;
+  bottom:auto;top:auto}
+body.fallback #p0{transform:none}
+body.fallback .fb-hero{display:block}
+.fb-hero{display:none;text-align:center;padding:5.5rem 1rem 1rem}
+.fb-hero .seal{width:70px;height:70px;margin:0 auto .6rem}
+body.fallback .topbar{position:sticky;background:rgba(250,247,242,.95)}
+
+@media (prefers-reduced-motion:reduce){
+  .panel{transition:opacity .3s,transform .3s}
+  .card3d .inner{transition:transform .4s}
+}
+</style>
+</head>
+<body class="webgl">
+
+<!-- Preloader -->
+<div id="pre">
+  <div class="cupwrap">
+    <svg class="stampsvg" viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="52" style="--len:327"/>
+      <path d="M40 46 h34 v18 a17 17 0 0 1 -34 0 z" style="--len:120"/>
+      <path d="M74 50 h9 a8 8 0 0 1 0 16 h-9" style="--len:60"/>
+      <path d="M46 34 q3 -6 0 -12 M56 34 q3 -6 0 -12 M66 34 q3 -6 0 -12" style="--len:44"/>
+      <path d="M38 80 h44" style="--len:44"/>
+    </svg>
+  </div>
+  <div class="plabel">Strangers</div>
+  <div class="pct" id="prePct">0%</div>
+</div>
+
+<!-- fallback hero (only shows in fallback mode) -->
+<div class="fb-hero">
+  <div class="seal" id="fbSeal"></div>
+  <div class="eyebrow">Strangers Coffee · Since 2017</div>
+  <h1 style="font-size:2rem">تعال غريب، اطلع صديق</h1>
+  <p class="latin">Come as a stranger, leave as a friend</p>
+</div>
+
+<div id="stage"></div>
+<div class="vignette"></div>
+<div class="grain"></div>
+<div class="scroll-spacer" id="spacer"></div>
+
+<!-- Top nav -->
+<nav class="topbar">
+  <div class="brand"><span class="seal" id="navSeal"></span><span>Strangers</span></div>
+  <div class="stations-nav" id="stationsNav"></div>
+  <button class="lang-btn" id="langBtn">EN</button>
+</nav>
+
+<div class="progress" id="progress"></div>
+
+<!-- Panels -->
+<div class="panels" id="panels">
+
+  <!-- 0 exterior / door -->
+  <section class="panel" id="p0" data-station="0">
+    <span class="eyebrow" data-en="Strangers Coffee · Since 2017">شركة سترينجرز · منذ ٢٠١٧</span>
+    <h2 data-en="Come as a stranger, leave as a friend">تعال غريب، اطلع صديق</h2>
+    <p class="latin" data-en="Push the door. The coffee is waiting inside.">افتح الباب، القهوة تنتظرك جوّا</p>
+    <div class="since">EST. 2017 · RIYADH</div>
+    <div class="hint" id="hint0" data-en="Scroll to walk inside">اسحب للدخول والمشي جوّا</div>
+  </section>
+
+  <!-- 1 lobby / about -->
+  <section class="panel" id="p1" data-station="1">
+    <span class="eyebrow" data-en="The lobby">الردهة</span>
+    <h2 data-en="One brand, many experiences">علامة واحدة، تجارب متعددة</h2>
+    <hr class="gold-rule">
+    <p data-en="A Saudi hospitality house since 2017: specialty coffee, a central bakery, business supply, catering, and logistics. All under one roof, one standard.">
+      منظومة ضيافة سعودية متكاملة منذ ٢٠١٧: قهوة مختصة، مخبز مركزي، حلول أعمال، كاترينج، ولوجستك. كلها تحت سقف واحد وبنفس المعيار.</p>
+    <div class="counters" id="counters">
+      <div class="c"><span class="num" data-count="9">٠</span><span class="lbl" data-en="Years">سنوات خبرة</span></div>
+      <div class="c"><span class="num" data-count="3">٠</span><span class="lbl" data-en="Branches">فروع</span></div>
+      <div class="c"><span class="num" data-count="50">٠</span><span class="lbl" data-en="Menu items">صنف بالمنيو</span></div>
+    </div>
+    <div class="divs">
+      <div class="d"><b>Coffee</b><span data-en="Our cafes">مقاهينا</span></div>
+      <div class="d"><b>Bakery</b><span data-en="Central bakery">المخبز المركزي</span></div>
+      <div class="d"><b>B2B</b><span data-en="Wholesale">حلول الأعمال</span></div>
+      <div class="d"><b>Catering</b><span data-en="Events">الكاترينج</span></div>
+      <div class="d"><b>Logistic</b><span data-en="Cold fleet">الأسطول المبرد</span></div>
+    </div>
+  </section>
+
+  <!-- 2 bar / cashier -->
+  <section class="panel" id="p2" data-station="2">
+    <span class="eyebrow" data-en="The bar">البار والكاشير</span>
+    <h2 data-en="The full menu">المنيو الكامل</h2>
+    <p class="latin" data-en="Coffee, cold drinks, meals, and bakes. Prices in SAR, VAT included.">قهوة، بارد، وجبات، ومخبوزات. الأسعار بالريال شاملة الضريبة</p>
+    <div class="tabs" id="menuTabs"></div>
+    <div class="menu-count mono" id="menuCount"></div>
+    <div class="menu-list" id="menuList"></div>
+    <div class="cta-row"><button class="btn btn-gold" onclick="toast('order')" data-en="Order now">اطلب الآن</button>
+      <button class="btn btn-ghost" onclick="Str.go(3)" data-en="See the bakery">شوف المخبز</button></div>
+  </section>
+
+  <!-- 3 bakery -->
+  <section class="panel" id="p3" data-station="3">
+    <span class="eyebrow" data-en="The bakery corner">ركن المخبز</span>
+    <h2 data-en="Baked fresh, every day">يُخبز طازجاً كل يوم</h2>
+    <hr class="gold-rule">
+    <p data-en="From our central bakery in Riyadh: 72-hour croissant dough, cheesecakes, and cakes. Same recipe for our branches and partners.">
+      من معملنا المركزي بالرياض: عجينة كرواسون ٧٢ ساعة، تشيز كيك، وكيك. نفس الوصفة لفروعنا وشركائنا.</p>
+    <div class="prod-grid" id="bakeGrid"></div>
+    <div class="cta-row"><button class="btn btn-gold" onclick="toast('samples')" data-en="Request samples">اطلب عينات</button>
+      <button class="btn btn-ghost" onclick="toast('partner')" data-en="Become a partner">كن شريكاً</button></div>
+  </section>
+
+  <!-- 4 seating / booking -->
+  <section class="panel" id="p4" data-station="4">
+    <span class="eyebrow" data-en="The seating hall">الصالة والجلوس</span>
+    <h2 data-en="Reserve your seat">احجز مقعدك</h2>
+    <form id="bookForm" novalidate>
+      <div class="form-grid">
+        <div class="field"><label data-en="Branch">الفرع</label>
+          <select name="branch"><option value="" data-en="Choose">اختر الفرع</option>
+            <option data-en="Al Olaya · Riyadh">العليا · الرياض</option>
+            <option data-en="Hittin · Riyadh">حطين · الرياض</option>
+            <option data-en="Al Kharj">الخرج</option></select>
+          <span class="err" data-en="Choose a branch">اختر الفرع</span></div>
+        <div class="field"><label data-en="Date">التاريخ</label>
+          <input type="date" name="date"><span class="err" data-en="Pick a date">اختر تاريخاً</span></div>
+        <div class="field"><label data-en="Time">الوقت</label>
+          <input type="time" name="time"><span class="err" data-en="Pick a time">اختر وقتاً</span></div>
+        <div class="field"><label data-en="Guests">عدد الأشخاص</label>
+          <input type="number" name="people" min="1" max="12" value="2" dir="ltr" style="text-align:end">
+          <span class="err" data-en="1 to 12 guests">من ١ إلى ١٢</span></div>
+      </div>
+      <div class="note"><span data-en="Deposit">عربون</span> <b>50%</b> ·
+        <span data-en="Grace period">فترة سماح</span> <b>15<span data-en="min"> د</span></b> ·
+        <span data-en="Free cancellation up to 2 hours before">إلغاء مجاني حتى ساعتين قبل الموعد</span></div>
+      <div class="cta-row"><button type="submit" class="btn btn-dark" data-en="Confirm reservation">أكّد الحجز</button></div>
+      <div class="ok-msg" id="bookOk"></div>
+    </form>
+
+    <div class="seatwrap">
+      <h4 data-en="Live seat map · Al Olaya">خريطة المقاعد الحية · العليا</h4>
+      <div class="sub" data-en="Tap a seat to see its live status.">اضغط أي مقعد لتشوف حالته الحية</div>
+      <div class="seatgrid" id="seatGrid"></div>
+      <div class="seat-detail" id="seatDetail" data-en="Green = free, gold = reserved soon, red = occupied.">أخضر متاح · ذهبي محجوز قريباً · أحمر مشغول</div>
+    </div>
+
+    <div class="member">
+      <div class="card3d" id="memberCard" title="اضغط لقلب البطاقة">
+        <div class="inner">
+          <div class="face front">
+            <div><div class="tier">GOLD MEMBER</div></div>
+            <div><div class="nm">نورة العتيبي</div><div class="no">STR · 2017 · 0447</div></div>
+            <div class="shine"></div>
+          </div>
+          <div class="face back"><canvas id="qr" width="96" height="96"></canvas>
+            <div style="font-size:.72rem;line-height:1.5" data-en="Scan at the bar to earn a free cup every 8 visits.">امسح عند البار، فنجان مجاني كل ٨ زيارات</div></div>
+        </div>
+      </div>
+      <div class="mtext" data-en="Members get priority seating and a free cup every 8 visits."><b data-en="Tap the card to flip it.">اضغط البطاقة تنقلب.</b> عضوية جولد: أولوية بالمقاعد وفنجان مجاني كل ٨ زيارات.</div>
+    </div>
+  </section>
+
+  <!-- 5 story wall -->
+  <section class="panel" id="p5" data-station="5">
+    <span class="eyebrow" data-en="The story wall">جدار القصة</span>
+    <h2 data-en="Why Strangers">ليش سترينجرز</h2>
+    <hr class="gold-rule">
+    <p data-en="It started with one cafe and a simple idea: a place where a stranger walks in and leaves as a friend. Today it is a full hospitality house, still run by the same standard.">
+      بدأت بمقهى واحد وفكرة بسيطة: مكان يدخله الغريب ويطلع صديق. اليوم صارت منظومة ضيافة كاملة، لكن بنفس المعيار الأول.</p>
+    <div class="values">
+      <div class="v"><b data-en="Quality">الجودة</b><span data-en="Selected ingredients, no shortcuts.">مكونات مختارة، بلا اختصارات</span></div>
+      <div class="v"><b data-en="Consistency">الثبات</b><span data-en="Same taste in every branch.">نفس الطعم بكل فرع</span></div>
+      <div class="v"><b data-en="Warmth">الدفء</b><span data-en="A seat, power, and a real welcome.">مقعد، كهرباء، وترحيب صادق</span></div>
+      <div class="v"><b data-en="Craft">الحِرفة</b><span data-en="Baked and roasted in-house.">نخبز ونحمّص بأنفسنا</span></div>
+    </div>
+    <div class="tagbig" data-en="One world. Many experiences.">عالم واحد. تجارب متعددة.</div>
+  </section>
+
+  <!-- 6 exit / contact -->
+  <section class="panel" id="p6" data-station="6">
+    <span class="eyebrow" data-en="The way out">المخرج</span>
+    <h2 data-en="Before you leave">قبل ما تطلع</h2>
+    <div class="branches">
+      <div class="branch"><span class="bc">RIYADH</span><h4 data-en="Al Olaya branch">فرع العليا</h4><p data-en="Al Olaya St, facing Kingdom Tower. Our first and largest.">شارع العليا، مقابل برج المملكة. الأول والأكبر</p></div>
+      <div class="branch"><span class="bc">RIYADH</span><h4 data-en="Hittin branch">فرع حطين</h4><p data-en="Hittin Boulevard. Outdoor seating and the monthly tasting workshop.">بوليفارد حطين. جلسات خارجية وورشة تذوق شهرية</p></div>
+      <div class="branch"><span class="bc">AL KHARJ</span><h4 data-en="Al Kharj branch">فرع الخرج</h4><p data-en="King Abdullah Rd. Our newest, open-bakery design.">طريق الملك عبدالله. أحدث فروعنا بمخبز مفتوح</p></div>
+    </div>
+    <form id="contactForm" novalidate>
+      <div class="form-grid">
+        <div class="field"><label data-en="Name">الاسم</label><input name="name"><span class="err" data-en="Enter your name">اكتب اسمك</span></div>
+        <div class="field"><label data-en="Mobile">الجوال</label><input name="phone" inputmode="tel" placeholder="05xxxxxxxx" dir="ltr" style="text-align:end"><span class="err" data-en="Valid Saudi mobile (05...)">جوال سعودي يبدأ بـ ٠٥</span></div>
+        <div class="field full"><label data-en="Message">رسالتك</label><input name="msg"><span class="err" data-en="Write a short message">اكتب رسالة قصيرة</span></div>
+      </div>
+      <div class="cta-row"><button type="submit" class="btn btn-dark" data-en="Send">أرسل</button></div>
+      <div class="ok-msg" id="contactOk"></div>
+    </form>
+    <div style="margin-top:1rem">
+      <div class="eyebrow" data-en="Get the app">حمّل التطبيق</div>
+      <div class="appbtns">
+        <a class="storebtn" href="#" onclick="toast('app');return false"><b>App Store</b><small data-en="Download on the">حمّله من</small></a>
+        <a class="storebtn" href="#" onclick="toast('app');return false"><b>Google Play</b><small data-en="Get it on">متوفر على</small></a>
+      </div>
+    </div>
+    <div class="cta-row"><button class="btn btn-gold" onclick="Str.restart()" data-en="Start the tour again">ابدأ الجولة من جديد</button></div>
+  </section>
+</div>
+
+<!-- toast -->
+<div id="toast" style="position:fixed;z-index:40;inset-inline:0;bottom:1.3rem;margin-inline:auto;width:max-content;max-width:90vw;
+  background:var(--espresso);color:var(--warm-white);padding:.7rem 1.2rem;border-radius:30px;font-size:.86rem;
+  box-shadow:0 14px 34px -12px rgba(42,29,20,.7);opacity:0;transform:translateY(20px);transition:.4s var(--spring);pointer-events:none"></div>
+
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+</script>
+
+<!-- ================= DATA + UI (no-module, runs always) ================= -->
+<script>
+const MENU_CATS=[
+ {k:"hot",ar:"الساخنة",en:"Hot Coffee"},{k:"iced",ar:"الباردة بقهوة",en:"Iced Coffee"},
+ {k:"cold",ar:"باردة بدون قهوة",en:"Cold Drinks"},{k:"meals",ar:"الوجبات",en:"Meals"},
+ {k:"croissant",ar:"الكرواسون",en:"Croissants"},{k:"cakes",ar:"الكيك",en:"Cakes"},{k:"desserts",ar:"الحلويات",en:"Desserts"}
+];
+const BADGES={best:{ar:"الأكثر طلباً",en:"Bestseller",c:"b-best"},new:{ar:"جديد",en:"New",c:"b-new"},veg:{ar:"نباتي",en:"Veg",c:"b-veg"},season:{ar:"موسمي",en:"Seasonal",c:"b-season"}};
+const MENU=[
+ {cat:"hot",ar:"إسبريسو",en:"Espresso",dAr:"لقطة مركزة من تحميصتنا الأسبوعية.",dEn:"A concentrated shot of our weekly roast.",price:12,badge:"best"},
+ {cat:"hot",ar:"أمريكانو",en:"Americano",dAr:"إسبريسو ممدود بالماء الساخن، صافٍ.",dEn:"Espresso lengthened with hot water.",price:15},
+ {cat:"hot",ar:"فلات وايت",en:"Flat White",dAr:"ثنائي لقطة مع حليب مخملي.",dEn:"A double shot with silky micro-foam.",price:17},
+ {cat:"hot",ar:"كابتشينو",en:"Cappuccino",dAr:"توازن كلاسيكي بين اللقطة والحليب والرغوة.",dEn:"Classic balance of shot, milk, and foam.",price:17},
+ {cat:"hot",ar:"لاتيه",en:"Latte",dAr:"حليب دافئ ناعم على لقطة، برسمة باريستا.",dEn:"Smooth steamed milk over a shot.",price:18},
+ {cat:"hot",ar:"سبانيش لاتيه",en:"Spanish Latte",dAr:"لاتيه بحليب مكثف محلى، حلاوة متوازنة.",dEn:"Latte with sweetened condensed milk.",price:20,badge:"best"},
+ {cat:"hot",ar:"موكا",en:"Mocha",dAr:"إسبريسو وشوكولاتة بلجيكية وحليب مخملي.",dEn:"Espresso, Belgian chocolate, velvety milk.",price:21},
+ {cat:"hot",ar:"هوت شوكلت",en:"Hot Chocolate",dAr:"شوكولاتة ذائبة كاملة الدسم بدون قهوة.",dEn:"Full melted chocolate, no coffee.",price:20},
+ {cat:"hot",ar:"مشروبات ساخنة سيجنتشر",en:"Signature Hot",dAr:"توليفات موسمية: توابل، عسل، وتحميصات مختارة.",dEn:"Seasonal barista creations.",price:24,badge:"new"},
+ {cat:"iced",ar:"آيس أمريكانو",en:"Iced Americano",dAr:"أمريكانو على ثلج، منعش وصافي.",dEn:"Americano over ice, crisp and clean.",price:16},
+ {cat:"iced",ar:"آيس لاتيه",en:"Iced Latte",dAr:"لقطة على حليب بارد وثلج.",dEn:"A shot over cold milk and ice.",price:19},
+ {cat:"iced",ar:"آيس سبانيش لاتيه",en:"Iced Spanish Latte",dAr:"النسخة الباردة الأكثر طلباً.",dEn:"Our most-ordered iced drink.",price:22,badge:"best"},
+ {cat:"iced",ar:"كولد برو",en:"Cold Brew",dAr:"منقوع ١٨ ساعة على البارد، جسم ناعم.",dEn:"Steeped cold 18 hours, smooth body.",price:23,badge:"best"},
+ {cat:"iced",ar:"آيس موكا",en:"Iced Mocha",dAr:"موكا الشوكولاتة على ثلج مع رذاذ كاكاو.",dEn:"Chocolate mocha over ice.",price:22},
+ {cat:"iced",ar:"آيس سيجنتشر",en:"Signature Iced",dAr:"توليفة باردة خاصة تتغير مع الموسم.",dEn:"A special cold blend, seasonal.",price:25,badge:"new"},
+ {cat:"cold",ar:"ماتشا",en:"Matcha",dAr:"شاي أخضر ياباني مخفوق مع حليب على ثلج.",dEn:"Japanese green tea with milk over ice.",price:22,badge:"veg"},
+ {cat:"cold",ar:"ريفريشر",en:"Refreshers",dAr:"مشروبات فواكه منعشة بدون كافيين.",dEn:"Light caffeine-free fruit drinks.",price:19,badge:"new"},
+ {cat:"cold",ar:"موهيتو",en:"Mojito",dAr:"نعناع وليمون وسودا، انتعاش صيفي.",dEn:"Mint, lime, and soda.",price:18},
+ {cat:"cold",ar:"ميلك شيك",en:"Milkshakes",dAr:"آيس كريم مخفوق كثيف بنكهات مختارة.",dEn:"Thick blended ice cream.",price:24,badge:"best"},
+ {cat:"cold",ar:"مشروبات الشوكولاتة",en:"Chocolate Drinks",dAr:"شوكولاتة باردة كثيفة بلمسة كريمة.",dEn:"Thick cold chocolate.",price:21},
+ {cat:"cold",ar:"مشروبات موسمية",en:"Seasonal Drinks",dAr:"نكهات محدودة تتبدل مع كل موسم.",dEn:"Limited seasonal flavors.",price:23,badge:"season"},
+ {cat:"cold",ar:"باردة سيجنتشر",en:"Signature Cold",dAr:"ابتكارات باردة حصرية للفروع.",dEn:"Branch-exclusive cold creations.",price:25,badge:"new"},
+ {cat:"meals",ar:"فطور",en:"Breakfast",dAr:"بيض وأجبان وعسل مع خبز معملنا الطازج.",dEn:"Eggs, cheeses, honey, house bread.",price:32},
+ {cat:"meals",ar:"ساندويتشات",en:"Sandwiches",dAr:"كلوب ساندويتش وخيارات مشوية على خبزنا.",dEn:"Club and grilled on our own bread.",price:34,badge:"best"},
+ {cat:"meals",ar:"ميني ساندويتش",en:"Mini Sandwiches",dAr:"لقيمات ساندويتش للمشاركة.",dEn:"Bite-size sandwiches for sharing.",price:22},
+ {cat:"meals",ar:"سلطات",en:"Salads",dAr:"خضار طازجة وصلصات خفيفة يومياً.",dEn:"Fresh greens, light dressings.",price:28,badge:"veg"},
+ {cat:"meals",ar:"وجبات خفيفة",en:"Light Meals",dAr:"أطباق سريعة متوازنة لفترة العمل.",dEn:"Quick, balanced plates.",price:30},
+ {cat:"meals",ar:"وجبات الطلاب",en:"Student Meals",dAr:"قيمة مشبعة بسعر عادل، مع مقعد وكهرباء.",dEn:"Filling value, a seat, and power.",price:25,badge:"best"},
+ {cat:"meals",ar:"أطباق العائلة",en:"Family Sharing",dAr:"طبق مشاركة كبير يكفي ٣ إلى ٤ أشخاص.",dEn:"A large platter for 3 to 4.",price:89},
+ {cat:"croissant",ar:"كرواسون مالح",en:"Savory Croissant",dAr:"بيستو وجبن ذائب على عجينة ٧٢ ساعة.",dEn:"Pesto and cheese on 72-hour dough.",price:19,img:"pesto-croissant.jpg"},
+ {cat:"croissant",ar:"كرواسون حلو",en:"Sweet Croissant",dAr:"نوتيلا أو حشوات حلوة على طبقات مورقة.",dEn:"Nutella and sweet fillings.",price:18,img:"nutella-croissant.jpg"},
+ {cat:"croissant",ar:"كرواسون ساندويتش",en:"Croissant Sandwiches",dAr:"محشو دجاج فاهيتا أو لحم بارد.",dEn:"Filled with chicken fajita or cold cuts.",price:26,img:"chicken-fajita-croissant.jpg"},
+ {cat:"croissant",ar:"كرواسون سيجنتشر",en:"Signature Croissant",dAr:"كرواسون مدام: بيض وجبن وصلصة بيضاء.",dEn:"Croissant Madame: egg, cheese, sauce.",price:24,badge:"best",img:"croissant-madame.jpg"},
+ {cat:"croissant",ar:"كرواسون موسمي",en:"Seasonal Croissant",dAr:"لوز وفستق ونكهات محدودة.",dEn:"Almond, pistachio, limited flavors.",price:22,badge:"season",img:"almond-croissant.jpg"},
+ {cat:"cakes",ar:"كيك الشوكولاتة",en:"Chocolate Cake",dAr:"طبقات شوكولاتة بلجيكية غنية وطرية.",dEn:"Rich moist Belgian chocolate layers.",price:27,badge:"best",img:"chocolate-collection.jpg"},
+ {cat:"cakes",ar:"كيك الفواكه",en:"Fruit Cake",dAr:"إسفنجة خفيفة بطبقة توت وفواكه موسمها.",dEn:"Light sponge with berries.",price:26,img:"blueberry-cheesecake.jpg"},
+ {cat:"cakes",ar:"كيك الجزر",en:"Carrot Cake",dAr:"جزر وقرفة وجوز مع كريمة الجبن.",dEn:"Carrot, cinnamon, cream cheese.",price:24,badge:"veg"},
+ {cat:"cakes",ar:"تشيز كيك",en:"Cheesecake",dAr:"لوتس، توت، وباشن فروت على قاعدة بسكويت.",dEn:"Lotus, berry, passion fruit.",price:26,badge:"best",img:"lotus-cheesecake.jpg"},
+ {cat:"cakes",ar:"كيك سيجنتشر",en:"Signature Cake",dAr:"تيراميسو بطبقات مسكربوني وإسبريسو معملنا.",dEn:"Tiramisu with mascarpone.",price:29,badge:"new",img:"tiramisu.jpg"},
+ {cat:"cakes",ar:"كيك المناسبات",en:"Celebration Cake",dAr:"كيك مخصص بطلب قبل ٤٨ ساعة.",dEn:"Custom cake, 48 hours ahead.",price:180,from:true},
+ {cat:"desserts",ar:"تارت",en:"Tarts",dAr:"قشرة زبدة هشة بحشوات فواكه وكريمة.",dEn:"Crisp butter shells, fruit and cream.",price:18,img:"mini-tart.jpg"},
+ {cat:"desserts",ar:"مافن",en:"Muffins",dAr:"كيك طري بحبيبات شوكولاتة أو توت.",dEn:"Soft cake with chocolate or berries.",price:14},
+ {cat:"desserts",ar:"كيك إنجليزي",en:"English Cake",dAr:"كيكة ليمون أو فواكه على الطريقة الإنجليزية.",dEn:"Lemon or fruit loaf.",price:16,img:"lemon-loaf.jpg"},
+ {cat:"desserts",ar:"سينابون",en:"Cinnabon",dAr:"لفائف قرفة دافئة بكريمة الجبن.",dEn:"Warm cinnamon rolls, cream glaze.",price:19,badge:"best"},
+ {cat:"desserts",ar:"كريب",en:"Crepes",dAr:"كريب رقيق بحشوات حلوة عند الطلب.",dEn:"Thin crepes, made to order.",price:26},
+ {cat:"desserts",ar:"وافل",en:"Waffles",dAr:"وافل مقرمش مع صوصات وآيس كريم.",dEn:"Crisp waffles with sauces.",price:27},
+ {cat:"desserts",ar:"أصابع الحلى",en:"Dessert Sticks",dAr:"إكلير وأصابع حلى بكريمات مختارة.",dEn:"Eclairs and dessert sticks.",price:20,img:"eclair.jpg"},
+ {cat:"desserts",ar:"كاسات الحلى",en:"Dessert Cups",dAr:"طبقات حلى فردية في كاسة أنيقة.",dEn:"Individual layered dessert cups.",price:22},
+ {cat:"desserts",ar:"آيس كريم",en:"Ice Cream",dAr:"سكوبات كريمية بنكهات أوريو وفراولة.",dEn:"Creamy scoops, Oreo and strawberry.",price:14,badge:"best",img:"icecream-oreo.jpg"},
+ {cat:"desserts",ar:"حلويات موسمية",en:"Seasonal Desserts",dAr:"دانش وحلى محدود يتبدل مع الموسم.",dEn:"Danishes and limited desserts.",price:23,badge:"season",img:"strawberry-danish.jpg"}
+];
+const IMG="assets/";
+const BAKE=[["nutella-croissant.jpg","كرواسون نوتيلا","Nutella Croissant"],["croissant-madame.jpg","كرواسون مدام","Croissant Madame"],
+ ["tiramisu.jpg","تيراميسو","Tiramisu"],["lotus-cheesecake.jpg","تشيز كيك لوتس","Lotus Cheesecake"],
+ ["eclair.jpg","إكلير","Eclair"],["strawberry-danish.jpg","دانش الفراولة","Strawberry Danish"]];
+const SEATS=[["T-201","free"],["T-202","busy"],["T-203","free"],["T-204","soon"],
+ ["S-101","free"],["S-102","busy"],["S-103","free"],["B-301","free"]];
+const SEAT_INFO={
+ free:{ar:"متاح الآن · احجزه من التطبيق",en:"Free now · reserve in the app"},
+ busy:{ar:"مشغول · يخلص بعد ٢٥ دقيقة تقريباً",en:"Occupied · frees in ~25 min"},
+ soon:{ar:"محجوز قريباً · بعد ١٥ دقيقة",en:"Reserved soon · in 15 min"}};
+
+let LANG="ar";
+const westToArabic=s=>String(s).replace(/[0-9]/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
+
+/* ---------- language ---------- */
+function setLang(lang){
+  LANG=lang; const en=lang==="en";
+  document.documentElement.lang=lang; document.documentElement.dir=en?"ltr":"rtl";
+  document.querySelectorAll("[data-en]").forEach(el=>{
+    if(el.dataset.ar===undefined) el.dataset.ar=el.textContent;
+    el.textContent = en? el.dataset.en : el.dataset.ar;
+  });
+  document.getElementById("langBtn").textContent = en? "ع" : "EN";
+  buildStationsNav(); renderMenuTabs(); renderMenu(); renderBake(); renderSeats();
+}
+
+/* ---------- menu ---------- */
+let menuFilter="hot";
+function renderMenuTabs(){
+  const box=document.getElementById("menuTabs"); box.innerHTML="";
+  MENU_CATS.forEach(c=>{
+    const b=document.createElement("button"); b.className="tab"+(c.k===menuFilter?" on":"");
+    b.textContent=LANG==="en"?c.en:c.ar;
+    b.onclick=()=>{menuFilter=c.k;renderMenuTabs();renderMenu();};
+    box.appendChild(b);
+  });
+}
+function renderMenu(){
+  const list=document.getElementById("menuList"); const items=MENU.filter(m=>m.cat===menuFilter);
+  list.innerHTML=items.map(m=>{
+    const nm=LANG==="en"?m.en:m.ar, d=LANG==="en"?m.dEn:m.dAr;
+    const bd=m.badge?`<span class="badge ${BADGES[m.badge].c}">${LANG==="en"?BADGES[m.badge].en:BADGES[m.badge].ar}</span>`:"";
+    const from=m.from?(LANG==="en"?"from ":"من "):"";
+    const price=LANG==="en"?m.price:westToArabic(m.price);
+    const cur=LANG==="en"?"SAR":"ر.س";
+    return `<div class="mrow"><div><span class="mn">${nm}</span>${bd}<span class="md">${d}</span></div>
+      <span class="mp">${from}${price}<small> ${cur}</small></span></div>`;
+  }).join("");
+  const cnt=document.getElementById("menuCount");
+  cnt.textContent=(LANG==="en"?`${items.length} items · ${MENU.length} total`:`${westToArabic(items.length)} صنف · ${westToArabic(MENU.length)} بالمنيو كامل`);
+}
+function renderBake(){
+  document.getElementById("bakeGrid").innerHTML=BAKE.map(b=>
+    `<div class="prod"><img src="${IMG}${b[0]}" alt="${b[1]}" loading="lazy"><span>${LANG==="en"?b[2]:b[1]}</span></div>`).join("");
+}
+function renderSeats(){
+  const g=document.getElementById("seatGrid");
+  g.innerHTML=SEATS.map(s=>`<button type="button" class="seat ${s[1]}" data-st="${s[1]}">${s[0]}</button>`).join("");
+  g.querySelectorAll(".seat").forEach(el=>el.onclick=()=>{
+    g.querySelectorAll(".seat").forEach(x=>x.classList.remove("sel"));
+    el.classList.add("sel");
+    const info=SEAT_INFO[el.dataset.st];
+    document.getElementById("seatDetail").textContent=(el.textContent+" · "+(LANG==="en"?info.en:info.ar));
+  });
+}
+
+/* ---------- stations nav + progress ---------- */
+const STATION_NAMES=[
+ {ar:"الباب",en:"The Door"},{ar:"من نحن",en:"About"},{ar:"البار",en:"The Bar"},
+ {ar:"المخبز",en:"Bakery"},{ar:"الصالة",en:"Seating"},{ar:"القصة",en:"Story"},{ar:"المخرج",en:"Exit"}];
+function buildStationsNav(){
+  const nav=document.getElementById("stationsNav"); nav.innerHTML="";
+  STATION_NAMES.forEach((s,i)=>{
+    const b=document.createElement("button"); b.textContent=LANG==="en"?s.en:s.ar; b.dataset.i=i;
+    b.onclick=()=>Str.go(i); nav.appendChild(b);
+  });
+  const prog=document.getElementById("progress"); prog.innerHTML="";
+  STATION_NAMES.forEach((s,i)=>{
+    const d=document.createElement("button"); d.className="dot"; d.dataset.t=(LANG==="en"?s.en:s.ar);
+    d.onclick=()=>Str.go(i); prog.appendChild(d);
+  });
+}
+function highlightStation(i){
+  document.querySelectorAll(".stations-nav button").forEach(b=>b.classList.toggle("on",+b.dataset.i===i));
+  document.querySelectorAll(".progress .dot").forEach((d,k)=>d.classList.toggle("on",k===i));
+}
+
+/* ---------- QR (deterministic pseudo-code) ---------- */
+function drawQR(){
+  const c=document.getElementById("qr"); if(!c)return; const x=c.getContext("2d"); const n=21,s=96/n;
+  x.fillStyle="#FAF7F2";x.fillRect(0,0,96,96); x.fillStyle="#2A1D14";
+  let seed=2017;
+  const rnd=()=>{seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;};
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){ if(rnd()>0.52) x.fillRect(i*s,j*s,s,s); }
+  const finder=(ox,oy)=>{x.fillStyle="#2A1D14";x.fillRect(ox,oy,s*7,s*7);x.fillStyle="#FAF7F2";x.fillRect(ox+s,oy+s,s*5,s*5);x.fillStyle="#2A1D14";x.fillRect(ox+s*2,oy+s*2,s*3,s*3);};
+  finder(0,0);finder(96-s*7,0);finder(0,96-s*7);
+}
+
+/* ---------- forms ---------- */
+function markBad(field,bad){field.classList.toggle("bad",bad);return !bad;}
+function initForms(){
+  const bf=document.getElementById("bookForm");
+  bf.addEventListener("submit",e=>{e.preventDefault();
+    const f=bf.elements; let ok=true;
+    ok=markBad(f.branch.closest(".field"),!f.branch.value)&&ok;
+    ok=markBad(f.date.closest(".field"),!f.date.value)&&ok;
+    ok=markBad(f.time.closest(".field"),!f.time.value)&&ok;
+    const p=+f.people.value; ok=markBad(f.people.closest(".field"),!(p>=1&&p<=12))&&ok;
+    if(!ok)return;
+    const data={branch:f.branch.value,date:f.date.value,time:f.time.value,people:p,ts:Date.now()};
+    try{localStorage.setItem("str_booking",JSON.stringify(data));}catch(_){}
+    const ref="STR-"+Math.floor(1000+Math.random()*9000);
+    const ok2=document.getElementById("bookOk"); ok2.classList.add("show");
+    ok2.textContent=(LANG==="en"
+      ?`Reserved ${data.branch}, ${data.people} guests on ${data.date} ${data.time}. Ref ${ref}. 50% deposit link sent.`
+      :`تم حجز ${data.branch} لـ${westToArabic(data.people)} أشخاص يوم ${data.date} الساعة ${data.time}. رقم الحجز ${ref}. أُرسل رابط العربون ٥٠٪.`);
+    toast("book");
+  });
+  const cf=document.getElementById("contactForm");
+  cf.addEventListener("submit",e=>{e.preventDefault();
+    const f=cf.elements; let ok=true;
+    ok=markBad(f.name.closest(".field"),!f.name.value.trim())&&ok;
+    ok=markBad(f.phone.closest(".field"),!/^05\d{8}$/.test(f.phone.value.trim()))&&ok;
+    ok=markBad(f.msg.closest(".field"),!f.msg.value.trim())&&ok;
+    if(!ok)return;
+    const arr=(()=>{try{return JSON.parse(localStorage.getItem("str_contacts")||"[]")}catch(_){return[]}})();
+    arr.push({name:f.name.value.trim(),phone:f.phone.value.trim(),msg:f.msg.value.trim(),ts:Date.now()});
+    try{localStorage.setItem("str_contacts",JSON.stringify(arr));}catch(_){}
+    const ok2=document.getElementById("contactOk"); ok2.classList.add("show");
+    ok2.textContent=(LANG==="en"?"Thank you. We saved your message and will reply within one business day.":"شكراً لك، حفظنا رسالتك ونرد عليك خلال يوم عمل.");
+    cf.reset();
+  });
+  document.getElementById("memberCard").onclick=function(){this.classList.toggle("flip");};
+}
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(kind){
+  const msgs={
+    order:{ar:"جاري تحويلك لتطبيق الطلب…",en:"Opening the ordering app…"},
+    samples:{ar:"سجّلنا طلب العينات، يتواصل معك فريق B2B.",en:"Samples request noted. Our B2B team will call."},
+    partner:{ar:"أهلاً بك شريكاً، نراجع طلبك ونرد خلال يومين.",en:"Welcome, partner. We reply within two days."},
+    book:{ar:"تم تأكيد الحجز وحُفظ محلياً.",en:"Reservation confirmed and saved."},
+    app:{ar:"رابط التطبيق يُفتح على المتجر الحقيقي عند النشر.",en:"App link opens the real store once published."}
+  };
+  const m=msgs[kind]||msgs.order; const t=document.getElementById("toast");
+  t.textContent=LANG==="en"?m.en:m.ar; t.style.opacity="1"; t.style.transform="translateY(0)";
+  clearTimeout(toastT); toastT=setTimeout(()=>{t.style.opacity="0";t.style.transform="translateY(20px)";},2600);
+}
+
+/* ---------- counters ---------- */
+let countersRun=false;
+function runCounters(){
+  if(countersRun)return; countersRun=true;
+  document.querySelectorAll("#counters .num").forEach(el=>{
+    const to=+el.dataset.count; let s=0; const step=Math.max(1,Math.round(to/34));
+    const t=setInterval(()=>{s+=step; if(s>=to){s=to;clearInterval(t);}
+      el.textContent=LANG==="en"?s:westToArabic(s);},26);
+  });
+}
+
+/* seal svg inject */
+const SEAL=`<svg viewBox="0 0 120 120" style="width:100%;height:100%"><g fill="none" stroke="currentColor" stroke-width="2.5">
+<circle cx="60" cy="60" r="52"/><circle cx="60" cy="60" r="44" stroke-width="1"/>
+<path d="M46 50 h30 v14 a15 15 0 0 1 -30 0 z"/><path d="M76 53 h7 a7 7 0 0 1 0 14 h-7"/>
+<path d="M50 42 q3 -5 0 -10 M60 42 q3 -5 0 -10 M70 42 q3 -5 0 -10"/></g>
+<text x="60" y="92" text-anchor="middle" font-family="IBM Plex Mono" font-size="8" letter-spacing="2" fill="currentColor">EST 2017</text></svg>`;
+document.getElementById("navSeal").innerHTML=SEAL;
+document.getElementById("navSeal").style.color="var(--gold-deep)";
+const fbSeal=document.getElementById("fbSeal"); if(fbSeal){fbSeal.innerHTML=SEAL;fbSeal.style.color="var(--gold-deep)";}
+
+buildStationsNav();renderMenuTabs();renderMenu();renderBake();renderSeats();drawQR();initForms();
+window.toast=toast;
+
+/* Hard safety net: if the WebGL module never becomes ready (e.g. CDN import failed
+   or no WebGL), drop to the plain scrollable fallback so the page never hangs. */
+setTimeout(function(){
+  if(window.__strangers && window.__strangers.ready) return;
+  if(document.body.classList.contains("fallback")) return;
+  document.body.classList.remove("webgl"); document.body.classList.add("fallback");
+  var p=document.getElementById("pre"); if(p) p.classList.add("gone");
+  runCounters();
+}, 4500);
+</script>
+
+<!-- ================= WEBGL WALK ================= -->
+<script type="module">
+import * as THREE from "three";
+
+const spacer=document.getElementById("spacer");
+const pre=document.getElementById("pre");
+const prePct=document.getElementById("prePct");
+const reduce=window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+const LOW=window.innerWidth<760;
+
+/* Global journey control shared with UI */
+window.Str={ go(i){flyTo(i);}, restart(){flyTo(0);} };
+
+/* ---- station journey layout (journey space 0..1) ---- */
+// plateau = camera holds + panel visible ; between = walking
+const STATIONS=[
+ {t:0.00, pj:[0.00,0.085], focus:[0,1.35,-6.5]},  // 0 exterior/door (look toward the door ahead)
+ {t:0.17, pj:[0.15,0.245], focus:null},          // 1 lobby
+ {t:0.33, pj:[0.325,0.45], focus:[2.6,1.35,0]},  // 2 bar (+x side) -> filled below
+ {t:0.50, pj:[0.50,0.585], focus:[-2.6,1.2,0]},  // 3 bakery (-x)
+ {t:0.66, pj:[0.635,0.72], focus:[0,1.2,-7]},    // 4 seating (level, down the avenue)
+ {t:0.82, pj:[0.775,0.86], focus:[2.7,1.6,0]},   // 5 story wall (+x)
+ {t:1.00, pj:[0.915,1.001], focus:[0,1.5,-3]}    // 6 exit
+];
+const stationCenters=STATIONS.map(s=>(s.pj[0]+s.pj[1])/2);
+
+let renderer,scene,camera,curve,door,steamPts,dustPts,bulbs=[];
+let ready=false, journey=0, activeStation=-1, walkPhase=0, lastT=0, revealedCounters=false;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const smooth=(a,b,x)=>{x=clamp((x-a)/(b-a),0,1);return x*x*(3-2*x);};
+
+function journeyToT(j){
+  // inside a plateau -> constant t
+  for(const s of STATIONS){ if(j>=s.pj[0]&&j<=s.pj[1]) return s.t; }
+  // between plateau i and i+1
+  for(let i=0;i<STATIONS.length-1;i++){
+    const a=STATIONS[i].pj[1], b=STATIONS[i+1].pj[0];
+    if(j>a&&j<b){ const k=smooth(a,b,j); return THREE.MathUtils.lerp(STATIONS[i].t,STATIONS[i+1].t,k);}
+  }
+  return j<STATIONS[0].pj[0]?STATIONS[0].t:STATIONS[STATIONS.length-1].t;
+}
+function doorOpen(j){ return smooth(STATIONS[0].pj[1], STATIONS[1].pj[0], j); }
+
+/* ---------- canvas textures ---------- */
+function woodTex(){
+  const c=document.createElement("canvas");c.width=c.height=256;const x=c.getContext("2d");
+  x.fillStyle="#8a6a45";x.fillRect(0,0,256,256);
+  for(let i=0;i<256;i+=32){x.fillStyle=i%64?"#7d5f3c":"#8f6f49";x.fillRect(0,i,256,30);
+    x.strokeStyle="rgba(60,40,22,.5)";x.beginPath();x.moveTo(0,i+30);x.lineTo(256,i+30);x.stroke();}
+  for(let i=0;i<900;i++){x.fillStyle="rgba(80,55,30,"+(Math.random()*.15)+")";x.fillRect(Math.random()*256,Math.random()*256,2,1);}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(4,18);
+  t.colorSpace=THREE.SRGBColorSpace;return t;
+}
+function plasterTex(hex){
+  const c=document.createElement("canvas");c.width=c.height=256;const x=c.getContext("2d");
+  x.fillStyle=hex;x.fillRect(0,0,256,256);
+  for(let i=0;i<2600;i++){x.fillStyle="rgba(255,255,255,"+(Math.random()*.06)+")";x.fillRect(Math.random()*256,Math.random()*256,2,2);}
+  for(let i=0;i<1400;i++){x.fillStyle="rgba(120,90,60,"+(Math.random()*.05)+")";x.fillRect(Math.random()*256,Math.random()*256,2,2);}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;return t;
+}
+function menuBoardTex(){
+  const c=document.createElement("canvas");c.width=512;c.height=384;const x=c.getContext("2d");
+  x.fillStyle="#241708";x.fillRect(0,0,512,384);
+  x.strokeStyle="#B8955A";x.lineWidth=6;x.strokeRect(14,14,484,356);
+  x.textAlign="center";x.fillStyle="#D8BE93";x.font="italic 44px Fraunces, serif";
+  x.fillText("MENU",256,66);
+  x.fillStyle="#E9DCC4";x.font="26px 'IBM Plex Sans Arabic', sans-serif";x.textAlign="right";
+  const rows=[["إسبريسو","12"],["سبانيش لاتيه","20"],["كولد برو","23"],["ماتشا","22"],["كرواسون مدام","24"],["تيراميسو","29"]];
+  let y=126;rows.forEach(r=>{x.fillStyle="#EDE0C8";x.textAlign="right";x.fillText(r[0],470,y);
+    x.fillStyle="#B8955A";x.textAlign="left";x.font="24px 'IBM Plex Mono', monospace";x.fillText(r[1]+" SAR",42,y);
+    x.font="26px 'IBM Plex Sans Arabic', sans-serif";y+=42;});
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;
+}
+function frameTex(title,sub){
+  const c=document.createElement("canvas");c.width=256;c.height=320;const x=c.getContext("2d");
+  const g=x.createLinearGradient(0,0,256,320);g.addColorStop(0,"#c9a86f");g.addColorStop(1,"#7d5f3c");
+  x.fillStyle=g;x.fillRect(0,0,256,320);
+  x.fillStyle="rgba(250,247,242,.9)";x.fillRect(22,22,212,276);
+  x.fillStyle="#3a2817";x.textAlign="center";x.font="italic 30px Fraunces, serif";x.fillText(title,128,150);
+  x.font="17px 'IBM Plex Sans Arabic', sans-serif";x.fillStyle="#7A6552";x.fillText(sub,128,186);
+  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;
+}
+
+/* ---------- build scene ---------- */
+function build(){
+  renderer=new THREE.WebGLRenderer({antialias:!LOW,alpha:false,preserveDrawingBuffer:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,LOW?1.5:2));
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.outputColorSpace=THREE.SRGBColorSpace;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.62;
+  document.getElementById("stage").appendChild(renderer.domElement);
+
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color("#efe3d0");
+  scene.fog=new THREE.Fog("#efe3d0",14,64);
+
+  camera=new THREE.PerspectiveCamera(58,window.innerWidth/window.innerHeight,0.1,120);
+
+  /* lights: warm, bright, airy */
+  const hemi=new THREE.HemisphereLight("#fff3df","#8f7350",1.15); scene.add(hemi);
+  const amb=new THREE.AmbientLight("#ffe9cf",0.55); scene.add(amb);
+  const sun=new THREE.DirectionalLight("#ffd9a0",1.5); sun.position.set(9,10,4); scene.add(sun);
+  const sun2=new THREE.DirectionalLight("#ffe4bd",0.7); sun2.position.set(-6,8,-10); scene.add(sun2);
+
+  const HALL_W=8, HALL_H=3.4, Z0=13, Z1=-56;
+  const wood=woodTex(), wallTex=plasterTex("#e7d8bf"), ceilTex=plasterTex("#efe4d2");
+
+  /* floor */
+  const floor=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,Z0-Z1),
+    new THREE.MeshStandardMaterial({map:wood,roughness:.85}));
+  floor.rotation.x=-Math.PI/2; floor.position.set(0,0,(Z0+Z1)/2); scene.add(floor);
+  /* ceiling */
+  const ceil=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,Z0-Z1),
+    new THREE.MeshStandardMaterial({map:ceilTex,roughness:1}));
+  ceil.rotation.x=Math.PI/2; ceil.position.set(0,HALL_H,(Z0+Z1)/2); scene.add(ceil);
+  /* walls */
+  const wallMat=new THREE.MeshStandardMaterial({map:wallTex,roughness:1,side:THREE.DoubleSide});
+  const wallL=new THREE.Mesh(new THREE.PlaneGeometry(Z0-Z1,HALL_H),wallMat);
+  wallL.rotation.y=Math.PI/2; wallL.position.set(-HALL_W/2,HALL_H/2,(Z0+Z1)/2); scene.add(wallL);
+  const wallR=new THREE.Mesh(new THREE.PlaneGeometry(Z0-Z1,HALL_H),wallMat);
+  wallR.rotation.y=-Math.PI/2; wallR.position.set(HALL_W/2,HALL_H/2,(Z0+Z1)/2); scene.add(wallR);
+
+  /* big warm windows on +x wall (backlit) */
+  const winMat=new THREE.MeshStandardMaterial({color:"#fff4df",emissive:"#ffdca4",emissiveIntensity:1.5,roughness:.4});
+  const winFrame=new THREE.MeshStandardMaterial({color:"#5a4229",roughness:.7});
+  for(let z=6;z>-52;z-=11){
+    const w=new THREE.Mesh(new THREE.PlaneGeometry(3,2),winMat);
+    w.rotation.y=-Math.PI/2; w.position.set(HALL_W/2-0.02,1.9,z); scene.add(w);
+    const fr=new THREE.Mesh(new THREE.PlaneGeometry(3.3,2.3),winFrame);
+    fr.rotation.y=-Math.PI/2; fr.position.set(HALL_W/2-0.04,1.9,z); scene.add(fr);
+    // muntins
+    const bar=new THREE.Mesh(new THREE.BoxGeometry(.05,2,.05),winFrame);
+    bar.position.set(HALL_W/2-0.01,1.9,z); scene.add(bar);
+    // soft window light + godray plane
+    const wl=new THREE.PointLight("#ffdca0",4.5,12,2); wl.position.set(HALL_W/2-1.4,2.1,z); scene.add(wl);
+    const ray=new THREE.Mesh(new THREE.PlaneGeometry(2.2,3.2),
+      new THREE.MeshBasicMaterial({color:"#ffe6b8",transparent:true,opacity:.05,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));
+    ray.position.set(HALL_W/2-1.7,1.6,z); ray.rotation.set(-0.5,-Math.PI/2,0.25); scene.add(ray);
+  }
+
+  /* edison bulbs down the middle */
+  for(let z=8;z>-54;z-=6){
+    const b=new THREE.Mesh(new THREE.SphereGeometry(.12,14,14),
+      new THREE.MeshStandardMaterial({color:"#ffdf9c",emissive:"#ffcf82",emissiveIntensity:2.4}));
+    b.position.set(0,HALL_H-0.35,z); scene.add(b);
+    const cord=new THREE.Mesh(new THREE.CylinderGeometry(.008,.008,.34),new THREE.MeshStandardMaterial({color:"#3a2a1a"}));
+    cord.position.set(0,HALL_H-0.17,z); scene.add(cord);
+    const pl=new THREE.PointLight("#ffcf88",5.5,9,2); pl.position.set(0,HALL_H-0.4,z); scene.add(pl); bulbs.push(pl);
+  }
+
+  /* plants helper */
+  const potMat=new THREE.MeshStandardMaterial({color:"#8a5a3a",roughness:.8});
+  const leafMat=new THREE.MeshStandardMaterial({color:"#5e7d52",roughness:.7});
+  function plant(px,pz){
+    const pot=new THREE.Mesh(new THREE.CylinderGeometry(.22,.16,.34,12),potMat);pot.position.set(px,.17,pz);scene.add(pot);
+    for(let i=0;i<7;i++){const l=new THREE.Mesh(new THREE.ConeGeometry(.09,.7,6),leafMat);
+      l.position.set(px+(Math.random()-.5)*.28,.55+Math.random()*.3,pz+(Math.random()-.5)*.28);
+      l.rotation.set((Math.random()-.5),(Math.random()-.5),(Math.random()-.5));scene.add(l);}
+  }
+  plant(-3.2,-2);plant(3.2,-6);plant(-3.2,-16);plant(3.3,-25);plant(-3.2,-34);plant(3.2,-44);
+
+  /* ===== exterior facade + door (around z=Z0 area, z≈8..9) ===== */
+  const facadeZ=8.2;
+  const facade=new THREE.Mesh(new THREE.PlaneGeometry(HALL_W,HALL_H),
+    new THREE.MeshStandardMaterial({map:plasterTex("#b7854e"),roughness:.9,side:THREE.DoubleSide}));
+  facade.position.set(0,HALL_H/2,facadeZ); scene.add(facade);
+  // sign
+  const signCanvas=document.createElement("canvas");signCanvas.width=512;signCanvas.height=140;
+  const sx=signCanvas.getContext("2d");sx.fillStyle="#241708";sx.fillRect(0,0,512,140);
+  sx.strokeStyle="#B8955A";sx.lineWidth=5;sx.strokeRect(10,10,492,120);
+  sx.fillStyle="#D8BE93";sx.textAlign="center";sx.font="italic 60px Fraunces, serif";sx.fillText("Strangers",256,78);
+  sx.font="18px 'IBM Plex Mono'";sx.fillStyle="#B8955A";sx.fillText("COFFEE · SINCE 2017",256,112);
+  const signT=new THREE.CanvasTexture(signCanvas);signT.colorSpace=THREE.SRGBColorSpace;
+  const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.4,0.93),
+    new THREE.MeshStandardMaterial({map:signT,emissive:"#ffdca0",emissiveIntensity:.35}));
+  sign.position.set(0,2.85,facadeZ-0.05);scene.add(sign);
+  // doorway opening (dark inner already lit). door frame
+  const frameMat=new THREE.MeshStandardMaterial({color:"#4a3322",roughness:.7});
+  const dfTop=new THREE.Mesh(new THREE.BoxGeometry(2.5,.22,.3),frameMat);dfTop.position.set(0,2.25,facadeZ);scene.add(dfTop);
+  const dfL=new THREE.Mesh(new THREE.BoxGeometry(.22,2.3,.3),frameMat);dfL.position.set(-1.15,1.15,facadeZ);scene.add(dfL);
+  const dfR=new THREE.Mesh(new THREE.BoxGeometry(.22,2.3,.3),frameMat);dfR.position.set(1.15,1.15,facadeZ);scene.add(dfR);
+  // wooden door leaf with stamp, hinged on right side
+  door=new THREE.Group(); door.position.set(1.02,0,facadeZ);
+  const doorCanvas=document.createElement("canvas");doorCanvas.width=256;doorCanvas.height=512;
+  const dx=doorCanvas.getContext("2d");
+  dx.fillStyle="#5c3e24";dx.fillRect(0,0,256,512);
+  for(let i=0;i<512;i+=8){dx.fillStyle="rgba(40,25,12,"+(Math.random()*.18)+")";dx.fillRect(0,i,256,3);}
+  dx.strokeStyle="#3a2617";dx.lineWidth=4;dx.strokeRect(20,20,216,472);dx.strokeRect(40,40,176,200);dx.strokeRect(40,272,176,200);
+  // monoline stamp
+  dx.strokeStyle="#D8BE93";dx.lineWidth=3;dx.beginPath();dx.arc(128,236,66,0,Math.PI*2);dx.stroke();
+  dx.beginPath();dx.arc(128,236,54,0,Math.PI*2);dx.lineWidth=1.4;dx.stroke();
+  dx.fillStyle="#D8BE93";dx.textAlign="center";dx.font="italic 30px Fraunces, serif";dx.fillText("Strangers",128,232);
+  dx.font="12px 'IBM Plex Mono'";dx.fillText("EST 2017",128,258);
+  const doorTex=new THREE.CanvasTexture(doorCanvas);doorTex.colorSpace=THREE.SRGBColorSpace;
+  const leaf=new THREE.Mesh(new THREE.BoxGeometry(2.0,2.3,.1),
+    [frameMat,frameMat,frameMat,frameMat,new THREE.MeshStandardMaterial({map:doorTex,roughness:.6}),new THREE.MeshStandardMaterial({map:doorTex,roughness:.6})]);
+  leaf.position.set(-1.0,1.15,0); door.add(leaf);
+  const handle=new THREE.Mesh(new THREE.SphereGeometry(.06,10,10),new THREE.MeshStandardMaterial({color:"#B8955A",metalness:.6,roughness:.3}));
+  handle.position.set(-1.85,1.1,.08); door.add(handle);
+  scene.add(door);
+
+  /* ===== station 2: bar counter (+x) ===== */
+  const barZ=STATIONS[2].t; // will place using curve later; approximate world by curve point
+  // We'll place using curve after curve is built (see placeFurniture)
+
+  /* ===== curve path ===== */
+  const pts=[
+    new THREE.Vector3(0,1.6,12),
+    new THREE.Vector3(0,1.6,7.5),
+    new THREE.Vector3(0,1.6,2),
+    new THREE.Vector3(-1.3,1.6,-6),
+    new THREE.Vector3(-1.4,1.6,-13),
+    new THREE.Vector3(1.4,1.6,-20),
+    new THREE.Vector3(1.2,1.6,-27),
+    new THREE.Vector3(-0.2,1.6,-33),
+    new THREE.Vector3(-1.3,1.6,-40),
+    new THREE.Vector3(0,1.6,-47),
+    new THREE.Vector3(0,1.6,-54)
+  ];
+  curve=new THREE.CatmullRomCurve3(pts,false,"catmullrom",0.5);
+
+  placeFurniture(wallMat,frameMat);
+
+  /* dust motes */
+  const dcount=LOW?90:220;
+  const dpos=new Float32Array(dcount*3);
+  for(let i=0;i<dcount;i++){dpos[i*3]=(Math.random()-.5)*7;dpos[i*3+1]=Math.random()*3;dpos[i*3+2]=8-Math.random()*62;}
+  const dgeo=new THREE.BufferGeometry();dgeo.setAttribute("position",new THREE.BufferAttribute(dpos,3));
+  dustPts=new THREE.Points(dgeo,new THREE.PointsMaterial({color:"#ffe4b0",size:.05,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending}));
+  scene.add(dustPts);
+
+  /* steam above bar */
+  const scount=60;const spos=new Float32Array(scount*3);
+  for(let i=0;i<scount;i++){spos[i*3]=0;spos[i*3+1]=0;spos[i*3+2]=0;}
+  const sgeo=new THREE.BufferGeometry();sgeo.setAttribute("position",new THREE.BufferAttribute(spos,3));
+  steamPts=new THREE.Points(sgeo,new THREE.PointsMaterial({color:"#fff6e8",size:.16,transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending}));
+  steamPts.userData.base=new THREE.Vector3();scene.add(steamPts);
+}
+
+function placeFurniture(wallMat,frameMat){
+  const P=i=>curve.getPointAt(STATIONS[i].t);
+  const barMat=new THREE.MeshStandardMaterial({color:"#4a3322",roughness:.6});
+  const woodTop=new THREE.MeshStandardMaterial({color:"#6b4a2c",roughness:.5});
+
+  /* Station 2: bar counter on +x */
+  let c=P(2);
+  const barX=c.x+2.4;
+  const counter=new THREE.Mesh(new THREE.BoxGeometry(3.4,1.1,.9),barMat);
+  counter.position.set(barX,.55,c.z); scene.add(counter);
+  const top=new THREE.Mesh(new THREE.BoxGeometry(3.6,.1,1.05),woodTop);top.position.set(barX,1.13,c.z);scene.add(top);
+  // espresso machine
+  const em=new THREE.Mesh(new THREE.BoxGeometry(1.1,.55,.6),new THREE.MeshStandardMaterial({color:"#9c7d45",metalness:.5,roughness:.35}));
+  em.position.set(barX,1.45,c.z);scene.add(em);
+  const emTop=new THREE.Mesh(new THREE.BoxGeometry(1.15,.18,.65),new THREE.MeshStandardMaterial({color:"#3a2817",roughness:.5}));
+  emTop.position.set(barX,1.78,c.z);scene.add(emTop);
+  // menu board behind bar (on wall +x)
+  const board=new THREE.Mesh(new THREE.PlaneGeometry(2.2,1.65),new THREE.MeshStandardMaterial({map:menuBoardTex(),emissive:"#2a1c0d",emissiveIntensity:.3}));
+  board.rotation.y=-Math.PI/2;board.position.set(3.95,2.15,c.z);scene.add(board);
+  // cups on counter
+  for(let i=-1;i<=1;i++){const cup=new THREE.Mesh(new THREE.CylinderGeometry(.07,.055,.12,12),new THREE.MeshStandardMaterial({color:"#f3ead9",roughness:.6}));
+    cup.position.set(barX-1.2+i*0.35,1.24,c.z+0.3);scene.add(cup);}
+  // steam origin
+  steamOrigin.set(barX-1.2,1.32,c.z+0.3);
+  const barLight=new THREE.PointLight("#ffd89a",7,10,2);barLight.position.set(barX,2.0,c.z-0.3);scene.add(barLight);
+
+  /* Station 3: bakery display case on -x */
+  c=P(3);
+  const caseX=c.x-2.4;
+  const glass=new THREE.MeshPhysicalMaterial({color:"#dfe8ec",roughness:.05,transmission:.9,transparent:true,opacity:.35,metalness:0,thickness:.4});
+  const caseBody=new THREE.Mesh(new THREE.BoxGeometry(3.4,1.0,.95),barMat);caseBody.position.set(caseX,.5,c.z);scene.add(caseBody);
+  const caseGlass=new THREE.Mesh(new THREE.BoxGeometry(3.3,.75,.85),glass);caseGlass.position.set(caseX,1.4,c.z);scene.add(caseGlass);
+  const caseTop=new THREE.Mesh(new THREE.BoxGeometry(3.5,.06,1.0),woodTop);caseTop.position.set(caseX,1.02,c.z);scene.add(caseTop);
+  // croissants (torus + cones)
+  const croMat=new THREE.MeshStandardMaterial({color:"#c98f4e",roughness:.55});
+  const cakeMat=new THREE.MeshStandardMaterial({color:"#e8c9a0",roughness:.5});
+  for(let i=-1;i<=1;i++){
+    const cr=new THREE.Mesh(new THREE.TorusGeometry(.13,.06,8,16,Math.PI*1.4),croMat);
+    cr.position.set(caseX-0.9+i*0.5,1.2,c.z);cr.rotation.z=.4;scene.add(cr);
+    const ck=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.12,16),cakeMat);
+    ck.position.set(caseX+0.5+i*0.5,1.2,c.z+0.15);scene.add(ck);
+  }
+  const caseLight=new THREE.PointLight("#fff0d0",5,8,2);caseLight.position.set(caseX,1.55,c.z+0.4);scene.add(caseLight);
+
+  /* Station 4: seating tables (center) */
+  c=P(4);
+  for(let k=0;k<3;k++){
+    const tz=c.z-3.2-k*2.8, tx=(k%2?1.7:-1.7);
+    const leg=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.72,10),barMat);leg.position.set(tx,.36,tz);scene.add(leg);
+    const tt=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,.06,20),woodTop);tt.position.set(tx,.74,tz);scene.add(tt);
+    // chairs
+    for(let s=0;s<2;s++){const chx=tx+(s?0.7:-0.7);
+      const seat=new THREE.Mesh(new THREE.BoxGeometry(.4,.06,.4),barMat);seat.position.set(chx,.45,tz);scene.add(seat);
+      const legc=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.45),barMat);legc.position.set(chx,.22,tz);scene.add(legc);}
+    // a cup on table
+    const cup=new THREE.Mesh(new THREE.CylinderGeometry(.06,.05,.1,12),new THREE.MeshStandardMaterial({color:"#f3ead9"}));cup.position.set(tx,.82,tz);scene.add(cup);
+    // hanging lamp
+    const lamp=new THREE.Mesh(new THREE.ConeGeometry(.28,.3,16,1,true),new THREE.MeshStandardMaterial({color:"#3a2817",side:THREE.DoubleSide,emissive:"#4a3322"}));
+    lamp.position.set(tx,2.4,tz);scene.add(lamp);
+    const lb=new THREE.Mesh(new THREE.SphereGeometry(.08,10,10),new THREE.MeshStandardMaterial({color:"#ffdf9c",emissive:"#ffcf82",emissiveIntensity:2.2}));
+    lb.position.set(tx,2.32,tz);scene.add(lb);
+    const ll=new THREE.PointLight("#ffcf88",3.5,6,2);ll.position.set(tx,2.2,tz);scene.add(ll);
+  }
+
+  /* Station 5: story wall frames on +x */
+  c=P(5);
+  const frames=[["الجودة","Quality"],["الثبات","Consistency"],["الدفء","Warmth"]];
+  frames.forEach((f,i)=>{
+    const fr=new THREE.Mesh(new THREE.PlaneGeometry(1.0,1.25),new THREE.MeshStandardMaterial({map:frameTex(LANG==="en"?f[1]:f[0],"Strangers")}));
+    fr.rotation.y=-Math.PI/2;fr.position.set(3.94,1.9,c.z-1.4+i*1.4);scene.add(fr);
+  });
+  const storyLight=new THREE.PointLight("#ffe0ad",5,9,2);storyLight.position.set(2.8,2.3,c.z);scene.add(storyLight);
+
+  /* Station 6: back exit door glow */
+  c=P(6);
+  const exitFrame=new THREE.Mesh(new THREE.BoxGeometry(2.4,2.6,.2),frameMat);exitFrame.position.set(0,1.3,c.z-2.4);scene.add(exitFrame);
+  const exitGlow=new THREE.Mesh(new THREE.PlaneGeometry(1.9,2.2),new THREE.MeshBasicMaterial({color:"#ffe7bd"}));
+  exitGlow.position.set(0,1.25,c.z-2.29);scene.add(exitGlow);
+  const exitLight=new THREE.PointLight("#ffdca0",6,10,2);exitLight.position.set(0,1.6,c.z-1.6);scene.add(exitLight);
+}
+const steamOrigin=new THREE.Vector3(2,1.3,-11);
+
+/* ---------- per-frame update ---------- */
+const _ahead=new THREE.Vector3(),_pos=new THREE.Vector3(),_target=new THREE.Vector3(),_focus=new THREE.Vector3();
+function updateScene(j,time){
+  const t=journeyToT(j);
+  curve.getPointAt(t,_pos);
+  // walk phase advances with movement
+  const moved=Math.abs(t-lastT); lastT=t;
+  walkPhase += moved*80 + 0.004;
+  const bobAmp=reduce?0:0.05, bob=Math.sin(walkPhase*6.28)*bobAmp*(0.4+Math.min(moved*140,1));
+  const sway=Math.sin(walkPhase*3.14)*(reduce?0:0.02);
+
+  // look target: tangent ahead, blended toward station focus when in a plateau
+  curve.getPointAt(Math.min(t+0.012,1),_ahead);
+  _target.copy(_ahead);
+  // station proximity
+  let prox=0, st=null;
+  for(const s of STATIONS){ if(j>=s.pj[0]-0.02&&j<=s.pj[1]+0.02){ st=s;
+    const cnt=(s.pj[0]+s.pj[1])/2, half=(s.pj[1]-s.pj[0])/2+0.02; prox=1-clamp(Math.abs(j-cnt)/half,0,1); break;} }
+  if(st&&st.focus){ _focus.set(st.focus[0],st.focus[1],st.focus[2]);
+    // focus stored as offset relative to station curve point for side items; treat as world if |x|>1 near hall
+    // our focus arrays are world-ish sideways offsets from station point:
+    curve.getPointAt(st.t,_ahead);
+    _focus.set(_ahead.x+st.focus[0], st.focus[1], _ahead.z+st.focus[2]);
+    _target.lerp(_focus, smooth(0,1,prox)*0.9);
+  }
+  camera.position.set(_pos.x+sway,_pos.y+bob,_pos.z);
+  camera.lookAt(_target);
+  camera.rotation.z += Math.sin(walkPhase*6.28)*(reduce?0:0.006);
+
+  // door
+  if(door) door.rotation.y = -doorOpen(j)*1.35;
+
+  // dust drift
+  if(dustPts){ const a=dustPts.geometry.attributes.position;
+    for(let i=1;i<a.count*3;i+=3){ a.array[i]+=0.0016; if(a.array[i]>3.1)a.array[i]=0; }
+    a.needsUpdate=true; dustPts.rotation.y=time*0.00002; }
+  // steam
+  if(steamPts){ const a=steamPts.geometry.attributes.position;
+    for(let i=0;i<a.count;i++){ let y=a.array[i*3+1]; y+=0.006+i*0.00002; if(y>1.6)y=0;
+      a.array[i*3]=steamOrigin.x+Math.sin(time*0.001+i)*0.12*(y/1.6);
+      a.array[i*3+1]=steamOrigin.y+y; a.array[i*3+2]=steamOrigin.z+Math.cos(time*0.0008+i)*0.1*(y/1.6);}
+    a.needsUpdate=true; }
+  // bulb flicker
+  if(!reduce) bulbs.forEach((b,i)=>{ b.intensity=5.5+Math.sin(time*0.003+i)*0.35; });
+
+  // panels + nav
+  updatePanels(j,st);
+}
+
+let shownPanel=-1;
+function updatePanels(j,st){
+  let active=-1;
+  for(let i=0;i<STATIONS.length;i++){ if(j>=STATIONS[i].pj[0]&&j<=STATIONS[i].pj[1]){active=i;break;} }
+  if(active!==shownPanel){
+    document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("show",+p.dataset.station===active));
+    shownPanel=active;
+    if(active>=0){ highlightStation(active); }
+    if(active===1) runCounters();
+  }
+  // nearest station for nav highlight during walks
+  if(active<0){
+    let near=0,best=9;stationCenters.forEach((cc,i)=>{const dd=Math.abs(j-cc);if(dd<best){best=dd;near=i;}});
+    highlightStation(near);
+  }
+}
+
+/* ---------- scroll + fly ---------- */
+function scrollJourney(){ const max=spacer.scrollHeight-window.innerHeight; return max>0?clamp(window.scrollY/max,0,1):0; }
+let flying=false;
+function flyTo(i){
+  const cnt=stationCenters[i]; const max=spacer.scrollHeight-window.innerHeight;
+  const targetY=cnt*max; const startY=window.scrollY; const d=targetY-startY;
+  if(Math.abs(d)<2){window.scrollTo(0,targetY);return;}
+  flying=true; const dur=reduce?350:1050; const t0=performance.now();
+  function step(now){ const k=clamp((now-t0)/dur,0,1); const e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+    window.scrollTo(0,startY+d*e); if(k<1)requestAnimationFrame(step); else flying=false; }
+  requestAnimationFrame(step);
+}
+
+/* ---------- render loop ---------- */
+function animate(now){
+  requestAnimationFrame(animate);
+  const jt=scrollJourney();
+  journey += (jt-journey)*(reduce?0.3:0.085);
+  if(Math.abs(jt-journey)<0.00005) journey=jt;
+  updateScene(journey,now||0);
+  renderer.render(scene,camera);
+}
+
+/* ---------- resize ---------- */
+function onResize(){ if(!renderer)return; camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth,window.innerHeight); }
+window.addEventListener("resize",onResize);
+
+/* ---------- hint fade ---------- */
+setTimeout(()=>document.getElementById("hint0")?.classList.add("vis"),700);
+window.addEventListener("scroll",()=>{document.getElementById("hint0")?.classList.remove("vis");},{once:true,passive:true});
+
+/* ---------- boot ---------- */
+function finishPreload(){ pre.classList.add("gone"); ready=true; window.__strangers.ready=true; }
+let pct=0;
+const preTimer=setInterval(()=>{ pct=Math.min(100,pct+Math.random()*16+6); prePct.textContent=Math.round(pct)+"%";
+  if(pct>=100){clearInterval(preTimer);} },90);
+
+/* safety: if webgl fails or too slow -> fallback */
+let booted=false;
+function fallback(reasonErr){
+  if(booted)return; booted=true;
+  document.body.classList.remove("webgl"); document.body.classList.add("fallback");
+  clearInterval(preTimer); pre.classList.add("gone");
+  // ensure counters + all content visible
+  runCounters();
+  if(reasonErr) console.warn("[strangers] fallback mode:",reasonErr&&reasonErr.message||reasonErr);
+}
+const safety=setTimeout(()=>{ if(!ready) fallback("timeout"); },4000);
+
+/* expose test hook */
+window.__strangers={
+  ready:false,
+  frame(p){ // set journey directly + render one frame (for pixel verification)
+    if(!renderer)return false; journey=clamp(p,0,1); updateScene(journey,performance.now());
+    renderer.render(scene,camera); return true; },
+  gl(){ return renderer?renderer.getContext():null; },
+  brightness(){ const gl=renderer&&renderer.getContext(); if(!gl)return -1;
+    const w=gl.drawingBufferWidth,h=gl.drawingBufferHeight; const px=new Uint8Array(w*h*4);
+    gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,px); let s=0; const step=4*997;
+    let n=0; for(let i=0;i<px.length;i+=step){s+=px[i]+px[i+1]+px[i+2];n+=3;} return s/n; },
+  stations:STATIONS,
+  _s:()=>scene, _c:()=>camera, _curve:()=>curve
+};
+
+try{
+  if(!window.WebGLRenderingContext) throw new Error("no WebGL");
+  build(); booted=true; clearTimeout(safety);
+  // let preloader show a beat, then reveal
+  setTimeout(()=>{ pct=100; prePct.textContent="100%"; finishPreload(); }, reduce?300:900);
+  requestAnimationFrame(animate);
+}catch(err){ clearTimeout(safety); fallback(err); }
+</script>
+</body>
+</html>

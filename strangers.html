@@ -702,10 +702,15 @@ function initBeans(){
       v.x*=0.74; v.z*=0.60;
       const taper=1-0.20*Math.pow(Math.abs(v.y),2.4); v.x*=taper; v.z*=taper;
       v.z*=1-0.10*Math.pow(Math.abs(v.z),2);
+      // At a sphere pole both x and z collapse to 0, so sign(z) flips arbitrarily
+      // and the crease folds the surface through itself: that is the flat dark cap.
+      // Fading the crease toward the tips removes the singularity, and real beans
+      // taper their crease at the ends anyway.
+      const cap=1-Math.pow(Math.min(1,Math.abs(v.y)),3.2);
       const dx=v.x-0.055*Math.sin(v.y*2.6);
       const crease=Math.exp(-(dx*dx)/0.016), dir=Math.sign(v.z)||1;
-      v.z-=dir*crease*0.30;
-      v.z+=dir*Math.exp(-Math.pow(Math.abs(dx)-0.19,2)/0.006)*0.035;
+      v.z-=dir*crease*0.30*cap;
+      v.z+=dir*Math.exp(-Math.pow(Math.abs(dx)-0.19,2)/0.006)*0.035*cap;
       v.z*=1+0.030*Math.cos(v.y*4.1+v.x*3.3);
       v.x*=1+0.022*Math.sin(v.y*3.4);
       p.setXYZ(i,v.x,v.y,v.z);

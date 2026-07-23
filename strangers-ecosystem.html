@@ -923,10 +923,14 @@ function initScene(){
       const dx=v.x-wave;
       const crease=Math.exp(-(dx*dx)/0.016);
       const dir=Math.sign(v.z)||1;
-      v.z-=dir*crease*0.30;
+      // At a sphere pole x and z both collapse to 0, so sign(z) flips arbitrarily
+      // and the crease folds the surface through itself (a flat dark cap).
+      // Fading it toward the tips removes the singularity.
+      const cap=1-Math.pow(Math.min(1,Math.abs(v.y)),3.2);
+      v.z-=dir*crease*0.30*cap;
       // 5. rolled lips either side of the crease
       const lip=Math.exp(-Math.pow(Math.abs(dx)-0.19,2)/0.006);
-      v.z+=dir*lip*0.035;
+      v.z+=dir*lip*0.035*cap;
       // 6. organic irregularity
       v.z*=1+0.030*Math.cos(v.y*4.1+v.x*3.3);
       v.x*=1+0.022*Math.sin(v.y*3.4);

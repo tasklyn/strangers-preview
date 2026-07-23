@@ -609,9 +609,12 @@ function initScene(){
       const dx=v.x-wave;
       const crease=Math.exp(-(dx*dx)/0.016);
       const dir=Math.sign(v.z)||1;
-      v.z-=dir*crease*0.30;                                 // the crease
+      // fade the crease at the tips: at a sphere pole x and z both hit 0, so
+      // sign(z) flips arbitrarily and the surface folds into a flat dark cap
+      const cap=1-Math.pow(Math.min(1,Math.abs(v.y)),3.2);
+      v.z-=dir*crease*0.30*cap;                             // the crease
       const lip=Math.exp(-Math.pow(Math.abs(dx)-0.19,2)/0.006);
-      v.z+=dir*lip*0.035;                                   // rolled lips
+      v.z+=dir*lip*0.035*cap;                               // rolled lips
       v.z*=1+0.030*Math.cos(v.y*4.1+v.x*3.3);               // organic irregularity
       v.x*=1+0.022*Math.sin(v.y*3.4);
       pos.setXYZ(i,v.x,v.y,v.z);

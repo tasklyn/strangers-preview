@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>عالم سترينجرز — Walk Inside Strangers</title>
+<meta name="description" content="ادخل مقهى Strangers وتجوّل فيه. عالم ثلاثي الأبعاد تمشي فيه وتكتشف أقسام سترينجرز.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF7F2; --surface:#EFE6D8; --ink:#141110; --ink-soft:#3A322B;
+  --brown:#4A3322; --brown-soft:#6B4F38;
+  --gold:#B8955A; --gold-deep:#9A7A45;
+  --dark:#141110; --dark-2:#1C1714; --on-dark:#F4EDE1; --on-dark-soft:rgba(244,237,225,.68);
+  --line:rgba(74,51,34,.14); --line-strong:rgba(74,51,34,.26);
+  --err:#A5453B;
+  --font-ar:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  --font-latin:"Fraunces",Georgia,serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,monospace;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --radius:18px; --radius-lg:26px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:var(--dark)}
+body{font-family:var(--font-ar);color:var(--ink);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:15px;width:100%}
+.mono{font-family:var(--font-mono);letter-spacing:.02em}
+.latin{font-family:var(--font-latin)}
+#app{position:fixed;inset:0}
+canvas{display:block;width:100%;height:100%}
+
+/* ---------- LOADING ---------- */
+#load{position:fixed;inset:0;z-index:300;background:var(--dark);color:var(--on-dark);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .7s var(--ease-out)}
+#load.gone{opacity:0;pointer-events:none}
+#load img{width:92px;height:92px;border-radius:50%;background:#fff;border:1px solid rgba(244,237,225,.2)}
+#load h1{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:600;letter-spacing:-.01em}
+#load .en{font-family:var(--font-latin);font-style:italic;color:var(--gold);font-size:1.05rem}
+.bar{width:min(320px,64vw);height:2px;background:rgba(244,237,225,.16);overflow:hidden;border-radius:2px}
+.bar i{display:block;height:100%;width:0%;background:var(--gold);transition:width .35s var(--ease-out)}
+#load .pct{font-size:12px;color:var(--on-dark-soft);letter-spacing:.22em}
+
+/* ---------- START GATE ---------- */
+#gate{position:fixed;inset:0;z-index:250;background:rgba(20,17,16,.82);backdrop-filter:blur(14px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:26px;color:var(--on-dark);text-align:center;padding:24px}
+#gate.on{display:flex}
+#gate h2{font-size:clamp(1.5rem,4vw,2.4rem);font-weight:600}
+#gate .en{font-family:var(--font-latin);font-style:italic;color:var(--gold);font-size:1.1rem;margin-top:6px}
+.keys{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.key{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12.5px;color:var(--on-dark-soft)}
+.key b{display:flex;gap:4px}
+.key b i{font-style:normal;min-width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(244,237,225,.3);
+  border-radius:8px;font-family:var(--font-mono);font-size:12px;color:var(--on-dark);padding:0 8px}
+.enter{background:var(--gold);color:#fff;padding:15px 34px;border-radius:999px;font-size:15.5px;font-weight:500;
+  transition:transform .3s var(--ease-out),background .3s}
+.enter:hover{transform:translateY(-3px);background:var(--gold-deep)}
+#gate .alt{font-size:13px;color:var(--on-dark-soft)}
+#gate .alt a{color:var(--gold);border-bottom:1px solid rgba(184,149,90,.4)}
+
+/* ---------- HUD ---------- */
+#hud{position:fixed;inset:0;z-index:60;pointer-events:none}
+.crosshair{position:absolute;top:50%;left:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:50%;
+  background:rgba(244,237,225,.55);box-shadow:0 0 0 1px rgba(20,17,16,.35);transition:transform .25s,background .25s}
+.crosshair.hot{transform:scale(1.9);background:var(--gold)}
+.zone{position:absolute;top:22px;inset-inline-start:22px;color:var(--on-dark);text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.zone b{display:block;font-size:15px;font-weight:600}
+.zone span{font-size:10.5px;letter-spacing:.24em;color:rgba(244,237,225,.7)}
+.brandmini{position:absolute;top:18px;inset-inline-end:22px;display:flex;align-items:center;gap:10px;color:var(--on-dark);text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.brandmini img{width:34px;height:34px;border-radius:50%;background:#fff}
+.brandmini span{font-size:10px;letter-spacing:.22em;color:rgba(244,237,225,.72)}
+.prompt{position:absolute;bottom:16%;left:50%;transform:translate(-50%,14px);opacity:0;transition:all .3s var(--ease-out);
+  background:rgba(20,17,16,.76);backdrop-filter:blur(10px);border:1px solid rgba(244,237,225,.2);
+  color:var(--on-dark);padding:12px 20px;border-radius:999px;display:flex;align-items:center;gap:11px;font-size:14.5px;white-space:nowrap}
+.prompt.on{opacity:1;transform:translate(-50%,0)}
+.prompt i{font-style:normal;font-family:var(--font-mono);font-size:11.5px;border:1px solid rgba(244,237,225,.34);
+  border-radius:6px;padding:3px 9px;color:var(--gold)}
+.hint{position:absolute;bottom:20px;inset-inline-start:22px;font-family:var(--font-mono);font-size:10.5px;
+  letter-spacing:.16em;color:rgba(244,237,225,.55);text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.compass{position:absolute;bottom:20px;inset-inline-end:22px;display:flex;gap:7px;pointer-events:auto}
+.compass button{width:36px;height:36px;border-radius:10px;background:rgba(20,17,16,.6);border:1px solid rgba(244,237,225,.2);
+  color:var(--on-dark);font-size:15px;display:grid;place-items:center;backdrop-filter:blur(8px)}
+.compass button:hover{background:rgba(184,149,90,.5)}
+
+/* mobile controls */
+#touch{position:fixed;inset:0;z-index:55;display:none}
+#touch.on{display:block}
+.stick{position:absolute;bottom:28px;inset-inline-start:26px;width:118px;height:118px;border-radius:50%;
+  background:rgba(20,17,16,.34);border:1px solid rgba(244,237,225,.22);backdrop-filter:blur(6px);pointer-events:auto;touch-action:none}
+.stick i{position:absolute;top:50%;left:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;
+  background:rgba(244,237,225,.5);transition:transform .06s linear}
+.tapact{position:absolute;bottom:44px;inset-inline-end:26px;width:78px;height:78px;border-radius:50%;
+  background:rgba(184,149,90,.6);border:1px solid rgba(244,237,225,.3);color:#fff;font-size:13px;
+  display:grid;place-items:center;pointer-events:auto;backdrop-filter:blur(6px);text-align:center;line-height:1.3}
+
+/* ---------- PANEL ---------- */
+#panel{position:fixed;inset:0;z-index:150;display:none;align-items:stretch;justify-content:flex-start}
+#panel.on{display:flex}
+#panel .scrim{position:absolute;inset:0;background:rgba(20,17,16,.66);backdrop-filter:blur(10px)}
+#panel .sheet{position:relative;width:min(720px,100%);height:100%;background:var(--bg);overflow-y:auto;
+  box-shadow:-30px 0 80px -30px rgba(0,0,0,.5);transform:translateX(100%);transition:transform .5s var(--ease-out)}
+#panel.on .sheet{transform:translateX(0)}
+.sheet-head{position:sticky;top:0;z-index:5;background:rgba(250,247,242,.94);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding:20px clamp(20px,4vw,40px);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.sheet-head .k{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.24em;color:var(--gold-deep)}
+.sheet-head h2{font-size:clamp(1.35rem,3vw,1.9rem);font-weight:600;line-height:1.15;margin-top:5px}
+.sheet-close{width:44px;height:44px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;font-size:20px;flex:none}
+.sheet-close:hover{border-color:var(--gold);color:var(--gold-deep)}
+.sheet-body{padding:clamp(22px,4vw,40px)}
+.sheet-body p.lead{color:var(--ink-soft);font-size:1.02rem;line-height:1.85;max-width:56ch}
+.sheet-body h3{font-size:1.2rem;margin:30px 0 12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.mini{border:1px solid var(--line);border-radius:14px;padding:18px;background:#fff}
+.mini b{display:block;font-family:var(--font-latin);font-size:1.35rem;color:var(--gold-deep);margin-bottom:4px}
+.mini h4{font-size:1rem;margin-bottom:5px}
+.mini p{font-size:14px;color:var(--ink-soft)}
+.prod{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:18px}
+.prod figure{border-radius:14px;overflow:hidden;position:relative;height:150px;background:var(--surface)}
+.prod img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease-out)}
+.prod figure:hover img{transform:scale(1.07)}
+.prod figcaption{position:absolute;inset-inline:0;bottom:0;padding:12px;color:#fff;font-size:13.5px;font-weight:500;
+  background:linear-gradient(to top,rgba(20,17,16,.82),transparent)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.chips i{font-style:normal;font-size:12.5px;padding:6px 13px;border:1px solid var(--line-strong);border-radius:999px;color:var(--ink-soft)}
+.flowline{margin-top:18px;border-inline-start:2px solid var(--gold);padding-inline-start:20px;display:grid;gap:16px}
+.flowline div b{display:block;font-size:15px}
+.flowline div span{font-size:13.5px;color:var(--ink-soft)}
+.btnrow{display:flex;gap:11px;flex-wrap:wrap;margin-top:26px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:999px;
+  font-size:14.5px;font-weight:500;transition:transform .3s var(--ease-out),background .3s,border-color .3s}
+.btn:active{transform:translateY(1px) scale(.98)}
+.btn-p{background:var(--gold);color:#fff}
+.btn-p:hover{transform:translateY(-3px);background:var(--gold-deep)}
+.btn-g{border:1px solid var(--line-strong)}
+.btn-g:hover{transform:translateY(-3px);border-color:var(--gold);color:var(--gold-deep)}
+
+/* forms in panel */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.frow.one{grid-template-columns:1fr}
+.fld label{display:block;font-size:12.5px;color:var(--brown-soft);margin-bottom:6px;font-weight:500}
+.fld .req{color:var(--err)}
+.fld input,.fld select,.fld textarea{background:#fff;border:1px solid var(--line-strong);border-radius:11px;padding:12px 14px;
+  color:var(--ink);transition:border-color .25s,box-shadow .25s}
+.fld textarea{min-height:96px;resize:vertical}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,149,90,.16)}
+.fld .err{display:none;color:var(--err);font-size:12px;margin-top:5px}
+.fld.bad input,.fld.bad select,.fld.bad textarea{border-color:var(--err)}
+.fld.bad .err{display:block}
+.fnote{font-size:12.5px;color:var(--brown-soft);margin-top:12px}
+.fok{display:none;margin-top:22px;border:1px solid var(--gold);background:rgba(184,149,90,.12);border-radius:14px;padding:22px}
+.fok.on{display:block}
+.fok h4{color:var(--gold-deep);font-size:1.1rem;margin-bottom:7px}
+.fok p{font-size:14px;color:var(--ink-soft)}
+.fok .ref{display:inline-block;font-family:var(--font-mono);margin-top:11px;background:#fff;padding:8px 15px;
+  border-radius:9px;border:1px solid var(--line-strong)}
+
+/* map overlay */
+#map{position:fixed;inset:0;z-index:160;display:none;align-items:center;justify-content:center;background:rgba(20,17,16,.8);backdrop-filter:blur(12px)}
+#map.on{display:flex}
+.mapbox{background:var(--bg);border-radius:var(--radius-lg);padding:28px;width:min(560px,92vw)}
+.mapbox h3{font-size:1.3rem;margin-bottom:6px}
+.mapbox p{font-size:13.5px;color:var(--ink-soft);margin-bottom:18px}
+.maplist{display:grid;gap:9px}
+.maplist button{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 16px;
+  border:1px solid var(--line-strong);border-radius:13px;text-align:start;transition:all .28s}
+.maplist button:hover{border-color:var(--gold);background:#fff;transform:translateX(-4px)}
+.maplist button b{font-size:15px}
+.maplist button span{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.18em;color:var(--gold-deep)}
+
+@media (max-width:820px){
+  .grid2,.prod,.frow{grid-template-columns:1fr}
+  #panel .sheet{width:100%}
+  .hint{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app"><canvas id="c"></canvas></div>
+
+<div id="load">
+  <img src="assets/logo.jpg" alt="Strangers">
+  <div style="text-align:center">
+    <h1>عالم سترينجرز</h1>
+    <div class="en">Building the world…</div>
+  </div>
+  <div class="bar"><i id="barFill"></i></div>
+  <div class="pct mono" id="pct">0%</div>
+</div>
+
+<div id="gate">
+  <div>
+    <h2>ادخل المقهى</h2>
+    <div class="en">Come as a Stranger, Leave as a Friend.</div>
+  </div>
+  <div class="keys" id="keysDesktop">
+    <div class="key"><b><i>W</i><i>A</i><i>S</i><i>D</i></b>المشي</div>
+    <div class="key"><b><i>الماوس</i></b>النظر</div>
+    <div class="key"><b><i>E</i></b>التفاعل</div>
+    <div class="key"><b><i>Shift</i></b>الجري</div>
+    <div class="key"><b><i>M</i></b>الخريطة</div>
+    <div class="key"><b><i>Esc</i></b>الخروج</div>
+  </div>
+  <button class="enter" id="enterBtn">ابدأ الجولة</button>
+  <div class="alt">تفضّل التصفح التقليدي؟ <a href="strangers-ecosystem.html">افتح الموقع العادي</a></div>
+</div>
+
+<div id="hud">
+  <div class="crosshair" id="cross"></div>
+  <div class="zone"><b id="zoneName">المدخل</b><span class="mono" id="zoneEn">ENTRANCE</span></div>
+  <div class="brandmini"><span class="mono">STRANGERS · EST 2017</span><img src="assets/logo.jpg" alt=""></div>
+  <div class="prompt" id="prompt"><i id="promptKey">E</i><span id="promptText"></span></div>
+  <div class="hint mono">WASD MOVE · MOUSE LOOK · E INTERACT · M MAP</div>
+  <div class="compass">
+    <button id="mapBtn" title="الخريطة">◱</button>
+    <button id="soundBtn" title="الصوت">♪</button>
+  </div>
+</div>
+
+<div id="touch">
+  <div class="stick" id="stick"><i id="stickNub"></i></div>
+  <button class="tapact" id="tapAct">تفاعل</button>
+</div>
+
+<div id="panel">
+  <div class="scrim" id="panelScrim"></div>
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><div class="k mono" id="pk"></div><h2 id="pt"></h2></div>
+      <button class="sheet-close" id="panelClose" aria-label="إغلاق">×</button>
+    </div>
+    <div class="sheet-body" id="pb"></div>
+  </div>
+</div>
+
+<div id="map">
+  <div class="mapbox">
+    <h3>خريطة العالم</h3>
+    <p>اختر محطة وسننقلك إليها فوراً.</p>
+    <div class="maplist" id="mapList"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+<script>
+/* =====================================================================
+   STRANGERS WORLD — a walkable 3D cafe.
+   Prototype: forms validate and store a reference locally (no backend).
+   ===================================================================== */
+const $=(s)=>document.querySelector(s);
+const IS_TOUCH=matchMedia('(pointer:coarse)').matches;
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------------- CONTENT ---------------- */
+const STATIONS=[
+ {id:'entrance',name:'المدخل',       en:'ENTRANCE',     pos:[0,12.5],    look:[0,8], noPanel:true},
+ {id:'story',   name:'جدار الحكاية', en:'OUR STORY',    pos:[-7.5,14.2], look:[-7.5,10]},
+ {id:'coffee',  name:'بار القهوة',   en:'COFFEE BAR',   pos:[13.2,2],    look:[8,2]},
+ {id:'bakery',  name:'ركن المخبز',   en:'BAKERY',       pos:[-13.2,2],   look:[-8,2]},
+ {id:'seating', name:'صالة الجلوس',  en:'THE FLOOR',    pos:[0,3],       look:[0,-2]},
+ {id:'b2b',     name:'ركن الأعمال',  en:'B2B DESK',     pos:[-11,-11.5], look:[-11,-7]},
+ {id:'catering',name:'طاولة الكاترينج',en:'CATERING',   pos:[11,-11.5],  look:[11,-7]},
+ {id:'logistic',name:'باب الشحن',    en:'LOGISTIC',     pos:[0,-13.2],   look:[0,-9]}
+];
+const CITIES=['الرياض','جدة','الدمام','الخبر','مكة المكرمة','المدينة المنورة','أبها','القصيم','أخرى'];
+const SERVICES=['Strangers Coffee','Strangers Bakery','Strangers B2B','Strangers Catering','Strangers Logistic','شراكة','امتياز (Franchise)','استفسار عام'];
+const MENU=[
+ {n:'كرواسون اللوز',img:'assets/almond-croissant.jpg'},
+ {n:'كرواسون نوتيلا',img:'assets/nutella-croissant.jpg'},
+ {n:'تشيز كيك لوتس',img:'assets/lotus-cheesecake.jpg'},
+ {n:'تيراميسو',img:'assets/tiramisu.jpg'},
+ {n:'دانش الفستق',img:'assets/pistachio-danish.jpg'},
+ {n:'إكلير',img:'assets/eclair.jpg'}
+];
+const BAKERY=[
+ {n:'كرواسون مدام',img:'assets/croissant-madame.jpg'},
+ {n:'كرواسون البيستو',img:'assets/pesto-croissant.jpg'},
+ {n:'دانش الفراولة',img:'assets/strawberry-danish.jpg'},
+ {n:'إنجلش كيك بالليمون',img:'assets/lemon-loaf.jpg'},
+ {n:'تشيز كيك التوت',img:'assets/blueberry-cheesecake.jpg'},
+ {n:'ميني تارت',img:'assets/mini-tart.jpg'}
+];
+const JOURNEY=[
+ ['المصدر','نختار البن من مزارع مختارة على أساس النكهة والمسؤولية.'],
+ ['التحميص','تحميص يومي بطيء يوقظ الزيوت والسكريات الطبيعية.'],
+ ['الطحن','نطحن عند الطلب، وحجم الطحنة يُضبط لكل مشروب.'],
+ ['الاستخلاص','ضغط وحرارة ووقت محسوب، فتخرج بقوام حريري.'],
+ ['التقديم','لمسة فن أخيرة على الحليب، وتبدأ الصداقة.']
+];
+const B2B_FLOW=[
+ ['طلب جديد','ترسل طلبك بالمنتجات والكميات وتاريخ التسليم.'],
+ ['المراجعة','فريق B2B يتحقق من التوفّر وموعد التسليم.'],
+ ['الإنتاج','يدخل الطلب خطة الإنتاج ويُصنّع في المعمل.'],
+ ['الجودة والتغليف','فحص المواصفات ثم التغليف والتوسيم.'],
+ ['التسليم','اللوجستك يوصّل، وتؤكد الاستلام وتصدر الفاتورة.']
+];
+const CAT_PKGS=[
+ ['Signature','للاجتماعات وورش العمل الصغيرة. حتى 30 ضيفاً.'],
+ ['Prestige','للمؤتمرات ومناسبات الشركات. حتى 150 ضيفاً.'],
+ ['Royal','للأعراس والمناسبات الكبرى. بلا حد للضيوف.']
+];
+const TIMELINE=[
+ ['2017','فتحنا أول فرع بفكرة واحدة: مكان يدخله الغريب فيخرج منه صديقاً.'],
+ ['2019','أنشأنا معملنا الخاص لنضبط جودة المخبوزات بأنفسنا.'],
+ ['2021','بدأنا نورّد لمقاهٍ وفنادق بعد أن تجاوزت قدرة المعمل حاجة فروعنا.'],
+ ['2023','أطلقنا خدمة تجهيز المناسبات بثلاث باقات.'],
+ ['2026','نربط الأقسام الخمسة في منظومة رقمية واحدة.']
+];
+
+/* ---------------- THREE SETUP ---------------- */
+const canvas=$('#c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:!IS_TOUCH});
+renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.5:2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=0.95;
+renderer.shadowMap.enabled=!IS_TOUCH;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x120f0d);
+scene.fog=new THREE.FogExp2(0x1a1512,0.017);
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,0.1,180);
+
+const SRGB=h=>new THREE.Color(h).convertSRGBToLinear();
+const loader=new THREE.TextureLoader();
+let pending=0,done=0;
+function tex(url,rep){
+  pending++;
+  const t=loader.load(url,()=>{done++;updateLoad();},undefined,()=>{done++;updateLoad();});
+  t.encoding=THREE.sRGBEncoding;
+  if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1]);}
+  return t;
+}
+function updateLoad(){
+  const p=pending?Math.round(done/pending*100):100;
+  $('#barFill').style.width=p+'%'; $('#pct').textContent=p+'%';
+}
+
+/* --- procedural materials --- */
+function woodTex(){
+  const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
+  x.fillStyle='#6b4a2e';x.fillRect(0,0,512,512);
+  for(let i=0;i<190;i++){
+    x.strokeStyle='rgba('+(60+Math.random()*55|0)+','+(38+Math.random()*32|0)+','+(20+Math.random()*22|0)+','+(0.16+Math.random()*0.4)+')';
+    x.lineWidth=0.6+Math.random()*3.2;x.beginPath();
+    const y=Math.random()*512;x.moveTo(0,y);
+    for(let px=0;px<=512;px+=32)x.lineTo(px,y+Math.sin(px/54+i)*4.5+(Math.random()-0.5)*3);
+    x.stroke();
+  }
+  for(let i=0;i<9;i++){ // plank seams
+    x.strokeStyle='rgba(28,18,10,.55)';x.lineWidth=2.4;
+    const y=i*(512/9);x.beginPath();x.moveTo(0,y);x.lineTo(512,y);x.stroke();
+  }
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(9,9);
+  t.encoding=THREE.sRGBEncoding;return t;
+}
+function plasterTex(){
+  const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
+  x.fillStyle='#efe4d2';x.fillRect(0,0,256,256);
+  const im=x.getImageData(0,0,256,256),d=im.data;
+  for(let i=0;i<d.length;i+=4){const n=(Math.random()-0.5)*17;d[i]+=n;d[i+1]+=n;d[i+2]+=n;}
+  x.putImageData(im,0,0);
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(7,4);
+  t.encoding=THREE.sRGBEncoding;return t;
+}
+function boardTex(lines,title){
+  const c=document.createElement('canvas');c.width=1024;c.height=640;const x=c.getContext('2d');
+  x.fillStyle='#171310';x.fillRect(0,0,1024,640);
+  x.strokeStyle='rgba(184,149,90,.55)';x.lineWidth=4;x.strokeRect(22,22,980,596);
+  x.textAlign='center';
+  x.fillStyle='#B8955A';x.font='500 40px "IBM Plex Mono", monospace';
+  x.fillText(title,512,96);
+  x.fillStyle='#F4EDE1';x.font='600 46px "IBM Plex Sans Arabic", sans-serif';
+  lines.forEach((l,i)=>x.fillText(l,512,190+i*74));
+  const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;return t;
+}
+const MAT={
+  floor:new THREE.MeshStandardMaterial({map:woodTex(),roughness:.72,metalness:.02}),
+  wall:new THREE.MeshStandardMaterial({map:plasterTex(),roughness:.94}),
+  darkWood:new THREE.MeshStandardMaterial({color:SRGB(0x4A3322),roughness:.6}),
+  midWood:new THREE.MeshStandardMaterial({color:SRGB(0x7A5636),roughness:.62}),
+  marble:new THREE.MeshStandardMaterial({color:SRGB(0xEFE6D8),roughness:.32,metalness:.05}),
+  gold:new THREE.MeshStandardMaterial({color:SRGB(0xB8955A),roughness:.3,metalness:.85}),
+  metal:new THREE.MeshStandardMaterial({color:SRGB(0x9aa0a3),roughness:.28,metalness:.9}),
+  dark:new THREE.MeshStandardMaterial({color:SRGB(0x1C1714),roughness:.7}),
+  glass:new THREE.MeshPhysicalMaterial({color:0xffffff,roughness:.06,metalness:0,transmission:.92,transparent:true,opacity:.28,side:THREE.DoubleSide}),
+  ceramic:new THREE.MeshStandardMaterial({color:SRGB(0xF7F3EC),roughness:.35}),
+  bean:new THREE.MeshStandardMaterial({color:SRGB(0x6B4A2F),roughness:.62})
+};
+
+/* ---------------- COLLIDERS ---------------- */
+const COL=[]; // {x,z,hw,hd}
+function box(w,h,d,mat,x,y,z,solid=true,ry=0){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+  m.position.set(x,y,z); m.rotation.y=ry;
+  m.castShadow=!IS_TOUCH; m.receiveShadow=true;
+  scene.add(m);
+  if(solid){
+    const c=Math.abs(Math.cos(ry)),s=Math.abs(Math.sin(ry));
+    COL.push({x,z,hw:(w*c+d*s)/2+0.25,hd:(d*c+w*s)/2+0.25});
+  }
+  return m;
+}
+
+/* ---------------- ROOM ---------------- */
+const W=20,D=15,H=6.2;
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(W*2,D*2),MAT.floor);
+floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+const ceil=new THREE.Mesh(new THREE.PlaneGeometry(W*2,D*2),new THREE.MeshStandardMaterial({color:SRGB(0x3A2C22),roughness:.95}));
+ceil.rotation.x=Math.PI/2;ceil.position.y=H;scene.add(ceil);
+// walls (thin boxes, solid)
+box(W*2,H,0.4,MAT.wall,0,H/2,-D);          // north
+box(W*2,H,0.4,MAT.wall,0,H/2,D);           // south (entrance wall)
+box(0.4,H,D*2,MAT.wall,-W,H/2,0);          // west
+box(0.4,H,D*2,MAT.wall,W,H/2,0);           // east
+
+/* warm ambience */
+scene.add(new THREE.HemisphereLight(0xffe9cc,0x2a1f18,0.34));
+const amb=new THREE.AmbientLight(0xffdcb0,0.16);scene.add(amb);
+function pendant(x,z,intensity=1.0){
+  const g=new THREE.Group();
+  const cord=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,1.5),MAT.dark);cord.position.y=H-0.75;g.add(cord);
+  const shade=new THREE.Mesh(new THREE.ConeGeometry(0.42,0.5,22,1,true),
+    new THREE.MeshStandardMaterial({color:SRGB(0xB8955A),roughness:.35,metalness:.7,side:THREE.DoubleSide}));
+  shade.position.y=H-1.7;g.add(shade);
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.1,14,10),
+    new THREE.MeshBasicMaterial({color:0xffdca8}));bulb.position.y=H-1.85;g.add(bulb);
+  const L=new THREE.PointLight(0xffc98a,intensity,16,2);L.position.y=H-1.9;
+  if(!IS_TOUCH){L.castShadow=true;L.shadow.mapSize.set(512,512);}
+  g.add(L);
+  g.position.set(x,0,z);scene.add(g);
+}
+[[-12,8],[0,8],[12,8],[-12,0],[0,0],[12,0],[-9,-9],[9,-9],[0,-9]].forEach(p=>pendant(p[0],p[1],0.95));
+
+/* daylight from entrance windows */
+const sun=new THREE.DirectionalLight(0xfff0d6,0.75);
+sun.position.set(6,9,22);sun.target.position.set(0,0,0);
+if(!IS_TOUCH){sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
+  const s=sun.shadow.camera;s.left=-26;s.right=26;s.top=20;s.bottom=-20;s.far=60;}
+scene.add(sun);scene.add(sun.target);
+
+/* windows on south wall (emissive planes) */
+for(const wx of [-13,-6.5,6.5,13]){
+  const win=new THREE.Mesh(new THREE.PlaneGeometry(4.4,3.2),
+    new THREE.MeshBasicMaterial({color:0xfff4e0}));
+  win.position.set(wx,3.1,D-0.22);win.rotation.y=Math.PI;scene.add(win);
+  box(4.8,0.16,0.14,MAT.darkWood,wx,4.75,D-0.3,false);
+  box(4.8,0.16,0.14,MAT.darkWood,wx,1.45,D-0.3,false);
+  box(0.14,3.4,0.14,MAT.darkWood,wx,3.1,D-0.3,false);
+}
+
+/* ---------------- FURNITURE ---------------- */
+/* --- Coffee bar (east) --- */
+(function coffeeBar(){
+  box(2.4,1.15,12,MAT.darkWood,15.4,0.575,2);            // counter body
+  box(2.7,0.12,12.4,MAT.marble,15.4,1.2,2,false);        // counter top
+  box(2.0,2.6,12,MAT.midWood,18.6,1.3,2);                // back bar
+  // espresso machine
+  box(1.5,0.85,0.95,MAT.metal,15.2,1.68,4.2,false);
+  box(1.2,0.22,0.7,MAT.gold,15.2,2.2,4.2,false);
+  for(const gz of [3.9,4.5]){
+    const grp=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,0.3),MAT.metal);
+    grp.position.set(14.7,1.45,gz);scene.add(grp);
+  }
+  // grinder
+  box(0.5,0.9,0.5,MAT.dark,15.2,1.7,2.6,false);
+  const hopper=new THREE.Mesh(new THREE.CylinderGeometry(0.24,0.16,0.5,18),
+    new THREE.MeshPhysicalMaterial({color:0x9a7a45,roughness:.15,transmission:.7,transparent:true,opacity:.5}));
+  hopper.position.set(15.2,2.4,2.6);scene.add(hopper);
+  // cups stack
+  for(let i=0;i<4;i++){
+    const cup=new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.06,0.11,14),MAT.ceramic);
+    cup.position.set(15.4,1.32+i*0.11,0.4);scene.add(cup);
+  }
+  // bean jars on back bar
+  for(let i=0;i<4;i++){
+    const jar=new THREE.Mesh(new THREE.CylinderGeometry(0.19,0.19,0.5,18),
+      new THREE.MeshPhysicalMaterial({color:0xffffff,roughness:.08,transmission:.85,transparent:true,opacity:.4}));
+    jar.position.set(18.2,2.9,-1.5+i*2.2);scene.add(jar);
+    const beans=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.16,0.3,14),MAT.bean);
+    beans.position.set(18.2,2.82,-1.5+i*2.2);scene.add(beans);
+  }
+  // menu board above
+  const b=new THREE.Mesh(new THREE.PlaneGeometry(5.4,3.4),
+    new THREE.MeshBasicMaterial({map:boardTex(['إسبريسو','فلات وايت','لاتيه','V60 مقطر','آيس أمريكانو'],'THE MENU')}));
+  b.position.set(18.5,4.35,2);b.rotation.y=-Math.PI/2;scene.add(b);   // clear the back bar
+})();
+
+/* --- Bakery display (west) --- */
+(function bakery(){
+  box(2.2,1.05,10,MAT.midWood,-15.6,0.525,2);
+  box(2.5,0.1,10.4,MAT.marble,-15.6,1.1,2,false);
+  // glass case
+  const g=new THREE.Mesh(new THREE.BoxGeometry(2.1,1.0,9.6),MAT.glass);
+  g.position.set(-15.6,1.65,2);scene.add(g);
+  box(2.3,0.08,10,MAT.gold,-15.6,2.18,2,false);
+  // pastry cards inside the case
+  BAKERY.forEach((p,i)=>{
+    const t=tex(p.img);
+    const card=new THREE.Mesh(new THREE.PlaneGeometry(1.25,0.85),
+      new THREE.MeshStandardMaterial({map:t,roughness:.8}));
+    card.position.set(-14.62,1.62,-1.9+i*1.6);card.rotation.y=-Math.PI/2;scene.add(card);
+  });
+  box(1.9,2.4,10,MAT.darkWood,-18.6,1.2,2);   // shelving behind
+  // bread loaves on shelves
+  for(let i=0;i<7;i++){
+    const l=new THREE.Mesh(new THREE.SphereGeometry(0.22,12,8),
+      new THREE.MeshStandardMaterial({color:SRGB(0xC08A4E),roughness:.85}));
+    l.scale.set(1,0.72,1.7);
+    l.position.set(-18.2,2.62,-2.4+i*1.5);scene.add(l);
+  }
+  const b=new THREE.Mesh(new THREE.PlaneGeometry(4.6,3),
+    new THREE.MeshBasicMaterial({map:boardTex(['كرواسون','دانش','كيك وتارت','حلويات'],'BAKERY')}));
+  b.position.set(-18.5,4.1,2);b.rotation.y=Math.PI/2;scene.add(b);   // clear the shelving
+})();
+
+/* --- seating --- */
+function chair(x,z,ry){
+  const g=new THREE.Group();
+  const seat=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.09,0.5),MAT.midWood);seat.position.y=0.47;
+  const back=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.56,0.08),MAT.midWood);back.position.set(0,0.76,-0.21);
+  g.add(seat,back);
+  for(const[lx,lz]of[[-0.2,-0.2],[0.2,-0.2],[-0.2,0.2],[0.2,0.2]]){
+    const l=new THREE.Mesh(new THREE.CylinderGeometry(0.026,0.026,0.47),MAT.darkWood);
+    l.position.set(lx,0.235,lz);g.add(l);
+  }
+  g.position.set(x,0,z);g.rotation.y=ry;
+  g.traverse(o=>{if(o.isMesh){o.castShadow=!IS_TOUCH;o.receiveShadow=true;}});
+  scene.add(g);
+  COL.push({x,z,hw:0.5,hd:0.5});
+}
+function table(x,z,r=0.62){
+  const top=new THREE.Mesh(new THREE.CylinderGeometry(r,r,0.07,26),MAT.marble);
+  top.position.set(x,0.74,z);top.castShadow=!IS_TOUCH;top.receiveShadow=true;scene.add(top);
+  const col=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.11,0.72,14),MAT.dark);
+  col.position.set(x,0.36,z);scene.add(col);
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.36,0.05,18),MAT.dark);
+  base.position.set(x,0.03,z);scene.add(base);
+  COL.push({x,z,hw:r+0.2,hd:r+0.2});
+  // a cup with steam
+  const cup=new THREE.Mesh(new THREE.CylinderGeometry(0.075,0.055,0.1,16),MAT.ceramic);
+  cup.position.set(x+0.18,0.82,z-0.1);scene.add(cup);
+  const sc=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.01,14),
+    new THREE.MeshStandardMaterial({color:SRGB(0x5A3A22),roughness:.4}));
+  sc.position.set(x+0.18,0.865,z-0.1);scene.add(sc);
+  steamSpots.push(new THREE.Vector3(x+0.18,0.92,z-0.1));
+}
+const steamSpots=[];
+[[-6,7],[0,7],[6,7],[-6,1],[6,1],[-3,-4],[3,-4]].forEach(p=>{
+  table(p[0],p[1]);
+  chair(p[0],p[1]+1.15,Math.PI);
+  chair(p[0],p[1]-1.15,0);
+});
+// long communal table (student/work zone)
+box(2.0,0.08,7,MAT.midWood,0,0.76,-4.5,false);
+for(const lx of [-0.8,0.8])for(const lz of [-7.4,-1.6])box(0.12,0.76,0.12,MAT.darkWood,lx,0.38,lz,false);
+COL.push({x:0,z:-4.5,hw:1.3,hd:3.8});
+for(let i=0;i<4;i++){chair(-1.5,-7+i*1.7,-Math.PI/2);chair(1.5,-7+i*1.7,Math.PI/2);}
+
+/* --- story wall (near entrance, west of door) --- */
+(function story(){
+  const frames=['assets/hero.jpg','assets/coffee-jar.jpg','assets/chocolate-collection.jpg'];
+  frames.forEach((f,i)=>{
+    const t=tex(f);
+    const pic=new THREE.Mesh(new THREE.PlaneGeometry(2.5,1.7),
+      new THREE.MeshStandardMaterial({map:t,roughness:.85}));
+    pic.position.set(-W+0.25,2.7,10.5-i*3.2);pic.rotation.y=Math.PI/2;scene.add(pic);
+    box(2.75,1.95,0.08,MAT.gold,-W+0.2,2.7,10.5-i*3.2,false,Math.PI/2);
+  });
+  const b=new THREE.Mesh(new THREE.PlaneGeometry(4,2.4),
+    new THREE.MeshBasicMaterial({map:boardTex(['منذ 2017','قصتنا'],'OUR STORY')}));
+  b.position.set(-W+0.26,4.6,7.3);b.rotation.y=Math.PI/2;scene.add(b);
+})();
+
+/* --- B2B desk (back-left) --- */
+(function b2b(){
+  box(3.4,0.78,1.6,MAT.darkWood,-11,0.39,-12.6);
+  box(3.6,0.07,1.8,MAT.marble,-11,0.8,-12.6,false);
+  chair(-11,-11.2,Math.PI);
+  // crates of product
+  for(let i=0;i<3;i++)box(0.9,0.6,0.7,MAT.midWood,-14.4,0.3+i*0.62,-12.4,i===0);
+  const b=new THREE.Mesh(new THREE.PlaneGeometry(4.4,2.7),
+    new THREE.MeshBasicMaterial({map:boardTex(['توريد للمقاهي','والفنادق والشركات'],'B2B')}));
+  b.position.set(-11,3.5,-D+0.26);scene.add(b);
+})();
+
+/* --- Catering table (back-right) --- */
+(function catering(){
+  box(4.2,0.78,1.5,MAT.midWood,11,0.39,-12.6);
+  box(4.4,0.06,1.7,MAT.marble,11,0.79,-12.6,false);
+  // tiered stands
+  for(const sx of [9.7,11,12.3]){
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.6),MAT.gold);
+    pole.position.set(sx,1.1,-12.6);scene.add(pole);
+    for(let t=0;t<2;t++){
+      const tier=new THREE.Mesh(new THREE.CylinderGeometry(0.34-t*0.09,0.34-t*0.09,0.03,20),MAT.marble);
+      tier.position.set(sx,0.95+t*0.42,-12.6);scene.add(tier);
+    }
+  }
+  const b=new THREE.Mesh(new THREE.PlaneGeometry(4.4,2.7),
+    new THREE.MeshBasicMaterial({map:boardTex(['تجهيز كامل','لمناسبتك'],'CATERING')}));
+  b.position.set(11,3.5,-D+0.26);scene.add(b);
+})();
+
+/* --- Logistic door (back centre) --- */
+(function logistic(){
+  box(6,4.4,0.3,MAT.metal,0,2.2,-D+0.3,false);
+  for(let i=0;i<8;i++)box(5.8,0.12,0.36,MAT.dark,0,0.5+i*0.5,-D+0.42,false);
+  // pallet + boxes
+  box(2.2,0.15,1.4,MAT.midWood,-3.4,0.075,-11.5);
+  box(0.85,0.8,0.8,MAT.midWood,-3.8,0.55,-11.5,false);
+  box(0.85,0.8,0.8,MAT.midWood,-2.9,0.55,-11.4,false);
+  const b=new THREE.Mesh(new THREE.PlaneGeometry(3.6,1.5),
+    new THREE.MeshBasicMaterial({map:boardTex(['الأسطول'],'LOGISTIC')}));
+  b.position.set(0,5.1,-D+0.26);scene.add(b);
+})();
+
+/* --- entrance door + rug --- */
+box(0.16,3.4,2.6,MAT.gold,0,1.7,D-0.35,false);
+const rug=new THREE.Mesh(new THREE.PlaneGeometry(4,2.4),
+  new THREE.MeshStandardMaterial({color:SRGB(0x6B4F38),roughness:.95}));
+rug.rotation.x=-Math.PI/2;rug.position.set(0,0.012,11.5);rug.receiveShadow=true;scene.add(rug);
+
+/* --- floating steam over cups --- */
+const steamGeo=new THREE.BufferGeometry();
+const sArr=new Float32Array(steamSpots.length*8*3),sMeta=[];
+steamSpots.forEach((p,i)=>{for(let k=0;k<8;k++){
+  const idx=(i*8+k)*3;
+  sArr[idx]=p.x+(Math.random()-.5)*.08;sArr[idx+1]=p.y+Math.random()*.5;sArr[idx+2]=p.z+(Math.random()-.5)*.08;
+  sMeta.push({base:p.y,sp:.003+Math.random()*.006});
+}});
+steamGeo.setAttribute('position',new THREE.BufferAttribute(sArr,3));
+function softDot(){const c=document.createElement('canvas');c.width=c.height=32;const x=c.getContext('2d');
+  const g=x.createRadialGradient(16,16,0,16,16,16);g.addColorStop(0,'rgba(255,250,240,.75)');g.addColorStop(1,'rgba(255,250,240,0)');
+  x.fillStyle=g;x.fillRect(0,0,32,32);return new THREE.CanvasTexture(c);}
+scene.add(new THREE.Points(steamGeo,new THREE.PointsMaterial({size:.16,map:softDot(),transparent:true,
+  opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending})));
+
+/* ---------------- CONTROLS ---------------- */
+const controls=new THREE.PointerLockControls(camera,document.body);
+const EYE=1.68;
+camera.position.set(0,EYE,12);
+controls.getObject().position.set(0,EYE,12);
+scene.add(controls.getObject());
+// default camera looks down -z, which is already into the room from the entrance
+
+const keys={};
+addEventListener('keydown',e=>{
+  keys[e.code]=true;
+  if(e.code==='KeyE')tryInteract();
+  if(e.code==='KeyM')toggleMap();
+  if(e.code==='Escape'){closePanel();closeMap();}
+});
+addEventListener('keyup',e=>keys[e.code]=false);
+
+/* touch look + joystick */
+let joy={x:0,y:0,active:false};
+if(IS_TOUCH){
+  $('#touch').classList.add('on');
+  $('#keysDesktop').innerHTML='<div class="key"><b><i>العصا</i></b>المشي</div><div class="key"><b><i>اسحب</i></b>النظر</div><div class="key"><b><i>تفاعل</i></b>الدخول</div>';
+  const st=$('#stick'),nub=$('#stickNub');
+  let sid=null,cx=0,cy=0;
+  st.addEventListener('pointerdown',e=>{sid=e.pointerId;const r=st.getBoundingClientRect();
+    cx=r.left+r.width/2;cy=r.top+r.height/2;joy.active=true;st.setPointerCapture(e.pointerId);});
+  st.addEventListener('pointermove',e=>{
+    if(e.pointerId!==sid)return;
+    let dx=e.clientX-cx,dy=e.clientY-cy;const m=Math.hypot(dx,dy),max=44;
+    if(m>max){dx=dx/m*max;dy=dy/m*max;}
+    nub.style.transform=`translate(${dx}px,${dy}px)`;
+    joy.x=dx/max;joy.y=dy/max;
+  });
+  const end=e=>{if(e.pointerId!==sid)return;sid=null;joy={x:0,y:0,active:false};nub.style.transform='';};
+  st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end);
+  // look drag anywhere on the right half
+  let lid=null,lx=0,ly=0;
+  addEventListener('pointerdown',e=>{
+    if(e.target.closest('#stick,#tapAct,#panel,#map,#gate,.compass'))return;
+    if(e.clientX<innerWidth*0.4)return;
+    lid=e.pointerId;lx=e.clientX;ly=e.clientY;
+  });
+  addEventListener('pointermove',e=>{
+    if(e.pointerId!==lid)return;
+    const o=controls.getObject();
+    o.rotation.y-=(e.clientX-lx)*0.004;
+    camera.rotation.x=Math.max(-1.2,Math.min(1.2,camera.rotation.x-(e.clientY-ly)*0.003));
+    lx=e.clientX;ly=e.clientY;
+  });
+  addEventListener('pointerup',e=>{if(e.pointerId===lid)lid=null;});
+  $('#tapAct').onclick=tryInteract;
+}
+
+/* ---------------- MOVEMENT + COLLISION ---------------- */
+const vel=new THREE.Vector3();
+const RADIUS=0.42;
+function collide(nx,nz){
+  for(const c of COL){
+    const dx=nx-c.x,dz=nz-c.z;
+    if(Math.abs(dx)<c.hw+RADIUS && Math.abs(dz)<c.hd+RADIUS){
+      // push out along the shallower axis
+      const ox=(c.hw+RADIUS)-Math.abs(dx),oz=(c.hd+RADIUS)-Math.abs(dz);
+      if(ox<oz) nx=c.x+Math.sign(dx||1)*(c.hw+RADIUS);
+      else      nz=c.z+Math.sign(dz||1)*(c.hd+RADIUS);
+    }
+  }
+  nx=Math.max(-W+0.7,Math.min(W-0.7,nx));
+  nz=Math.max(-D+0.7,Math.min(D-0.7,nz));
+  return [nx,nz];
+}
+
+/* ---------------- STATIONS / HUD ---------------- */
+let nearest=null;
+function updateStations(){
+  const p=controls.getObject().position;
+  let best=null,bd=1e9;
+  for(const s of STATIONS){
+    const d=Math.hypot(p.x-s.pos[0],p.z-s.pos[1]);
+    if(d<bd){bd=d;best=s;}
+  }
+  if(best){
+    $('#zoneName').textContent=best.name;
+    $('#zoneEn').textContent=best.en;
+  }
+  const hot=(bd<3.6&&best&&!best.noPanel&&best.id!=='seating')?best:null;
+  if(hot!==nearest){
+    nearest=hot;
+    $('#prompt').classList.toggle('on',!!hot);
+    $('#cross').classList.toggle('hot',!!hot);
+    if(hot)$('#promptText').textContent=PANELS[hot.id].prompt;
+  }
+}
+function tryInteract(){ if(nearest)openPanel(nearest.id); }
+
+/* ---------------- PANELS (the site content) ---------------- */
+const ref=p=>p+'-'+Math.random().toString(36).slice(2,7).toUpperCase()+'-'+String(Date.now()).slice(-4);
+const optHtml=a=>a.map(v=>`<option value="${v}">${v}</option>`).join('');
+function fieldHtml(f){
+  const req=f.req?'<span class="req">*</span>':'';
+  let ctrl;
+  if(f.type==='select')ctrl=`<select name="${f.n}"><option value="">اختر</option>${optHtml(f.opts)}</select>`;
+  else if(f.type==='textarea')ctrl=`<textarea name="${f.n}" placeholder="${f.ph||''}"></textarea>`;
+  else ctrl=`<input type="${f.type||'text'}" name="${f.n}" placeholder="${f.ph||''}">`;
+  return `<div class="fld" data-f="${f.n}"><label>${f.l} ${req}</label>${ctrl}<span class="err">${f.msg||'هذا الحقل مطلوب'}</span></div>`;
+}
+function formHtml(fields,btn){
+  let h='<form novalidate>';
+  for(let i=0;i<fields.length;i++){
+    if(fields[i].full){h+=`<div class="frow one">${fieldHtml(fields[i])}</div>`;continue;}
+    const pair=[fields[i]];
+    if(fields[i+1]&&!fields[i+1].full){pair.push(fields[i+1]);i++;}
+    h+=`<div class="frow ${pair.length===1?'one':''}">${pair.map(fieldHtml).join('')}</div>`;
+  }
+  h+=`<div class="btnrow"><button class="btn btn-p" type="submit">${btn}</button></div>
+      <div class="fnote">نسخة عرض: يُحفظ محلياً في متصفحك ولا يُرسل لخادم بعد.</div><div class="fok"></div></form>`;
+  return h;
+}
+function wireForm(root,prefix,okT,okB){
+  const f=root.querySelector('form'); if(!f)return;
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    let ok=true;
+    f.querySelectorAll('.fld').forEach(fl=>{
+      const c=fl.querySelector('input,select,textarea');if(!c)return;
+      fl.classList.remove('bad');
+      if(fl.querySelector('.req')&&!c.value.trim()){fl.classList.add('bad');ok=false;return;}
+      if(c.name==='phone'&&c.value.trim()&&!/^0?5\d{8}$/.test(c.value.replace(/\s|-/g,''))){fl.classList.add('bad');ok=false;}
+      if(c.type==='email'&&c.value.trim()&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.value)){fl.classList.add('bad');ok=false;}
+    });
+    if(!ok){f.querySelector('.fld.bad')?.scrollIntoView({block:'center'});return;}
+    const data={};new FormData(f).forEach((v,k)=>data[k]=v);
+    const r=ref(prefix);
+    try{const all=JSON.parse(localStorage.getItem('strangers_leads')||'[]');
+      all.push({ref:r,type:prefix,data,at:new Date().toISOString()});
+      localStorage.setItem('strangers_leads',JSON.stringify(all));}catch(_){}
+    const box=f.querySelector('.fok');
+    box.innerHTML=`<h4>${okT}</h4><p>${okB}</p><span class="ref">${r}</span>`;
+    box.classList.add('on');
+    f.querySelector('.btnrow').style.display='none';
+    box.scrollIntoView({block:'center'});
+  });
+}
+const LEAD_FIELDS=[
+ {n:'name',l:'الاسم',req:1},{n:'phone',l:'رقم الجوال',req:1,ph:'05XXXXXXXX',msg:'أدخل رقم جوال سعودي صحيح'},
+ {n:'city',l:'المدينة',type:'select',opts:CITIES,req:1},{n:'service',l:'نوع الخدمة',type:'select',opts:SERVICES,req:1},
+ {n:'need',l:'وصف مختصر للاحتياج',type:'textarea',full:1,req:1}
+];
+const PANELS={
+ story:{k:'OUR STORY',t:'بدأنا بفنجان، وصرنا منظومة',prompt:'اقرأ قصة سترينجرز',
+  html:()=>`<p class="lead">لسنا علامة قهوة فحسب. نحن شركة ضيافة سعودية تبني تجربة متكاملة: من حبة البن، إلى رغيف الكرواسون، إلى تجهيز مناسبة كاملة، إلى أسطول يوصلها في وقتها.</p>
+   <h3>المحطات</h3><div class="flowline">${TIMELINE.map(t=>`<div><b>${t[0]}</b><span>${t[1]}</span></div>`).join('')}</div>
+   <div class="btnrow"><a class="btn btn-g" href="strangers-ecosystem.html">افتح الموقع الكامل</a></div>`},
+ coffee:{k:'COFFEE BAR',t:'قهوةٌ تجمع الغرباء',prompt:'اطّلع على القائمة ورحلة الحبة',
+  html:()=>`<p class="lead">قهوة مختصة نحمّصها بأنفسنا، تُطحن عند الطلب وتُقدّم بلمسة فن. هذه رحلة كل حبة قبل أن تصل فنجانك.</p>
+   <h3>رحلة الحبة</h3><div class="flowline">${JOURNEY.map(j=>`<div><b>${j[0]}</b><span>${j[1]}</span></div>`).join('')}</div>
+   <h3>من القائمة</h3><div class="prod">${MENU.map(m=>`<figure><img loading="lazy" src="${m.img}" alt="${m.n}"><figcaption>${m.n}</figcaption></figure>`).join('')}</div>
+   <div class="chips"><i>إسبريسو</i><i>فلات وايت</i><i>لاتيه</i><i>V60</i><i>آيس أمريكانو</i></div>`},
+ bakery:{k:'BAKERY',t:'معمل يخبز لفروعنا ولشركائنا',prompt:'تصفّح منتجات المخبز',
+  html:()=>`<p class="lead">خطوط إنتاج يومية للكرواسون والدانش والكيك والحلويات، بمعايير جودة موثّقة وتغليف جاهز للتوريد.</p>
+   <div class="grid2">
+    <div class="mini"><b>06</b><h4>خطوط إنتاج</h4><p>كرواسون، دانش، كيك، تارت، مافن، وساندويتشات.</p></div>
+    <div class="mini"><b>FEFO</b><h4>إدارة المواد</h4><p>الأقرب انتهاءً يُصرف أولاً، مع تتبّع لكل دفعة.</p></div>
+    <div class="mini"><b>QC</b><h4>مراقبة الجودة</h4><p>فحص عند الاستلام وأثناء الإنتاج وقبل التغليف.</p></div>
+    <div class="mini"><b>24h</b><h4>جاهزية التوريد</h4><p>خطة يومية تستوعب طلبات الفروع والشركاء.</p></div>
+   </div>
+   <h3>ما نخبزه</h3><div class="prod">${BAKERY.map(m=>`<figure><img loading="lazy" src="${m.img}" alt="${m.n}"><figcaption>${m.n}</figcaption></figure>`).join('')}</div>
+   <h3>اطلب عينات</h3>${formHtml([
+     {n:'org',l:'اسم المنشأة',req:1},{n:'name',l:'الشخص المسؤول',req:1},
+     {n:'phone',l:'رقم الجوال',req:1,ph:'05XXXXXXXX',msg:'أدخل رقم جوال سعودي صحيح'},
+     {n:'city',l:'المدينة',type:'select',opts:CITIES,req:1},
+     {n:'category',l:'الفئة المطلوبة',type:'select',opts:['كرواسون','دانش','كيك وتارت','ساندويتشات','حلويات','تشكيلة كاملة'],req:1,full:1}
+   ],'اطلب العينات')}`,
+  wire:r=>wireForm(r,'SMP','تم استلام طلب العينات','سيتواصل معك فريق المخبز لترتيب الإرسال وقائمة الأسعار.')},
+ b2b:{k:'B2B DESK',t:'نورّد للمقاهي والفنادق والشركات',prompt:'افتح حساباً تجارياً',
+  html:()=>`<p class="lead">حساب تجاري بقائمة أسعار مخصصة، شروط دفع، سجل طلبات، وفواتير. من التسجيل إلى التسليم في مسار واحد.</p>
+   <h3>مسار الطلب</h3><div class="flowline">${B2B_FLOW.map(f=>`<div><b>${f[0]}</b><span>${f[1]}</span></div>`).join('')}</div>
+   <h3>سجّل منشأتك</h3>${formHtml([
+     {n:'org',l:'اسم المنشأة',req:1},{n:'cr',l:'رقم السجل التجاري',req:1},
+     {n:'activity',l:'نوع النشاط',type:'select',opts:['مقهى','مطعم','فندق','شركة','منظم فعاليات','جامعة أو مدرسة','متجر','جهة حكومية','أخرى'],req:1},
+     {n:'name',l:'الشخص المسؤول',req:1},
+     {n:'phone',l:'رقم الجوال',req:1,ph:'05XXXXXXXX',msg:'أدخل رقم جوال سعودي صحيح'},
+     {n:'city',l:'المدينة',type:'select',opts:CITIES,req:1},
+     {n:'qty',l:'الكمية المتوقعة شهرياً',type:'number',req:1},
+     {n:'freq',l:'معدل الطلب',type:'select',opts:['يومي','أسبوعي','نصف شهري','شهري'],req:1}
+   ],'أرسل التسجيل')}`,
+  wire:r=>wireForm(r,'B2B','تم استلام طلب التسجيل','يراجع فريق B2B بياناتك ويتواصل معك لإصدار العضوية التجارية.')},
+ catering:{k:'CATERING',t:'نجهّز مناسبتك بالكامل',prompt:'اطلب عرض سعر للكاترينج',
+  html:()=>`<p class="lead">من اجتماع عمل صغير إلى حفل بمئات الضيوف. محطة قهوة، مخبوزات، حلويات، وطاقم تقديم.</p>
+   <h3>الباقات</h3><div class="grid2">${CAT_PKGS.map(p=>`<div class="mini"><b>${p[0]}</b><p>${p[1]}</p></div>`).join('')}</div>
+   <h3>تفاصيل مناسبتك</h3>${formHtml([
+     {n:'name',l:'الاسم',req:1},{n:'phone',l:'رقم الجوال',req:1,ph:'05XXXXXXXX',msg:'أدخل رقم جوال سعودي صحيح'},
+     {n:'eventtype',l:'نوع المناسبة',type:'select',opts:['اجتماع عمل','مؤتمر','افتتاح','حفل زواج','مناسبة خاصة','فعالية جامعية','تجمّع عائلي','أخرى'],req:1},
+     {n:'package',l:'الباقة',type:'select',opts:CAT_PKGS.map(p=>p[0]),req:1},
+     {n:'date',l:'تاريخ المناسبة',type:'date',req:1},{n:'guests',l:'عدد الضيوف',type:'number',req:1},
+     {n:'city',l:'المدينة',type:'select',opts:CITIES,req:1},
+     {n:'location',l:'موقع المناسبة',type:'textarea',full:1,req:1}
+   ],'اطلب عرض سعر')}`,
+  wire:r=>wireForm(r,'CAT','تم استلام طلب الكاترينج','سيتواصل معك مسؤول الكاترينج لتثبيت التفاصيل وإصدار عرض السعر.')},
+ logistic:{k:'LOGISTIC',t:'الأسطول الذي يربط المنظومة',prompt:'تعرّف على خدمات اللوجستك',
+  html:()=>`<p class="lead">نقل بين الفروع، توصيل منتجات المخبز، دعم طلبات B2B والكاترينج، وتتبّع كامل للشحنة.</p>
+   <div class="grid2">
+    <div class="mini"><b>01</b><h4>النقل بين الفروع</h4><p>تحريك المنتجات والمواد حسب الحاجة اليومية.</p></div>
+    <div class="mini"><b>02</b><h4>توصيل المخبز</h4><p>من المعمل إلى الفروع والشركاء بحرارة مضبوطة.</p></div>
+    <div class="mini"><b>03</b><h4>دعم B2B</h4><p>تسليم طلبات العملاء التجاريين في مواعيدها.</p></div>
+    <div class="mini"><b>04</b><h4>دعم الكاترينج</h4><p>نقل المعدات والمنتجات إلى موقع المناسبة.</p></div>
+   </div>
+   <h3>تواصل مع الفريق</h3>${formHtml(LEAD_FIELDS,'أرسل الطلب')}`,
+  wire:r=>wireForm(r,'LEAD','تم استلام طلبك','سجّلنا طلبك وأسندناه للفريق المختص.')}
+};
+function openPanel(id){
+  const p=PANELS[id];if(!p)return;
+  $('#pk').textContent=p.k;$('#pt').textContent=p.t;
+  const body=$('#pb');body.innerHTML=p.html();
+  if(p.wire)p.wire(body);
+  body.scrollTop=0;
+  $('#panel').classList.add('on');
+  if(controls.isLocked)controls.unlock();
+}
+function closePanel(){$('#panel').classList.remove('on');}
+$('#panelClose').onclick=closePanel;
+$('#panelScrim').onclick=closePanel;
+
+/* ---------------- MAP / TELEPORT ---------------- */
+$('#mapList').innerHTML=STATIONS.map(s=>`<button data-id="${s.id}"><b>${s.name}</b><span class="mono">${s.en}</span></button>`).join('');
+$('#mapList').onclick=e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const s=STATIONS.find(x=>x.id===b.dataset.id);if(!s)return;
+  const o=controls.getObject();
+  // stand a little back from the station, facing it
+  const dx=s.pos[0]-s.look[0],dz=s.pos[1]-s.look[1];
+  const len=Math.hypot(dx,dz)||1;
+  o.position.set(s.pos[0]-dx/len*2.6,EYE,s.pos[1]-dz/len*2.6);
+  o.rotation.y=Math.atan2(-(s.pos[0]-o.position.x),-(s.pos[1]-o.position.z));
+  camera.rotation.x=0;
+  closeMap();
+};
+function toggleMap(){$('#map').classList.toggle('on');if($('#map').classList.contains('on')&&controls.isLocked)controls.unlock();}
+function closeMap(){$('#map').classList.remove('on');}
+$('#mapBtn').onclick=toggleMap;
+$('#map').onclick=e=>{if(e.target.id==='map')closeMap();};
+
+/* ---------------- AMBIENT SOUND (opt-in) ---------------- */
+let audioCtx=null,ambientOn=false;
+$('#soundBtn').onclick=()=>{
+  if(!audioCtx){
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    // gentle café hum: filtered noise bed
+    const buf=audioCtx.createBuffer(1,audioCtx.sampleRate*2,audioCtx.sampleRate);
+    const dd=buf.getChannelData(0);
+    for(let i=0;i<dd.length;i++)dd[i]=(Math.random()*2-1)*0.13;
+    const src=audioCtx.createBufferSource();src.buffer=buf;src.loop=true;
+    const flt=audioCtx.createBiquadFilter();flt.type='lowpass';flt.frequency.value=420;
+    const g=audioCtx.createGain();g.gain.value=0.05;
+    src.connect(flt);flt.connect(g);g.connect(audioCtx.destination);src.start();
+    window.__amb=g;ambientOn=true;$('#soundBtn').style.color='#B8955A';
+  }else{
+    ambientOn=!ambientOn;
+    window.__amb.gain.value=ambientOn?0.05:0;
+    $('#soundBtn').style.color=ambientOn?'#B8955A':'';
+  }
+};
+
+/* ---------------- GATE / START ---------------- */
+$('#enterBtn').onclick=()=>{
+  $('#gate').classList.remove('on');
+  if(!IS_TOUCH)controls.lock();
+};
+controls.addEventListener('unlock',()=>{
+  if(!$('#panel').classList.contains('on')&&!$('#map').classList.contains('on'))$('#gate').classList.add('on');
+});
+controls.addEventListener('lock',()=>$('#gate').classList.remove('on'));
+canvas.addEventListener('click',()=>{
+  if(IS_TOUCH)return;
+  if(!controls.isLocked&&!$('#panel').classList.contains('on')&&!$('#map').classList.contains('on'))controls.lock();
+});
+
+/* ---------------- LOOP ---------------- */
+const clock=new THREE.Clock();
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),0.05);
+  const o=controls.getObject();
+  const run=keys['ShiftLeft']||keys['ShiftRight'];
+  const speed=(run?6.4:3.3);
+
+  let fwd=0,strafe=0;
+  if(keys['KeyW']||keys['ArrowUp'])fwd+=1;
+  if(keys['KeyS']||keys['ArrowDown'])fwd-=1;
+  if(keys['KeyA']||keys['ArrowLeft'])strafe-=1;
+  if(keys['KeyD']||keys['ArrowRight'])strafe+=1;
+  if(IS_TOUCH&&joy.active){fwd+=-joy.y;strafe+=joy.x;}
+
+  const active=(controls.isLocked||IS_TOUCH)&&!$('#panel').classList.contains('on')&&!$('#map').classList.contains('on');
+  if(active&&(fwd||strafe)){
+    const dir=new THREE.Vector3();
+    camera.getWorldDirection(dir);dir.y=0;dir.normalize();
+    const right=new THREE.Vector3().crossVectors(dir,new THREE.Vector3(0,1,0)).normalize();
+    vel.set(0,0,0).addScaledVector(dir,fwd).addScaledVector(right,strafe);
+    if(vel.lengthSq()>0)vel.normalize().multiplyScalar(speed*dt);
+    const [nx,nz]=collide(o.position.x+vel.x,o.position.z+vel.z);
+    o.position.x=nx;o.position.z=nz;
+    // subtle head bob
+    o.position.y=EYE+Math.sin(clock.elapsedTime*(run?13:8.5))*(run?0.045:0.028);
+  }else{
+    o.position.y+=(EYE-o.position.y)*0.14;
+  }
+
+  // steam drift
+  const sp=steamGeo.attributes.position.array;
+  for(let i=0;i<sMeta.length;i++){
+    sp[i*3+1]+=sMeta[i].sp;
+    if(sp[i*3+1]>sMeta[i].base+0.75)sp[i*3+1]=sMeta[i].base;
+  }
+  steamGeo.attributes.position.needsUpdate=true;
+
+  updateStations();
+  renderer.render(scene,camera);
+}
+animate();
+
+addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+
+/* ---------------- BOOT ---------------- */
+updateLoad();
+function finishLoad(){
+  $('#load').classList.add('gone');
+  $('#gate').classList.add('on');
+  setTimeout(()=>$('#load').style.display='none',800);
+}
+// wait for textures (or bail after 6s so a slow asset never traps the user)
+let waited=0;
+const poll=setInterval(()=>{
+  waited+=200;
+  if((pending&&done>=pending)||waited>6000){clearInterval(poll);$('#barFill').style.width='100%';$('#pct').textContent='100%';setTimeout(finishLoad,320);}
+},200);
+</script>
+</body>
+</html>

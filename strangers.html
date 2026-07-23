@@ -133,7 +133,8 @@ h1,h2,h3{font-weight:400;letter-spacing:-.015em;line-height:1.08}
 
 /* ---------- SECTION RHYTHM (Onyx: alternating paper / sand) ---------- */
 section{padding:clamp(72px,11vh,132px) 0}
-.sand{background:var(--sand)}
+/* translucent so the 3D beans read faintly behind text-led sections */
+.sand{background:rgba(238,233,223,.88)}
 .ink{background:var(--ink);color:var(--paper)}
 .ink .body{color:rgba(253,251,247,.72)}
 .ink .small{color:rgba(253,251,247,.55)}
@@ -343,7 +344,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </div>
 
 <!-- STORY -->
-<section id="story">
+<section id="story" data-act="1">
   <div class="wrap">
     <div class="split wide-img">
       <div class="reveal">
@@ -367,7 +368,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- FEATURED COFFEE (Onyx pattern: one coffee, its notes, one CTA) -->
-<section class="ink see-3d on-dark" id="coffee" data-act="1">
+<section class="ink see-3d on-dark" id="coffee" data-act="2">
   <div class="wrap">
     <div class="feature">
       <figure class="reveal bean-stage">
@@ -392,7 +393,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- MENU GRID -->
-<section class="sand" id="menu">
+<section class="sand" id="menu" data-act="3">
   <div class="wrap">
     <div class="reveal" style="max-width:60ch">
       <p class="eyebrow">القائمة</p>
@@ -404,7 +405,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- DIVISIONS (EMP family model) -->
-<section id="companies" data-act="2">
+<section id="companies" data-act="4">
   <div class="wrap">
     <div class="reveal" style="max-width:62ch">
       <p class="eyebrow">أقسامنا</p>
@@ -419,7 +420,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- PLACES as chapters -->
-<section class="sand" id="places">
+<section class="sand" id="places" data-act="5">
   <div class="wrap">
     <div class="reveal" style="max-width:60ch">
       <p class="eyebrow">فروعنا</p>
@@ -431,7 +432,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- CREDIBILITY -->
-<section class="ink see-3d on-dark" data-act="3">
+<section class="ink see-3d on-dark" data-act="6">
   <div class="wrap">
     <div class="reveal" style="max-width:58ch">
       <p class="eyebrow">بالأرقام</p>
@@ -448,7 +449,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- CONTACT -->
-<section id="contact">
+<section id="contact" data-act="7">
   <div class="wrap">
     <div class="split">
       <div class="reveal">
@@ -829,15 +830,18 @@ function initBeans(){
   solo.scale.setScalar(1.5);scene.add(solo);
 
   /* ---- ACTS: each section tagged data-act gets its own 3D state ---- */
+  /* One act per section, so the beans are present the whole way down.
+     Over light, text-led sections they sit small and pushed to the margins
+     (high spread, low cluster) so nothing competes with the copy. */
   const ACTS=[
-    // 0: hero — wide drifting cluster
-    {cluster:1, solo:0, cam:8.4, spread:1.35, soloY:0,   clusterY:0},
-    // 1: coffee close-up — one bean, big and slow
-    {cluster:.22,solo:1, cam:5.6, spread:.75, soloY:0,   clusterY:-1.4},
-    // 2: divisions — cluster returns, pushed back behind the list
-    {cluster:.85,solo:0, cam:9.6, spread:1.9,  soloY:0,  clusterY:.3},
-    // 3: numbers — tight orbit
-    {cluster:1, solo:0, cam:7.2, spread:1.05, soloY:0,   clusterY:0}
+    /* 0 hero     */ {cluster:1,  solo:0, cam:8.4,  spread:1.35, clusterY:0},
+    /* 1 story    */ {cluster:.5, solo:0, cam:10.4, spread:2.7,  clusterY:.2},
+    /* 2 coffee   */ {cluster:.22,solo:1, cam:5.6,  spread:.75,  clusterY:-1.4},
+    /* 3 menu     */ {cluster:.42,solo:0, cam:11.0, spread:3.0,  clusterY:-.2},
+    /* 4 divisions*/ {cluster:.85,solo:0, cam:9.6,  spread:1.9,  clusterY:.3},
+    /* 5 places   */ {cluster:.42,solo:0, cam:11.0, spread:3.0,  clusterY:.2},
+    /* 6 numbers  */ {cluster:1,  solo:0, cam:7.2,  spread:1.05, clusterY:0},
+    /* 7 contact  */ {cluster:.55,solo:0, cam:10.0, spread:2.5,  clusterY:-.15}
   ];
   const state={cluster:1,solo:0,cam:8.4,spread:1.35,clusterY:0};
   let target={...ACTS[0]}, veilOn=false;

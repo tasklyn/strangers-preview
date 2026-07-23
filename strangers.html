@@ -32,6 +32,26 @@ html{scroll-behavior:smooth}
 html,body{overflow-x:clip}
 body{font-family:var(--sans);background:var(--paper);color:var(--ink);
   font-size:16.5px;line-height:1.85;-webkit-font-smoothing:antialiased}
+
+/* ---------- GLOBAL 3D STAGE ---------- */
+/* One WebGL context for the whole document. Sections with a solid background
+   sit on top of it; sections marked .see-3d let it show through. */
+/* layer stack: hero photo (0) -> 3D beans (1) -> veil (2) -> content (3) */
+#heroPhoto{position:fixed;inset:0;z-index:0;background:#17130F;transition:opacity .7s var(--ease)}
+#heroPhoto img{width:100%;height:100%;object-fit:cover;opacity:.42}
+#stage3d{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;
+  opacity:0;transition:opacity .8s var(--ease)}
+#stage3d.ready{opacity:1}
+.nav,section,footer,.ways{position:relative;z-index:3}
+section.see-3d{background:transparent!important}
+section.see-3d.on-dark{color:var(--paper)}
+section.see-3d.on-dark .body{color:rgba(253,251,247,.74)}
+section.see-3d.on-dark .h2,section.see-3d.on-dark h3{color:var(--paper)}
+/* z-0, after #heroPhoto in the DOM: it darkens the backdrop but stays behind the beans */
+.veil-dark{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
+  background:radial-gradient(130% 100% at 50% 45%,#1E1913 0%,#17130F 55%,#0E0B09 100%);
+  transition:opacity .8s var(--ease)}
+.veil-dark.on{opacity:1}
 img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
@@ -83,13 +103,14 @@ h1,h2,h3{font-weight:400;letter-spacing:-.015em;line-height:1.08}
 .burger i{width:20px;height:1.4px;background:var(--ink)}
 
 /* ---------- HERO (Dishoom: a feeling, not a product) ---------- */
-.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;padding:120px 0 clamp(46px,7vh,80px)}
-.hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
-.hero-bg img{width:100%;height:100%;object-fit:cover;transform:scale(1.04)}
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;
+  padding:120px 0 clamp(46px,7vh,80px);background:transparent}
+/* the photo itself now lives in the fixed #heroPhoto layer, behind the beans */
+.hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
 .hero-bg::after{content:"";position:absolute;inset:0;
   background:
-    linear-gradient(to top,rgba(17,13,10,.92) 4%,rgba(17,13,10,.55) 46%,rgba(17,13,10,.34) 74%,rgba(17,13,10,.62) 100%),
-    linear-gradient(to left,rgba(17,13,10,.5),transparent 62%)}
+    linear-gradient(to top,rgba(17,13,10,.92) 4%,rgba(17,13,10,.5) 46%,rgba(17,13,10,.18) 74%,rgba(17,13,10,.5) 100%),
+    linear-gradient(to left,rgba(17,13,10,.45),transparent 62%)}
 .hero .wrap{position:relative;z-index:2;color:#FDFBF7}
 .hero .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:rgba(253,251,247,.72);margin-bottom:22px}
 .hero h1{max-width:19ch;color:#FDFBF7}
@@ -147,9 +168,8 @@ section{padding:clamp(72px,11vh,132px) 0}
 .feature figure{aspect-ratio:1;overflow:hidden;border-radius:var(--r);background:var(--paper)}
 .feature figure img{width:100%;height:100%;object-fit:cover}
 /* 3D stage: canvas replaces the photo once WebGL is confirmed working */
-/* beats `.feature figure` on specificity, which sets the paper background */
-.feature figure.bean-stage{position:relative;cursor:grab;
-  background:radial-gradient(120% 100% at 50% 40%,#241C16 0%,#17130F 62%,#100D0A 100%)}
+/* transparent so the fixed global canvas shows through this slot */
+.feature figure.bean-stage{position:relative;cursor:grab;background:transparent;overflow:visible}
 .bean-stage:active{cursor:grabbing}
 .bean-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:none;touch-action:none}
 .bean-stage.live canvas{display:block}
@@ -261,6 +281,10 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </head>
 <body>
 
+<div id="heroPhoto"><img src="assets/hero.jpg" alt="" fetchpriority="high"></div>
+<canvas id="stage3d"></canvas>
+<div class="veil-dark" id="veil"></div>
+
 <header class="nav" id="nav">
   <div class="wrap">
     <a class="brand" href="#top">
@@ -281,7 +305,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 
 <!-- HERO: a feeling, not a product -->
 <section class="hero" id="top">
-  <div class="hero-bg"><img src="assets/hero.jpg" alt="ضيافة سترينجرز" fetchpriority="high"></div>
+  <div class="hero-bg"></div>
   <div class="wrap">
     <p class="kicker">SINCE 2017 · الرياض</p>
     <h1 class="display">تعال غريباً،<br>وارحل صديقاً.</h1>
@@ -343,7 +367,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- FEATURED COFFEE (Onyx pattern: one coffee, its notes, one CTA) -->
-<section class="ink" id="coffee">
+<section class="ink see-3d on-dark" id="coffee" data-act="1">
   <div class="wrap">
     <div class="feature">
       <figure class="reveal bean-stage">
@@ -380,7 +404,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- DIVISIONS (EMP family model) -->
-<section id="companies">
+<section id="companies" data-act="2">
   <div class="wrap">
     <div class="reveal" style="max-width:62ch">
       <p class="eyebrow">أقسامنا</p>
@@ -407,7 +431,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </section>
 
 <!-- CREDIBILITY -->
-<section class="ink">
+<section class="ink see-3d on-dark" data-act="3">
   <div class="wrap">
     <div class="reveal" style="max-width:58ch">
       <p class="eyebrow">بالأرقام</p>
@@ -639,11 +663,11 @@ if(!REDUCE){
    ===================================================================== */
 function initBeans(){
   if(REDUCE||!window.THREE)return;
-  const canvas=$('#beans'), stage=canvas.parentElement;
+  const canvas=$('#stage3d'), stage=$('.bean-stage');
   let renderer;
   try{ renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true}); }
   catch(e){ return; }                       // no WebGL: the photo stays
-  const size=()=>({w:stage.clientWidth||600,h:stage.clientHeight||600});
+  const size=()=>({w:innerWidth,h:innerHeight});
   let {w,h}=size();
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.setSize(w,h,false);
@@ -709,51 +733,107 @@ function initBeans(){
   const key=new THREE.DirectionalLight(0xfff1da,0.62);key.position.set(4,6,5);scene.add(key);
   const rim=new THREE.PointLight(0xC79A5E,0.45,30);rim.position.set(-6,-1,3);scene.add(rim);
 
-  // pointer parallax + drag-to-spin with inertia
+  /* ---- a single hero bean for the close-up act ---- */
+  const solo=new THREE.Mesh(beanGeo(),mat);
+  solo.scale.setScalar(1.5);scene.add(solo);
+
+  /* ---- ACTS: each section tagged data-act gets its own 3D state ---- */
+  const ACTS=[
+    // 0: hero — wide drifting cluster
+    {cluster:1, solo:0, cam:8.4, spread:1.35, soloY:0,   clusterY:0},
+    // 1: coffee close-up — one bean, big and slow
+    {cluster:.22,solo:1, cam:5.6, spread:.75, soloY:0,   clusterY:-1.4},
+    // 2: divisions — cluster returns, pushed back behind the list
+    {cluster:.85,solo:0, cam:9.6, spread:1.9,  soloY:0,  clusterY:.3},
+    // 3: numbers — tight orbit
+    {cluster:1, solo:0, cam:7.2, spread:1.05, soloY:0,   clusterY:0}
+  ];
+  const state={cluster:1,solo:0,cam:8.4,spread:1.35,clusterY:0};
+  let target={...ACTS[0]}, veilOn=false;
+
+  const veil=$('#veil');
+  const acts=[...document.querySelectorAll('[data-act]')];
+  const heroEl=document.querySelector('.hero');
+
+  function pickAct(){
+    const mid=innerHeight*0.5;
+    let chosen=0, dark=false;
+    for(const el of acts){
+      const r=el.getBoundingClientRect();
+      if(r.top<=mid && r.bottom>=mid){
+        chosen=+el.dataset.act;
+        dark=el.classList.contains('on-dark');
+        break;
+      }
+    }
+    // hero still on screen wins
+    if(heroEl){const hr=heroEl.getBoundingClientRect();
+      if(hr.bottom>mid){chosen=0;dark=false;}}
+    target=ACTS[chosen]||ACTS[0];
+    if(dark!==veilOn){veilOn=dark;veil.classList.toggle('on',dark);}
+    // the photograph belongs to the hero only; fade it out past it
+    const hp=$('#heroPhoto');
+    if(hp&&heroEl){
+      const hr=heroEl.getBoundingClientRect();
+      hp.style.opacity=hr.bottom>0?Math.max(0,Math.min(1,hr.bottom/innerHeight)):0;
+    }
+  }
+  addEventListener('scroll',pickAct,{passive:true});
+  addEventListener('resize',pickAct);
+  pickAct();
+
+  /* ---- pointer parallax + drag-to-spin ---- */
   let mx=0,my=0,tx=0,ty=0,drag=false,lx=0,ly=0,vy=0,vx=0,ry=0,rx=0;
-  stage.addEventListener('pointermove',e=>{
-    const r=stage.getBoundingClientRect();
-    tx=(e.clientX-r.left)/r.width-.5; ty=(e.clientY-r.top)/r.height-.5;
+  addEventListener('pointermove',e=>{
+    tx=e.clientX/innerWidth-.5; ty=e.clientY/innerHeight-.5;
     if(drag){vy+=(e.clientX-lx)*0.005;vx+=(e.clientY-ly)*0.004;lx=e.clientX;ly=e.clientY;}
-  });
-  stage.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;stage.setPointerCapture(e.pointerId);});
-  const stop=()=>drag=false;
-  stage.addEventListener('pointerup',stop);stage.addEventListener('pointercancel',stop);
-  stage.addEventListener('pointerleave',()=>{tx=0;ty=0;});
-
-  // only render while the section is on screen
-  let visible=false;
-  new IntersectionObserver(es=>{visible=es[0].isIntersecting;},{threshold:.02}).observe(stage);
-
-  let scrollP=0;
-  const onS=()=>{const r=stage.getBoundingClientRect();
-    scrollP=Math.max(-1,Math.min(1,(r.top+r.height/2-innerHeight/2)/innerHeight));};
-  addEventListener('scroll',onS,{passive:true});onS();
+  },{passive:true});
+  if(stage){
+    stage.style.pointerEvents='auto';
+    stage.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY;
+      stage.setPointerCapture(e.pointerId);});
+    const stop=()=>drag=false;
+    stage.addEventListener('pointerup',stop);stage.addEventListener('pointercancel',stop);
+  }
 
   const clock=new THREE.Clock();
   function frame(){
     requestAnimationFrame(frame);
-    if(!visible)return;
     const t=clock.getElapsedTime();
+    // ease every act property so section changes glide instead of snapping
+    for(const k of ['cluster','solo','cam','spread','clusterY'])
+      state[k]+=((target[k]??0)-state[k])*0.045;
+
     mx+=(tx-mx)*.05; my+=(ty-my)*.05;
     ry+=vy; rx+=vx; vy*=.94; vx*=.94; rx=Math.max(-.7,Math.min(.7,rx));
+
     for(let i=0;i<COUNT;i++){
       const b=beans[i];
-      dummy.position.set(b.base.x+Math.sin(t*b.spd+i)*.22,
-                         b.base.y+Math.cos(t*b.spd*.8+i)*.22,
-                         b.base.z);
+      dummy.position.set((b.base.x+Math.sin(t*b.spd+i)*.22)*state.spread,
+                         (b.base.y+Math.cos(t*b.spd*.8+i)*.22)*state.spread+state.clusterY,
+                         b.base.z*state.spread);
       dummy.rotation.set(b.rot.x+t*b.spd*b.dir,b.rot.y+t*b.spd*.7,b.rot.z+t*b.spd*.4*b.dir);
-      dummy.scale.setScalar(b.scl);
+      dummy.scale.setScalar(b.scl*state.cluster);
       dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
     }
     mesh.instanceMatrix.needsUpdate=true;
-    group.rotation.y=mx*.6+ry+scrollP*0.5;   // scroll gently turns the cluster
-    group.rotation.x=my*.4+rx;
-    group.position.y=-scrollP*0.6;
+
+    // desktop: sits in the figure column (right, in RTL). narrow: centred,
+    // because the two-column feature collapses to one below 960px.
+    const wide=innerWidth>960;
+    solo.scale.setScalar((wide?1.05:1.25)*state.solo);
+    solo.visible=state.solo>0.02;
+    solo.position.set(wide?1.75:0,0,0);
+    solo.rotation.set(0.25+my*.5+rx, t*0.35+mx*.9+ry, 0.12);
+
+    group.rotation.y=mx*.5+ry;
+    group.rotation.x=my*.3+rx;
+    camera.position.z+=(state.cam-camera.position.z)*0.05;
     renderer.render(scene,camera);
   }
   frame();
-  stage.classList.add('live');
+  canvas.classList.add('ready');
+  if(stage)stage.classList.add('live');
 
   addEventListener('resize',()=>{
     const s=size();

@@ -558,37 +558,79 @@ function initScene(){
   const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.88;
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, window.innerWidth/window.innerHeight, 0.1, 100);
   camera.position.set(0, 0, 8);
 
-  // --- warm lighting ---
-  scene.add(new THREE.HemisphereLight(0xfff2dd, 0x3a2a1c, 0.9));
-  const key = new THREE.DirectionalLight(0xfff0d8, 1.15); key.position.set(4, 6, 5); scene.add(key);
-  const rim = new THREE.PointLight(0xB8955A, 1.5, 30); rim.position.set(-6, -2, 4); scene.add(rim);
-  const fill = new THREE.PointLight(0xffd9a0, 0.5, 40); fill.position.set(3,-4,6); scene.add(fill);
+  // --- procedural warm studio environment for real reflections ---
+  function envTexture(){
+    const c=document.createElement('canvas');c.width=512;c.height=256;const x=c.getContext('2d');
+    const g=x.createLinearGradient(0,0,0,256);
+    g.addColorStop(0,'#fff6e8');g.addColorStop(.45,'#e8d8be');g.addColorStop(.72,'#6b563c');g.addColorStop(1,'#241c15');
+    x.fillStyle=g;x.fillRect(0,0,512,256);
+    const h=x.createRadialGradient(140,60,4,140,60,110);
+    h.addColorStop(0,'rgba(255,255,255,.95)');h.addColorStop(1,'rgba(255,255,255,0)');
+    x.fillStyle=h;x.fillRect(0,0,512,256);
+    const t=new THREE.CanvasTexture(c);
+    t.mapping=THREE.EquirectangularReflectionMapping;
+    t.encoding=THREE.sRGBEncoding;
+    return t;
+  }
+  const pmrem=new THREE.PMREMGenerator(renderer); pmrem.compileEquirectangularShader();
+  scene.environment=pmrem.fromEquirectangular(envTexture()).texture;
 
-  // --- build one coffee-bean geometry (deformed sphere w/ centre groove) ---
+  // --- micro surface roughness (roasted, slightly porous) ---
+  function roughTexture(){
+    const s=256,c=document.createElement('canvas');c.width=c.height=s;const x=c.getContext('2d');
+    x.fillStyle='#9a9a9a';x.fillRect(0,0,s,s);
+    const im=x.getImageData(0,0,s,s),d=im.data;
+    for(let i=0;i<d.length;i+=4){const n=140+Math.random()*95;d[i]=d[i+1]=d[i+2]=n;}
+    x.putImageData(im,0,0);
+    for(let i=0;i<420;i++){x.fillStyle='rgba(60,60,60,'+(0.18+Math.random()*0.3)+')';
+      x.beginPath();x.arc(Math.random()*s,Math.random()*s,Math.random()*2.1,0,7);x.fill();}
+    const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(2,2);return t;
+  }
+
+  // --- true coffee-bean geometry: ellipsoid, flattened, deep wavy crease, tapered ends ---
   function makeBean(){
-    const g = new THREE.SphereGeometry(1, 40, 28);
-    g.scale(0.72, 1.0, 0.5);            // ellipsoid, bean-like
-    const pos = g.attributes.position;
-    const v = new THREE.Vector3();
+    const g=new THREE.SphereGeometry(1,128,84);
+    const pos=g.attributes.position,v=new THREE.Vector3();
     for(let i=0;i<pos.count;i++){
-      v.fromBufferAttribute(pos, i);
-      // carve a groove where |x| is small (the bean crease), front & back
-      const crease = Math.exp(-(v.x*v.x)/0.02);      // 1 near x=0
-      const dir = Math.sign(v.z) || 1;
-      v.z -= dir * crease * 0.34;                     // push both faces inward at centre
-      v.z *= 1 + 0.06*Math.cos(v.y*3.0);              // subtle organic wobble
-      pos.setXYZ(i, v.x, v.y, v.z);
+      v.fromBufferAttribute(pos,i);
+      v.x*=0.74; v.y*=1.0; v.z*=0.60;                       // bean proportions
+      const taper=1-0.20*Math.pow(Math.abs(v.y),2.4);       // taper the tips
+      v.x*=taper; v.z*=taper;
+      v.z*=1-0.10*Math.pow(Math.abs(v.z),2);                // flatten broad faces
+      const wave=0.055*Math.sin(v.y*2.6);                   // wavy centre line
+      const dx=v.x-wave;
+      const crease=Math.exp(-(dx*dx)/0.016);
+      const dir=Math.sign(v.z)||1;
+      v.z-=dir*crease*0.30;                                 // the crease
+      const lip=Math.exp(-Math.pow(Math.abs(dx)-0.19,2)/0.006);
+      v.z+=dir*lip*0.035;                                   // rolled lips
+      v.z*=1+0.030*Math.cos(v.y*4.1+v.x*3.3);               // organic irregularity
+      v.x*=1+0.022*Math.sin(v.y*3.4);
+      pos.setXYZ(i,v.x,v.y,v.z);
     }
     g.computeVertexNormals();
     return g;
   }
   const beanGeo = makeBean();
-  const beanMat = new THREE.MeshStandardMaterial({ color:0x4A3322, roughness:0.46, metalness:0.12 });
+  const beanMat = new THREE.MeshPhysicalMaterial({
+    color:new THREE.Color(0x6B4A2F).convertSRGBToLinear(),
+    roughness:0.68, metalness:0.0, roughnessMap:roughTexture(),
+    clearcoat:0.30, clearcoatRoughness:0.62, envMapIntensity:0.14
+  });
+
+  // Light budget stays low: dark albedo plus ACES tone mapping turns beige fast.
+  scene.add(new THREE.HemisphereLight(0xfff3e0, 0x3a2a1c, 0.16));
+  const key = new THREE.DirectionalLight(0xfff1da, 0.55); key.position.set(4, 6, 5); scene.add(key);
+  const rim = new THREE.PointLight(0xC79A5E, 0.40, 32); rim.position.set(-6, -1, 3); scene.add(rim);
+  const fill = new THREE.PointLight(0xffdcae, 0.12, 40); fill.position.set(4,-5,7); scene.add(fill);
 
   const COUNT = IS_MOBILE ? 16 : 30;
   const mesh = new THREE.InstancedMesh(beanGeo, beanMat, COUNT);

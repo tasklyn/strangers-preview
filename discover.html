@@ -77,6 +77,37 @@ h1,h2,h3{font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0}
   display:block;margin-bottom:14px}
 .chapter--dark .chap-no{color:var(--gold)}
 
+/* ---------- WORLD MAP ---------- */
+.mapwrap{position:relative;margin-top:44px;border:2px solid var(--ink);border-radius:6px;
+  background:var(--paper);overflow:hidden}
+#worldMap{display:block;width:100%;height:auto}
+.map__pins{position:absolute;inset:0;pointer-events:none}
+.pin{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;
+  background:none;border:0;padding:0;cursor:pointer;font-family:var(--sans)}
+.pin__dot{width:15px;height:15px;border-radius:50%;background:var(--gold);
+  border:2.5px solid var(--paper);box-shadow:0 0 0 2px var(--ink);
+  transition:transform .3s var(--ease)}
+.pin::after{content:"";position:absolute;top:50%;left:50%;width:15px;height:15px;
+  margin:-7.5px 0 0 -7.5px;border-radius:50%;border:2px solid var(--gold);
+  animation:ping 2.4s var(--ease) infinite}
+@keyframes ping{0%{transform:scale(1);opacity:.85}70%,100%{transform:scale(3.2);opacity:0}}
+.pin:hover .pin__dot,.pin.on .pin__dot{transform:scale(1.5)}
+.pin__label{position:absolute;top:18px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;font-size:12px;font-weight:700;color:var(--ink);
+  background:var(--paper);border:1.5px solid var(--ink);border-radius:999px;
+  padding:2px 9px}
+.pin.on .pin__label{background:var(--ink);color:var(--cream)}
+.map__note{position:absolute;bottom:10px;inset-inline-start:14px;margin:0;
+  font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);max-width:60%;line-height:1.6}
+@media (prefers-reduced-motion:reduce){.pin::after{animation:none;opacity:0}}
+@media (max-width:640px){
+  .pin__label{font-size:10px;padding:1px 6px}
+  .map__note{position:static;padding:10px 14px;max-width:none}
+}
+.origin.on{background:var(--ink);color:var(--cream)}
+.origin.on dt{color:rgba(255,247,234,.6)}
+.origin.on .flagname{color:var(--gold)}
+
 /* ---------- ORIGINS ---------- */
 .origins{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:44px}
 .origin{background:var(--paper);border:2px solid var(--ink);border-radius:6px;padding:24px;
@@ -177,6 +208,14 @@ footer .cr{font-family:var(--mono);font-size:12px;color:rgba(255,247,234,.5);mar
     <span class="chap-no reveal">الفصل الأول</span>
     <h2 class="h2 reveal">من أين تأتي <span class="band">حبّتنا</span></h2>
     <p class="lead reveal" style="margin-top:20px">لا نشتري «بنّاً». نشتري محصولاً من مزرعة لها اسم، وارتفاع، وطريقة معالجة تغيّر طعم الفنجان تماماً.</p>
+
+    <div class="mapwrap reveal">
+      <canvas id="worldMap" role="img"
+        aria-label="خريطة العالم توضّح دول منشأ محصول سترينجرز داخل حزام البن"></canvas>
+      <div class="map__pins" id="mapPins"></div>
+      <p class="map__note mono">حزام البن: المنطقة بين مدار السرطان ومدار الجدي، حيث ينمو البن العربي</p>
+    </div>
+
     <div class="origins" id="originGrid"></div>
   </div>
 </section>
@@ -233,11 +272,13 @@ const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
    ===================================================================== */
 const NEEDS='<span class="tbd">بانتظار البيانات</span>';
 
+/* lat/lon are real geography, so they are safe to state. Everything else waits
+   for the sourcing sheet. Swap this list for the real origins. */
 const ORIGINS=[
-  {country:'إثيوبيا', region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
-  {country:'كولومبيا', region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
-  {country:'البرازيل', region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
-  {country:'كينيا', region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS}
+  {country:'إثيوبيا',  lat:9.1,   lon:40.5,  region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
+  {country:'كينيا',    lat:0.2,   lon:37.9,  region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
+  {country:'كولومبيا', lat:4.6,   lon:-74.1, region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
+  {country:'البرازيل', lat:-14.2, lon:-51.9, region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS}
 ];
 
 const COFFEE=[
@@ -280,8 +321,8 @@ const BAKERY=[
 ];
 
 /* ---------- RENDER ---------- */
-$('#originGrid').innerHTML=ORIGINS.map(o=>`
- <article class="origin reveal">
+$('#originGrid').innerHTML=ORIGINS.map((o,i)=>`
+ <article class="origin reveal" data-i="${i}" tabindex="0" role="button">
    <div class="flagname">ORIGIN</div>
    <h3 class="h3">${o.country}</h3>
    <dl>
@@ -310,6 +351,95 @@ function stages(list){
 $('#trackCoffee').innerHTML=stages(COFFEE);
 $('#trackBakery').innerHTML=stages(BAKERY);
 
+/* =====================================================================
+   WORLD MAP
+   Equirectangular projection drawn to canvas from a local outline file, so
+   there is no tile server, no API key and nothing to break offline. The view
+   is cropped to the coffee belt because that is the only part that matters.
+   ===================================================================== */
+const MAP={lon0:-125,lon1:65,lat0:40,lat1:-40};   // window on the growing world
+function project(lon,lat,w,h){
+  return [ (lon-MAP.lon0)/(MAP.lon1-MAP.lon0)*w,
+           (lat-MAP.lat0)/(MAP.lat1-MAP.lat0)*h ];
+}
+async function drawMap(){
+  const cv=$('#worldMap'); if(!cv)return;
+  const pinHost=$('#mapPins');
+  let shapes=null;
+  try{
+    const res=await fetch('assets/world.json',{cache:'force-cache'});
+    if(res.ok)shapes=await res.json();
+  }catch(_){}
+
+  function render(){
+    const wrap=cv.parentElement;
+    const w=wrap.clientWidth, h=Math.round(w*0.46);
+    const dpr=Math.min(devicePixelRatio||1,2);
+    cv.width=w*dpr; cv.height=h*dpr;
+    cv.style.height=h+'px';
+    const x=cv.getContext('2d');
+    x.setTransform(dpr,0,0,dpr,0,0);
+    x.clearRect(0,0,w,h);
+
+    // the coffee belt: the tropics, where arabica actually grows
+    const [,yTropN]=project(0, 23.44,w,h);
+    const [,yTropS]=project(0,-23.44,w,h);
+    x.fillStyle='rgba(190,66,15,.10)';
+    x.fillRect(0,yTropN,w,yTropS-yTropN);
+    x.strokeStyle='rgba(190,66,15,.45)';x.lineWidth=1;x.setLineDash([5,5]);
+    [yTropN,yTropS].forEach(y=>{x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke();});
+    x.setLineDash([]);
+
+    // landmasses
+    if(shapes){
+      x.fillStyle='#D9C3A3'; x.strokeStyle='rgba(43,21,8,.32)'; x.lineWidth=.7;
+      for(const rings of shapes){
+        for(const flat of rings){
+          x.beginPath();
+          for(let i=0;i<flat.length;i+=2){
+            const [px,py]=project(flat[i],flat[i+1],w,h);
+            i===0?x.moveTo(px,py):x.lineTo(px,py);
+          }
+          x.closePath(); x.fill(); x.stroke();
+        }
+      }
+    }else{
+      x.fillStyle='var(--ink-3)';
+      x.font='600 14px system-ui';x.textAlign='center';
+      x.fillText('تعذّر تحميل حدود الخريطة',w/2,h/2);
+    }
+    placePins(w,h);
+  }
+
+  function placePins(w,h){
+    pinHost.innerHTML=ORIGINS.map((o,i)=>{
+      const [px,py]=project(o.lon,o.lat,w,h);
+      // physical `left`: the projection measures x from the left edge, and the
+      // page is RTL, so `right` would mirror every pin to the wrong continent
+      return `<button class="pin" data-i="${i}" type="button"
+        style="left:${(px/w*100).toFixed(2)}%;top:${(py/h*100).toFixed(2)}%"
+        aria-label="${o.country}">
+        <span class="pin__dot"></span><span class="pin__label">${o.country}</span></button>`;
+    }).join('');
+  }
+
+  pinHost.addEventListener('click',e=>{
+    const b=e.target.closest('.pin'); if(!b)return;
+    select(+b.dataset.i);
+  });
+
+  render();
+  let t; addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(render,150);});
+}
+
+/* pin <-> card selection, both directions */
+function select(i){
+  $$('.pin').forEach((p,k)=>p.classList.toggle('on',k===i));
+  $$('.origin').forEach((c,k)=>c.classList.toggle('on',k===i));
+  const card=$$('.origin')[i];
+  if(card)card.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+
 /* ---------- REVEAL ---------- */
 const io=new IntersectionObserver(es=>{
   es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
@@ -336,8 +466,18 @@ function horizontal(panSel,trackSel,railSel){
     }
   });
 }
+/* clicking a card highlights its pin too, and it works from the keyboard */
+$('#originGrid').addEventListener('click',e=>{
+  const c=e.target.closest('.origin'); if(c)select(+c.dataset.i);
+});
+$('#originGrid').addEventListener('keydown',e=>{
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  const c=e.target.closest('.origin'); if(c){e.preventDefault();select(+c.dataset.i);}
+});
+
 window.addEventListener('load',()=>{
   gsap.registerPlugin(ScrollTrigger);
+  drawMap();
   horizontal('#panCoffee','#trackCoffee','#railCoffee');
   horizontal('#panBakery','#trackBakery','#railBakery');
   ScrollTrigger.refresh();

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اكتشف عالم سترينجرز — من المحصول إلى فنجانك</title>
+<meta name="description" content="رحلة المحصول من المزرعة إلى فنجانك، ورحلة المخبوزات من العجين إلى الفرع. مجلة تفاعلية من Strangers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6E9D7; --sand:#EBD9C0; --ink:#2B1508; --ink-2:#4E2C16; --ink-3:#6B4526;
+  --gold:#BE420F; --gold-ink:#9E3A0E; --cream:#FFF7EA;
+  --line:rgba(43,21,8,.14); --line-2:rgba(43,21,8,.26);
+  --sans:"IBM Plex Sans Arabic",system-ui,sans-serif;
+  --serif:"Fraunces",Georgia,serif;
+  --mono:"IBM Plex Mono",monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --maxw:1240px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;overflow-x:clip}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);
+  font-size:16.5px;line-height:1.85;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--gold);color:#fff}
+.wrap{width:100%;max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(20px,5vw,60px)}
+.mono{font-family:var(--mono);letter-spacing:.02em}
+h1,h2,h3{font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0}
+.display{font-size:clamp(2.8rem,9.5vw,7.5rem);letter-spacing:-.045em;line-height:.9}
+.h2{font-size:clamp(2.1rem,6vw,4.4rem);letter-spacing:-.04em;line-height:.94}
+.h3{font-size:clamp(1.2rem,2.2vw,1.6rem);letter-spacing:-.02em}
+.band{background:var(--ink);color:var(--cream);display:inline-block;
+  padding:.05em .26em .13em;transform:rotate(-1.2deg);border-radius:3px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;
+  color:var(--gold-ink);text-transform:uppercase;margin-bottom:18px}
+.lead{font-size:clamp(1.02rem,1.9vw,1.2rem);color:var(--ink-2);max-width:56ch;line-height:1.8}
+
+/* ---------- NAV ---------- */
+.nav{position:fixed;top:0;inset-inline:0;z-index:60;height:70px;display:flex;align-items:center;
+  background:rgba(246,233,215,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:11px}
+.brand img{width:36px;height:36px;border-radius:50%;border:1px solid var(--line-2);background:#fff}
+.brand b{font-size:13.5px;letter-spacing:.05em;display:block}
+.brand span{font-size:9px;letter-spacing:.24em;color:var(--ink-3);display:block}
+.backlink{font-size:14px;padding:10px 20px;border:2px solid var(--ink);border-radius:999px;
+  font-weight:600;transition:background .3s,color .3s}
+.backlink:hover{background:var(--ink);color:var(--cream)}
+
+/* ---------- COVER ---------- */
+.cover{min-height:100svh;display:flex;align-items:center;padding:110px 0 60px;position:relative;overflow:hidden}
+.cover__bg{position:absolute;inset:0;z-index:0}
+.cover__bg img{width:100%;height:100%;object-fit:cover;opacity:.32}
+.cover__bg::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(to top,var(--paper) 4%,rgba(246,233,215,.72) 48%,rgba(246,233,215,.5))}
+.cover .wrap{position:relative;z-index:2}
+.cover h1{max-width:14ch}
+.cover .lead{margin-top:26px}
+.scrollcue{margin-top:44px;display:inline-flex;align-items:center;gap:12px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.24em;color:var(--ink-3)}
+.scrollcue i{width:34px;height:34px;border:2px solid var(--ink);border-radius:50%;
+  display:grid;place-items:center;font-style:normal;animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+@media (prefers-reduced-motion:reduce){.scrollcue i{animation:none}}
+
+/* ---------- CHAPTER ---------- */
+.chapter{padding:clamp(70px,10vh,120px) 0}
+.chapter--dark{background:var(--ink);color:var(--cream)}
+.chapter--dark .lead{color:rgba(255,247,234,.75)}
+.chapter--dark .eyebrow{color:var(--gold)}
+.chapter--sand{background:var(--sand)}
+.chap-no{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--gold-ink);
+  display:block;margin-bottom:14px}
+.chapter--dark .chap-no{color:var(--gold)}
+
+/* ---------- ORIGINS ---------- */
+.origins{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:44px}
+.origin{background:var(--paper);border:2px solid var(--ink);border-radius:6px;padding:24px;
+  transition:transform .35s var(--ease),box-shadow .35s}
+.origin:hover{transform:translateY(-5px);box-shadow:0 10px 0 0 var(--ink)}
+.origin .flagname{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--gold-ink)}
+.origin h3{margin:8px 0 12px}
+.origin dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:14px}
+.origin dt{color:var(--ink-3);font-family:var(--mono);font-size:11px;letter-spacing:.06em;align-self:center}
+.origin dd{margin:0;font-weight:600}
+
+/* the marker that keeps invented specifics out of a client pitch */
+.tbd{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  background:rgba(190,66,15,.14);color:var(--gold-ink);border:1px dashed var(--gold);
+  padding:2px 7px;border-radius:3px;font-weight:500}
+
+/* ---------- JOURNEY (horizontal) ---------- */
+.pan{position:relative;height:100svh;overflow:hidden}
+.pan__track{display:flex;height:100%;align-items:center;gap:clamp(20px,3vw,44px);
+  padding-inline:clamp(20px,5vw,60px);will-change:transform}
+.stage{flex:0 0 min(84vw,460px);display:flex;flex-direction:column;gap:16px}
+.stage__no{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--gold)}
+.chapter--sand .stage__no{color:var(--gold-ink)}
+.stage h3{font-size:clamp(1.5rem,3vw,2.1rem)}
+.stage p{font-size:15.2px;color:rgba(255,247,234,.76);margin:0}
+.chapter--sand .stage p{color:var(--ink-2)}
+
+/* video slot: designed to look intentional while empty */
+.vslot{position:relative;aspect-ratio:16/10;border-radius:6px;overflow:hidden;
+  border:2px dashed rgba(255,247,234,.34);background:rgba(255,247,234,.05);
+  display:grid;place-items:center;text-align:center;padding:18px}
+.chapter--sand .vslot{border-color:var(--line-2);background:rgba(43,21,8,.04)}
+.vslot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.3}
+.vslot__inner{position:relative;z-index:2}
+.vslot__play{width:52px;height:52px;border-radius:50%;border:2px solid currentColor;
+  display:grid;place-items:center;margin:0 auto 12px;font-size:16px}
+.vslot__label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;line-height:1.7;
+  color:rgba(255,247,234,.7)}
+.chapter--sand .vslot__label{color:var(--ink-3)}
+.vslot video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3}
+
+/* progress rail */
+.rail{position:sticky;top:70px;z-index:10;height:3px;background:rgba(255,247,234,.16)}
+.chapter--sand .rail{background:var(--line)}
+.rail i{display:block;height:100%;width:0;background:var(--gold);transition:width .1s linear}
+
+/* ---------- CLOSING ---------- */
+.close-cta{padding:clamp(70px,10vh,120px) 0;text-align:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:19px 38px;border-radius:999px;font-size:16px;font-weight:700;
+  background:var(--gold);color:#fff;box-shadow:0 8px 0 0 #6E250A;
+  transition:transform .3s var(--ease),box-shadow .3s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 11px 0 0 #6E250A}
+.btn:active{transform:translateY(4px);box-shadow:0 4px 0 0 #6E250A}
+
+footer{background:var(--ink);color:var(--cream);padding:50px 0;text-align:center}
+footer .one{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--gold)}
+footer .cr{font-family:var(--mono);font-size:12px;color:rgba(255,247,234,.5);margin-top:8px}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+@media (max-width:640px){
+  .stage{flex-basis:86vw}
+  .backlink{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="strangers.html">
+      <img src="assets/logo.jpg" alt="Strangers">
+      <span><b>STRANGERS</b><span>COMPANY · EST 2017</span></span>
+    </a>
+    <a class="backlink" href="strangers.html">الرئيسية</a>
+  </div>
+</header>
+
+<!-- COVER -->
+<section class="cover">
+  <div class="cover__bg"><img src="assets/coffee-jar.jpg" alt=""></div>
+  <div class="wrap">
+    <p class="eyebrow reveal">مجلة سترينجرز التفاعلية</p>
+    <h1 class="display reveal">اكتشف<br><span class="band">عالمنا</span></h1>
+    <p class="lead reveal">من مزرعة على ارتفاع ألفي متر، إلى فنجان على طاولتك. ومن كيس دقيق، إلى كرواسون يخرج من فرن الفرع الساعة السادسة. هاتان رحلتان نمشيهما كل يوم.</p>
+    <div class="scrollcue reveal"><i>↓</i> انزل لتبدأ الرحلة</div>
+  </div>
+</section>
+
+<!-- CHAPTER 1: ORIGINS -->
+<section class="chapter chapter--sand" id="origins">
+  <div class="wrap">
+    <span class="chap-no reveal">الفصل الأول</span>
+    <h2 class="h2 reveal">من أين تأتي <span class="band">حبّتنا</span></h2>
+    <p class="lead reveal" style="margin-top:20px">لا نشتري «بنّاً». نشتري محصولاً من مزرعة لها اسم، وارتفاع، وطريقة معالجة تغيّر طعم الفنجان تماماً.</p>
+    <div class="origins" id="originGrid"></div>
+  </div>
+</section>
+
+<!-- CHAPTER 2: THE COFFEE JOURNEY -->
+<section class="chapter chapter--dark" id="coffee-journey">
+  <div class="wrap">
+    <span class="chap-no reveal">الفصل الثاني</span>
+    <h2 class="h2 reveal">رحلة المحصول</h2>
+    <p class="lead reveal" style="margin-top:18px">ست محطات بين قطف الثمرة ووصولها فنجانك. اسحب أفقياً.</p>
+  </div>
+  <div class="rail"><i id="railCoffee"></i></div>
+  <div class="pan" id="panCoffee"><div class="pan__track" id="trackCoffee"></div></div>
+</section>
+
+<!-- CHAPTER 3: THE BAKERY JOURNEY -->
+<section class="chapter chapter--sand" id="bakery-journey">
+  <div class="wrap">
+    <span class="chap-no reveal">الفصل الثالث</span>
+    <h2 class="h2 reveal">رحلة <span class="band">المخبوزات</span></h2>
+    <p class="lead reveal" style="margin-top:18px">من كيس الدقيق إلى رفّ العرض في الفرع. خمس محطات تبدأ قبل الفجر.</p>
+  </div>
+  <div class="rail"><i id="railBakery"></i></div>
+  <div class="pan" id="panBakery"><div class="pan__track" id="trackBakery"></div></div>
+</section>
+
+<!-- CLOSE -->
+<section class="close-cta">
+  <div class="wrap">
+    <h2 class="h2 reveal">وتصل إليك</h2>
+    <p class="lead reveal" style="margin:20px auto 0">كل ما قرأته يحدث كل يوم قبل أن تفتح الباب.</p>
+    <div class="reveal" style="margin-top:34px"><a class="btn" href="strangers.html#contact">تحدّث إلينا</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="one">One Brand. Multiple Experiences.</div>
+    <div class="cr">© 2017–2026 STRANGERS COMPANY</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* =====================================================================
+   CONTENT
+   Everything tagged NEEDS_DATA is a placeholder. It renders with a visible
+   "بانتظار البيانات" marker so nothing invented is ever shown as fact.
+   Replace with the real sourcing sheet from Strangers.
+   ===================================================================== */
+const NEEDS='<span class="tbd">بانتظار البيانات</span>';
+
+const ORIGINS=[
+  {country:'إثيوبيا', region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
+  {country:'كولومبيا', region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
+  {country:'البرازيل', region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS},
+  {country:'كينيا', region:NEEDS, alt:NEEDS, process:NEEDS, notes:NEEDS}
+];
+
+const COFFEE=[
+  {t:'القطف', s:'في المزرعة',
+   p:'تُقطف الثمرة الحمراء يدوياً عند نضجها. القطف الانتقائي يعني أن الثمار غير الناضجة تُترك للجولة التالية.',
+   shot:'لقطة: يد تقطف ثمار البن الحمراء', img:'assets/coffee-jar.jpg'},
+  {t:'المعالجة', s:'مغسول / طبيعي / عسلي',
+   p:'هنا يتحدد نصف طعم الفنجان. الطريقة تُختار لكل محصول على حدة، وتغيّر الحموضة والحلاوة تماماً.',
+   shot:'لقطة: أحواض الغسيل أو مصاطب التجفيف', img:'assets/coffee-jar.jpg'},
+  {t:'التجفيف والفرز', s:'حتى 11% رطوبة',
+   p:'يُجفَّف البن ثم يُفرز يدوياً وآلياً لاستبعاد الحبوب المعيبة قبل التعبئة.',
+   shot:'لقطة: فرز الحبوب على السير', img:'assets/coffee-jar.jpg'},
+  {t:'الشحن', s:'من المنشأ إلى الرياض',
+   p:'يُشحن البن الأخضر في أكياس مبطّنة تحفظ رطوبته حتى يصل مستودعنا.',
+   shot:'لقطة: أكياس البن الأخضر في المستودع', img:'assets/coffee-jar.jpg'},
+  {t:'التحميص', s:'في محمصتنا',
+   p:'نحمّص كل محصول بمنحنى خاص به. اللون وحده لا يكفي: الوقت والحرارة يحددان أين تقف الحلاوة وأين تبدأ المرارة.',
+   shot:'لقطة: الحبوب تدور داخل المحمصة', img:'assets/coffee-jar.jpg'},
+  {t:'الفنجان', s:'في الفرع',
+   p:'يُطحن عند الطلب ويُستخلص خلال دقائق من طحنه. من الثمرة إلى يدك.',
+   shot:'لقطة: استخلاص الإسبريسو ورسم اللاتيه', img:'assets/coffee-jar.jpg'}
+];
+
+const BAKERY=[
+  {t:'المكوّنات', s:'قبل الفجر',
+   p:'دقيق وزبدة وحليب وخميرة. لا شيء غير ذلك، ولا شيء جاهز.',
+   shot:'لقطة: وزن المكوّنات في المعمل', img:'assets/almond-croissant.jpg'},
+  {t:'العجن والتخمير', s:'راحة طويلة',
+   p:'تُعجن ثم تُترك ترتاح ساعات. التخمير البطيء هو ما يعطي الطبقات نكهتها.',
+   shot:'لقطة: العجين يرتاح في الثلاجة', img:'assets/croissant-madame.jpg'},
+  {t:'الطي', s:'ثلاث طيّات',
+   p:'تُطوى العجينة على الزبدة ثلاث مرات على مدى يومين. كل طية تضاعف الطبقات.',
+   shot:'لقطة قريبة: طي العجينة على الزبدة', img:'assets/pesto-croissant.jpg'},
+  {t:'الفرن', s:'الساعة الخامسة',
+   p:'تدخل الفرن فتنتفخ الطبقات ويتحول السطح إلى ذهبي هش.',
+   shot:'لقطة: الكرواسون يخرج من الفرن', img:'assets/nutella-croissant.jpg'},
+  {t:'الفرع', s:'الساعة السادسة',
+   p:'تُنقل ساخنة إلى رفوف الفروع. ما لا يُباع في يومه لا يُعاد عرضه.',
+   shot:'لقطة: ترتيب المخبوزات على الرف', img:'assets/strawberry-danish.jpg'}
+];
+
+/* ---------- RENDER ---------- */
+$('#originGrid').innerHTML=ORIGINS.map(o=>`
+ <article class="origin reveal">
+   <div class="flagname">ORIGIN</div>
+   <h3 class="h3">${o.country}</h3>
+   <dl>
+     <dt>المنطقة</dt><dd>${o.region}</dd>
+     <dt>الارتفاع</dt><dd>${o.alt}</dd>
+     <dt>المعالجة</dt><dd>${o.process}</dd>
+     <dt>النكهات</dt><dd>${o.notes}</dd>
+   </dl>
+ </article>`).join('');
+
+function stages(list){
+  return list.map((s,i)=>`
+   <article class="stage">
+     <div class="vslot">
+       <img loading="lazy" src="${s.img}" alt="">
+       <div class="vslot__inner">
+         <div class="vslot__play">▶</div>
+         <div class="vslot__label">${s.shot}<br><span class="tbd">مكان فيديو</span></div>
+       </div>
+     </div>
+     <div class="stage__no">${String(i+1).padStart(2,'0')} · ${s.s}</div>
+     <h3>${s.t}</h3>
+     <p>${s.p}</p>
+   </article>`).join('');
+}
+$('#trackCoffee').innerHTML=stages(COFFEE);
+$('#trackBakery').innerHTML=stages(BAKERY);
+
+/* ---------- REVEAL ---------- */
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+},{rootMargin:'0px 0px -8% 0px',threshold:.08});
+$$('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- HORIZONTAL JOURNEYS ---------- */
+function horizontal(panSel,trackSel,railSel){
+  const pan=$(panSel), track=$(trackSel), rail=$(railSel);
+  if(!pan||!track)return;
+  if(REDUCE){                      // no hijack: let it scroll sideways by hand
+    pan.style.height='auto';
+    track.style.overflowX='auto';
+    track.style.paddingBlock='30px';
+    return;
+  }
+  const dist=()=>Math.max(0,track.scrollWidth-innerWidth+60);
+  gsap.to(track,{
+    x:()=>-dist(), ease:'none',
+    scrollTrigger:{
+      trigger:pan, start:'top top', end:()=>'+='+dist(),
+      pin:true, scrub:1, invalidateOnRefresh:true,
+      onUpdate:s=>{ if(rail)rail.style.width=(s.progress*100).toFixed(1)+'%'; }
+    }
+  });
+}
+window.addEventListener('load',()=>{
+  gsap.registerPlugin(ScrollTrigger);
+  horizontal('#panCoffee','#trackCoffee','#railCoffee');
+  horizontal('#panBakery','#trackBakery','#railBakery');
+  ScrollTrigger.refresh();
+});
+</script>
+</body>
+</html>

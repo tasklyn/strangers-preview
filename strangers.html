@@ -108,21 +108,6 @@ h1,h2,h3{font-weight:400;letter-spacing:-.015em;line-height:1.08}
 .burger i{width:20px;height:1.4px;background:var(--ink)}
 
 /* ---------- HERO (Dishoom: a feeling, not a product) ---------- */
-/* ---------- TELESCOPE ENTRY ---------- */
-/* #enter is only a scroll runway; everything visible is the fixed .tele stage. */
-#enter{position:relative;height:280svh;z-index:3;pointer-events:none}
-.tele{position:fixed;inset:0;z-index:3;pointer-events:none;overflow:hidden}
-.tele__layer{position:absolute;inset:0;display:grid;place-items:center;
-  opacity:0;will-change:transform,opacity}
-.tele__layer img{width:100%;height:100%;object-fit:cover;
-  /* each copy is clipped to a soft round aperture so it reads as looking
-     through the bean's crease rather than as a plain cross-fade */
-  clip-path:circle(38% at 50% 50%)}
-.tele__layer.l4 img{clip-path:none}
-.tele__cue{position:absolute;left:50%;bottom:7vh;transform:translateX(-50%);
-  font-size:10.5px;letter-spacing:.32em;color:rgba(253,251,247,.62);
-  transition:opacity .5s var(--ease)}
-
 .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;
   padding:120px 0 clamp(46px,7vh,80px);background:transparent}
 /* the photo itself now lives in the fixed #heroPhoto layer, behind the beans */
@@ -355,19 +340,6 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 </header>
 
 <!-- HERO: a feeling, not a product -->
-<!-- TELESCOPE: scroll drives the camera into the bean's crease, then nested
-     copies of the same interior photo scale through one another so you fall out
-     of the bean and into the cafe. Technique from the Codrops demo (MIT). -->
-<section id="enter" aria-hidden="true">
-  <div class="tele" id="tele">
-    <div class="tele__layer l1"><img src="assets/hero.jpg" alt=""></div>
-    <div class="tele__layer l2"><img src="assets/hero.jpg" alt=""></div>
-    <div class="tele__layer l3"><img src="assets/hero.jpg" alt=""></div>
-    <div class="tele__layer l4"><img src="assets/hero.jpg" alt=""></div>
-    <p class="tele__cue mono" id="teleCue">انزل للدخول</p>
-  </div>
-</section>
-
 <section class="hero" id="top">
   <div class="hero-bg"></div>
   <div class="wrap">
@@ -683,14 +655,7 @@ const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
    all (reduced motion, no WebGL, a thrown error), reveal immediately, and keep a
    hard timer so the page can never be left blank. */
 if(REDUCE||!window.THREE) document.body.classList.add('opened');
-/* The telescope opens the page itself, so don't pre-empt it — but if the 3D
-   stage never came up, the telescope will never run and the page must not be
-   left hidden. Two nets: one on stage health, one unconditional. */
-setTimeout(()=>{
-  const stageUp=document.getElementById('stage3d')?.classList.contains('ready');
-  if(!document.getElementById('enter')||!stageUp) document.body.classList.add('opened');
-},3500);
-setTimeout(()=>document.body.classList.add('opened'),12000);
+setTimeout(()=>document.body.classList.add('opened'),3500);
 
 /* ---------- COUNTERS ---------- */
 const countIO=new IntersectionObserver(es=>{
@@ -1039,60 +1004,9 @@ function initBeans(){
       hp.style.opacity=hr.bottom>0?Math.max(0,Math.min(1,hr.bottom/innerHeight)):0;
     }
   }
-  /* ---- TELESCOPE: scroll position inside #enter drives the whole entry ---- */
-  const enterEl=$('#enter'), teleEl=$('#tele'), teleCue=$('#teleCue');
-  const teleLayers=[...document.querySelectorAll('.tele__layer')];
-  let teleP=0;
-  const TELE_ON=!!enterEl;
-  if(TELE_ON) intro=INTRO_FALL+INTRO_PART;   // telescope replaces the drop-in
-
-  function updateTele(){
-    if(!TELE_ON)return;
-    const r=enterEl.getBoundingClientRect();
-    const total=Math.max(1,enterEl.offsetHeight-innerHeight);
-    teleP=Math.max(0,Math.min(1,-r.top/total));
-    teleEl.style.opacity=teleP>=1?0:1;
-    teleEl.style.pointerEvents='none';
-    if(teleCue)teleCue.style.opacity=teleP>0.04?0:1;
-
-    // Phase B: four copies of the interior, each rushing past the camera.
-    // Stagger their starts so one is always filling the aperture.
-    const last=teleLayers.length-1;
-    teleLayers.forEach((el,i)=>{
-      if(i===last){
-        // the final copy is the arrival: it settles at full frame and holds,
-        // so the hero photograph can take over without a jump
-        const p=Math.max(0,Math.min(1,(teleP-0.70)/0.30));
-        const s=0.06+p*0.94;
-        el.style.transform='scale('+s.toFixed(3)+')';
-        el.style.opacity=(p<0.18?p/0.18:1).toFixed(3);
-        return;
-      }
-      const start=0.34+i*0.14, span=0.30;
-      const p=Math.max(0,Math.min(1,(teleP-start)/span));
-      // scale runs 0.04 -> 9: from a speck in the crease to past the viewer
-      const s=0.04*Math.pow(9/0.04,p);
-      // fade in fast, hold, then blow out as it passes
-      const o=p<=0?0:(p<0.14?p/0.14:(p>0.86?Math.max(0,(1-p)/0.14):1));
-      el.style.transform='scale('+s.toFixed(3)+')';
-      el.style.opacity=o.toFixed(3);
-    });
-    // Inside the bean it is dark. Hold the veil on for the whole approach and
-    // lift it exactly as the arrival layer settles.
-    if(teleP<1){
-      veil.classList.add('on');
-      veil.style.opacity=String(Math.max(0,1-Math.max(0,(teleP-0.74)/0.26)));
-      veilOn=true;
-    }else{ veil.style.opacity=''; }
-    // the hero photograph belongs to the hero, not to the inside of the bean
-    const hp=$('#heroPhoto');
-    if(hp&&teleP<1) hp.style.opacity=Math.max(0,(teleP-0.72)/0.28);
-    // the page proper only unlocks once we are through
-    if(teleP>0.88)document.body.classList.add('opened');
-  }
-  addEventListener('scroll',()=>{pickAct();updateTele();},{passive:true});
-  addEventListener('resize',()=>{pickAct();updateTele();});
-  pickAct(); updateTele();
+  addEventListener('scroll',pickAct,{passive:true});
+  addEventListener('resize',pickAct);
+  pickAct();
 
   /* ---- pointer parallax + drag-to-spin ---- */
   let mx=0,my=0,tx=0,ty=0,drag=false,lx=0,ly=0,vy=0,vx=0,ry=0,rx=0;
@@ -1129,23 +1043,9 @@ function initBeans(){
     // roast follows the whole document, so scrolling literally roasts the bean
     applyRoast(scrollP);
 
-    // During the telescope the acts must not fight the entry, so hold act 0.
-    if(TELE_ON&&teleP<1) target=ACTS[0];
-
     // ease every act property so section changes glide instead of snapping
     for(const k of ['cluster','solo','cam','spread','clusterY','cup'])
       state[k]+=((target[k]??0)-state[k])*0.045;
-
-    /* Phase A of the telescope: fly the camera into the crease. Overrides the
-       eased camera so the dolly stays locked to the scrollbar. */
-    if(TELE_ON&&teleP<1){
-      const a=Math.min(1,teleP/0.52);            // approach finishes at 52%
-      const ease=a<.5?4*a*a*a:1-Math.pow(-2*a+2,3)/2;
-      state.cam=8.4-ease*7.5;                    // 8.4 -> 0.9, i.e. inside it
-      state.spread=1.35-ease*1.15;               // the cluster closes in
-      state.cluster=1-Math.max(0,(teleP-0.46)/0.2);  // then dissolves
-      state.clusterY=0;
-    }
 
     mx+=(tx-mx)*.05; my+=(ty-my)*.05;
     ry+=vy; rx+=vx; vy*=.94; vx*=.94; rx=Math.max(-.7,Math.min(.7,rx));
@@ -1238,8 +1138,7 @@ function initBeans(){
 
     group.rotation.y=mx*.5+ry;
     group.rotation.x=my*.3+rx;
-    // the entry dolly must track the scrollbar exactly; elsewhere it eases
-    camera.position.z+=(state.cam-camera.position.z)*((TELE_ON&&teleP<1)?0.34:0.05);
+    camera.position.z+=(state.cam-camera.position.z)*0.05;
     renderer.render(scene,camera);
   }
   frame();

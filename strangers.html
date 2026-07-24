@@ -142,6 +142,10 @@ section{padding:clamp(72px,11vh,132px) 0}
   text-transform:uppercase;margin-bottom:20px}
 .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .reveal.in{opacity:1;transform:none}
+/* The hero waits for the beans to drop and part, so they read as opening the page.
+   No-JS and reduced-motion users get it immediately via the fallbacks below. */
+.hero .wrap,.nav .wrap{opacity:0;transition:opacity 1s var(--ease)}
+body.opened .hero .wrap,body.opened .nav .wrap{opacity:1}
 
 /* ---------- WAYFINDING (Dishoom "Treasured guest") ---------- */
 .ways{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);
@@ -275,6 +279,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
+  .hero .wrap,.nav .wrap{opacity:1}
   .reveal{opacity:1;transform:none;transition:none}
   *{transition:none!important}
 }
@@ -292,7 +297,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
       <img src="assets/logo.jpg" alt="Strangers Company">
       <span><b>STRANGERS</b><span>COMPANY · EST 2017</span></span>
     </a>
-    <nav id="menu">
+    <nav id="navMenu">
       <a href="#story">قصتنا</a>
       <a href="#coffee">القهوة</a>
       <a href="#companies">أقسامنا</a>
@@ -469,7 +474,7 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
   </div>
 </section>
 
-<footer>
+<footer data-act="7">
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
@@ -604,8 +609,8 @@ $('#leadForm').addEventListener('submit',e=>{
 const nav=$('#nav');
 const onScroll=()=>nav.classList.toggle('solid',scrollY>40);
 addEventListener('scroll',onScroll,{passive:true}); onScroll();
-$('#burger').onclick=()=>$('#menu').classList.toggle('open');
-$$('#menu a').forEach(a=>a.onclick=()=>$('#menu').classList.remove('open'));
+$('#burger').onclick=()=>$('#navMenu').classList.toggle('open');
+$$('#navMenu a').forEach(a=>a.onclick=()=>$('#navMenu').classList.remove('open'));
 
 // IntersectionObserver: cheap, no scroll handlers, and elements already
 // in view on load still animate in.
@@ -615,6 +620,12 @@ const io=new IntersectionObserver(es=>{
 $$('.reveal').forEach(el=>io.observe(el));
 
 const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* The hero is hidden until the bean intro parts it. If the intro cannot run at
+   all (reduced motion, no WebGL, a thrown error), reveal immediately, and keep a
+   hard timer so the page can never be left blank. */
+if(REDUCE||!window.THREE) document.body.classList.add('opened');
+setTimeout(()=>document.body.classList.add('opened'),3500);
 
 /* ---------- COUNTERS ---------- */
 const countIO=new IntersectionObserver(es=>{
@@ -667,7 +678,7 @@ function initBeans(){
   const canvas=$('#stage3d'), stage=$('.bean-stage');
   let renderer;
   try{ renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true}); }
-  catch(e){ return; }                       // no WebGL: the photo stays
+  catch(e){ document.body.classList.add('opened'); return; }   // no WebGL
   const size=()=>({w:innerWidth,h:innerHeight});
   let {w,h}=size();
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -727,13 +738,16 @@ function initBeans(){
 
     // Procedural roast mottling. Used on its own until the photographic grain
     // loads, then redrawn underneath it.
+    /* Painted as a near-neutral luminance map: it carries only the DETAIL
+       (mottling, silverskin, pores). The roast colour lives in material.color,
+       so the bean can travel from raw green to dark roast as the page scrolls. */
     function paintBase(){
-      x.fillStyle='#6B4A2F';x.fillRect(0,0,W,H);
+      x.fillStyle='#D9D3CB';x.fillRect(0,0,W,H);
       for(let i=0;i<300;i++){
         const rx=Math.random()*W, ry=Math.random()*H, rr=18+Math.random()*90;
         const g=x.createRadialGradient(rx,ry,0,rx,ry,rr);
         const dark=Math.random()>.5;
-        g.addColorStop(0,dark?'rgba(58,36,20,.30)':'rgba(150,108,66,.24)');
+        g.addColorStop(0,dark?'rgba(120,112,104,.34)':'rgba(255,250,242,.30)');
         g.addColorStop(1,'rgba(0,0,0,0)');
         x.fillStyle=g;x.fillRect(rx-rr,ry-rr,rr*2,rr*2);
       }
@@ -744,12 +758,12 @@ function initBeans(){
       for(const u of [0.25,0.75]){
         const cx=u*W;
         const g=x.createLinearGradient(cx-42,0,cx+42,0);
-        g.addColorStop(0,'rgba(198,164,120,0)');
-        g.addColorStop(.5,'rgba(206,176,132,.85)');
-        g.addColorStop(1,'rgba(198,164,120,0)');
+        g.addColorStop(0,'rgba(255,252,246,0)');
+        g.addColorStop(.5,'rgba(255,252,246,.92)');
+        g.addColorStop(1,'rgba(255,252,246,0)');
         x.fillStyle=g;x.fillRect(cx-42,0,84,H);
         for(let i=0;i<160;i++){   // ragged edge, so it is not a printed stripe
-          x.fillStyle='rgba(120,86,52,'+(0.1+Math.random()*0.28)+')';
+          x.fillStyle='rgba(150,142,132,'+(0.1+Math.random()*0.28)+')';
           const yy=Math.random()*H, off=(Math.random()-.5)*70;
           x.fillRect(cx+off,yy,2+Math.random()*9,1+Math.random()*3);
         }
@@ -757,11 +771,11 @@ function initBeans(){
     }
     function paintPores(n1,n2){
       for(let i=0;i<n1;i++){
-        x.fillStyle='rgba(44,26,13,'+(0.06+Math.random()*0.26)+')';
+        x.fillStyle='rgba(58,52,46,'+(0.07+Math.random()*0.28)+')';
         x.beginPath();x.arc(Math.random()*W,Math.random()*H,0.4+Math.random()*1.7,0,7);x.fill();
       }
       for(let i=0;i<n2;i++){
-        x.fillStyle='rgba(196,152,102,'+(0.05+Math.random()*0.16)+')';
+        x.fillStyle='rgba(255,251,244,'+(0.06+Math.random()*0.18)+')';
         x.beginPath();x.arc(Math.random()*W,Math.random()*H,0.3+Math.random()*1.2,0,7);x.fill();
       }
     }
@@ -790,11 +804,56 @@ function initBeans(){
   const SURF=beanSurface();
   // r128 reads raw colours as linear, so convert or the roast washes out to cream
   const mat=new THREE.MeshPhysicalMaterial({
-    // the map already carries the roast colour; a white base lets it show unmuddied
-    color:0xffffff,
+    // the map is a neutral luminance detail map; this colour is the roast level
+    color:new THREE.Color(0x9CA678).convertSRGBToLinear(),
     map:SURF.map, roughnessMap:SURF.rough,
     roughness:0.78,metalness:0,clearcoat:0.26,clearcoatRoughness:0.55,envMapIntensity:0.30});
-  window.__beanMat=mat;   // handle for live tuning
+
+  /* The roast: raw green -> yellowing -> first crack -> medium -> dark and oily.
+     Divided through the map's average luminance (~0.85) so the final dark stage
+     lands on the brown that was signed off. */
+  const ROAST=[
+    {p:0.00, c:0x9CA678, rough:.86, coat:.06},   // raw, pale sage, matte
+    {p:0.22, c:0xC2A863, rough:.84, coat:.10},   // yellowing
+    {p:0.45, c:0xB07C45, rough:.80, coat:.18},   // first crack
+    {p:0.70, c:0x8E5F38, rough:.78, coat:.26},   // medium
+    {p:1.00, c:0x7E573A, rough:.74, coat:.38}    // dark, oils to the surface
+  ];
+  const cRaw=new THREE.Color(), cA=new THREE.Color(), cB=new THREE.Color();
+  function applyRoast(p){
+    let i=0; while(i<ROAST.length-2 && p>ROAST[i+1].p) i++;
+    const a=ROAST[i], b=ROAST[i+1];
+    const t=Math.max(0,Math.min(1,(p-a.p)/(b.p-a.p||1)));
+    cA.setHex(a.c); cB.setHex(b.c);
+    cRaw.copy(cA).lerp(cB,t);
+    mat.color.copy(cRaw).convertSRGBToLinear();
+    mat.roughness=a.rough+(b.rough-a.rough)*t;
+    mat.clearcoat=a.coat+(b.coat-a.coat)*t;
+  }
+
+  /* ---- the payoff: the beans become a cup ---- */
+  const cup=new THREE.Group();
+  {
+    const porcelain=new THREE.MeshPhysicalMaterial({
+      color:new THREE.Color(0xF6F1E8).convertSRGBToLinear(),
+      roughness:.28,metalness:0,clearcoat:.5,clearcoatRoughness:.25,envMapIntensity:.9});
+    const brew=new THREE.MeshPhysicalMaterial({
+      color:new THREE.Color(0x3A1E10).convertSRGBToLinear(),
+      roughness:.16,metalness:0,clearcoat:.9,clearcoatRoughness:.1,envMapIntensity:1.1});
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(.92,.66,1.05,72,1,true),porcelain);
+    body.material.side=THREE.DoubleSide; body.position.y=.1; cup.add(body);
+    const base=new THREE.Mesh(new THREE.CylinderGeometry(.66,.62,.07,48),porcelain);
+    base.position.y=-.45; cup.add(base);
+    const rim=new THREE.Mesh(new THREE.TorusGeometry(.92,.035,14,72),porcelain);
+    rim.rotation.x=Math.PI/2; rim.position.y=.625; cup.add(rim);
+    const handle=new THREE.Mesh(new THREE.TorusGeometry(.34,.062,16,48,Math.PI*1.25),porcelain);
+    handle.position.set(1.0,.16,0); handle.rotation.z=-0.35; cup.add(handle);
+    const surf=new THREE.Mesh(new THREE.CircleGeometry(.88,64),brew);
+    surf.rotation.x=-Math.PI/2; surf.position.y=.44; cup.add(surf);
+    const saucer=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.34,.06,64),porcelain);
+    saucer.position.y=-.52; cup.add(saucer);
+  }
+  cup.visible=false; cup.position.y=-.35; scene.add(cup);
 
   const COUNT=window.matchMedia('(max-width:620px)').matches?9:14;
   const mesh=new THREE.InstancedMesh(beanGeo(),mat,COUNT);
@@ -851,10 +910,17 @@ function initBeans(){
     /* 4 divisions*/ {cluster:.85,solo:0, cam:9.6,  spread:1.9,  clusterY:.3},
     /* 5 places   */ {cluster:.42,solo:0, cam:11.0, spread:3.0,  clusterY:.2},
     /* 6 numbers  */ {cluster:1,  solo:0, cam:7.2,  spread:1.05, clusterY:0},
-    /* 7 contact  */ {cluster:.55,solo:0, cam:10.0, spread:2.5,  clusterY:-.15}
+    /* 7 contact  */ {cluster:0,  solo:0, cam:6.4,  spread:1.2,  clusterY:0, cup:1}
   ];
-  const state={cluster:1,solo:0,cam:8.4,spread:1.35,clusterY:0};
+  ACTS.forEach(a=>{ if(a.cup===undefined)a.cup=0; });
+  const state={cluster:1,solo:0,cam:8.4,spread:1.35,clusterY:0,cup:0};
   let target={...ACTS[0]}, veilOn=false;
+
+  /* ---- INTRO: the beans drop in, then part to open the page ---- */
+  // 0 -> 1 fall, 1 -> 2 part. Content is held back until the parting starts.
+  let intro=0;
+  const INTRO_FALL=1.15, INTRO_PART=1.0;
+  let scrollP=0;   // 0..1 down the whole document, drives the roast
 
   const veil=$('#veil');
   const acts=[...document.querySelectorAll('[data-act]')];
@@ -862,19 +928,26 @@ function initBeans(){
 
   function pickAct(){
     const mid=innerHeight*0.5;
-    let chosen=0, dark=false;
+    // Nearest section to the viewport middle. A plain containment test fails at
+    // the very bottom, where the footer owns the middle and nothing matches.
+    let chosen=0, dark=false, best=Infinity;
     for(const el of acts){
       const r=el.getBoundingClientRect();
-      if(r.top<=mid && r.bottom>=mid){
+      const d=(r.top<=mid&&r.bottom>=mid) ? 0
+             : (mid<r.top ? r.top-mid : mid-r.bottom);
+      if(d<best){
+        best=d;
         chosen=+el.dataset.act;
         dark=el.classList.contains('on-dark');
-        break;
       }
     }
     // hero still on screen wins
     if(heroEl){const hr=heroEl.getBoundingClientRect();
       if(hr.bottom>mid){chosen=0;dark=false;}}
     target=ACTS[chosen]||ACTS[0];
+    // how far down the document we are: this is the roast curve
+    const max=Math.max(1,document.documentElement.scrollHeight-innerHeight);
+    scrollP=Math.max(0,Math.min(1,scrollY/max));
     if(dark!==veilOn){veilOn=dark;veil.classList.toggle('on',dark);}
     // the photograph belongs to the hero only; fade it out past it
     const hp=$('#heroPhoto');
@@ -902,11 +975,28 @@ function initBeans(){
   }
 
   const clock=new THREE.Clock();
+  let last=performance.now();
   function frame(){
     requestAnimationFrame(frame);
+    const now=performance.now(), dt=Math.min((now-last)/1000,0.05); last=now;
     const t=clock.getElapsedTime();
+
+    /* ---- intro timeline ---- */
+    if(intro<INTRO_FALL+INTRO_PART){
+      intro+=dt;
+      if(intro>=INTRO_FALL && !document.body.classList.contains('opened'))
+        document.body.classList.add('opened');       // content starts fading in
+    }
+    const fall=Math.min(1,intro/INTRO_FALL);
+    const part=Math.max(0,Math.min(1,(intro-INTRO_FALL)/INTRO_PART));
+    const fallE=1-Math.pow(1-fall,3);                // ease-out drop
+    const partE=part<.5?4*part*part*part:1-Math.pow(-2*part+2,3)/2;
+
+    // roast follows the whole document, so scrolling literally roasts the bean
+    applyRoast(scrollP);
+
     // ease every act property so section changes glide instead of snapping
-    for(const k of ['cluster','solo','cam','spread','clusterY'])
+    for(const k of ['cluster','solo','cam','spread','clusterY','cup'])
       state[k]+=((target[k]??0)-state[k])*0.045;
 
     mx+=(tx-mx)*.05; my+=(ty-my)*.05;
@@ -914,15 +1004,30 @@ function initBeans(){
 
     for(let i=0;i<beans.length;i++){
       const b=beans[i];
-      dummy.position.set((b.base.x+Math.sin(t*b.spd+i)*DRIFT)*state.spread,
-                         (b.base.y+Math.cos(t*b.spd*.8+i)*DRIFT)*state.spread+state.clusterY,
-                         b.base.z*state.spread);
-      dummy.rotation.set(b.rot.x+t*b.spd*b.dir,b.rot.y+t*b.spd*.7,b.rot.z+t*b.spd*.4*b.dir);
-      const s=b.scl*state.cluster;
+      // intro: start high and tight, fall into place, then part outward
+      const dropY=(1-fallE)*9;
+      const partOut=1+(1-partE)*-0.55;          // pulled in, then released
+      const px=(b.base.x+Math.sin(t*b.spd+i)*DRIFT)*state.spread*partOut;
+      const py=(b.base.y+Math.cos(t*b.spd*.8+i)*DRIFT)*state.spread*partOut+state.clusterY+dropY;
+      dummy.position.set(px,py,b.base.z*state.spread*partOut);
+      dummy.rotation.set(b.rot.x+t*b.spd*b.dir+(1-fallE)*4,
+                         b.rot.y+t*b.spd*.7,
+                         b.rot.z+t*b.spd*.4*b.dir);
+      const s=b.scl*state.cluster*fallE;
       dummy.scale.set(s*b.sx,s*b.sy,s*b.sz);
       dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
     }
     mesh.instanceMatrix.needsUpdate=true;
+
+    /* ---- the cup rises as the last beans dissolve into it ---- */
+    cup.visible=state.cup>0.015;
+    if(cup.visible){
+      const e=state.cup;
+      cup.scale.setScalar(1.5*e);
+      cup.position.y=-0.4-(1-e)*1.6;
+      cup.rotation.y=mx*.5+ry+Math.sin(t*.25)*.06;
+      cup.rotation.x=Math.max(-.25,Math.min(.25,my*.25+rx*.4));
+    }
 
     // desktop: sits in the figure column (right, in RTL). narrow: centred,
     // because the two-column feature collapses to one below 960px.

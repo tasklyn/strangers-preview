@@ -286,6 +286,17 @@ footer{background:var(--ink);color:var(--paper);padding:clamp(60px,9vh,100px) 0 
   .div-row{grid-template-columns:auto 1fr auto;gap:18px}
   .div-row .thumb{display:none}
 }
+/* Short viewports (a phone held sideways) pushed the hero to 509px against a
+   390px screen, dropping the CTA below the fold. Tighten the stack and drop the
+   quote, which is the one element the hero can lose. */
+@media (max-height:560px){
+  .hero{padding-top:82px;padding-bottom:26px}
+  .hero .kicker{margin-bottom:14px;height:32px;padding:5px 5px 5px 13px}
+  .hero h1{font-size:clamp(1.5rem,4vw,2.1rem)}
+  .hero .quote{display:none}
+  .hero-actions{margin-top:20px;gap:10px}
+  .btn{padding:12px 22px;font-size:13.5px}
+}
 @media (max-width:620px){
   .nav nav,.navcta{display:none}
   .burger{display:flex}

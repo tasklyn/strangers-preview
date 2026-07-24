@@ -16,8 +16,9 @@
   --sand:#EEE9DF;         /* alternating background, per Onyx */
   --ink:#17130F;
   --ink-2:#4A423A;
-  --ink-3:#8A7E70;
-  --gold:#9A7A45;
+  --ink-3:#6E6459;       /* darkened: #8A7E70 was 3.3:1 on --sand, under WCAG AA */
+  --gold:#9A7A45;        /* decorative only: rules, borders, focus, selection */
+  --gold-ink:#7D6135;    /* the same accent for TEXT: 5.6:1 on paper, 4.8:1 on sand */
   --line:rgba(23,19,15,.10);
   --line-2:rgba(23,19,15,.18);
   --serif:"Fraunces",Georgia,serif;
@@ -47,6 +48,10 @@ section.see-3d{background:transparent!important}
 section.see-3d.on-dark{color:var(--paper)}
 section.see-3d.on-dark .body{color:rgba(253,251,247,.74)}
 section.see-3d.on-dark .h2,section.see-3d.on-dark h3{color:var(--paper)}
+/* On near-black the darkened accent drops to 3.2:1, so dark sections get the
+   brighter gold back (4.7:1 on --ink). */
+.ink .eyebrow,.ink .en,section.see-3d.on-dark .eyebrow,section.see-3d.on-dark .en,
+footer .en,footer .fcol a:hover{color:var(--gold)}
 /* z-0, after #heroPhoto in the DOM: it darkens the backdrop but stays behind the beans */
 .veil-dark{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
   background:radial-gradient(130% 100% at 50% 45%,#1E1913 0%,#17130F 55%,#0E0B09 100%);
@@ -65,7 +70,7 @@ h1,h2,h3{font-weight:400;letter-spacing:-.015em;line-height:1.08}
 .display{font-family:var(--sans);font-weight:600;font-size:clamp(2.3rem,5.6vw,4.2rem);letter-spacing:-.025em;line-height:1.06}
 .h2{font-family:var(--sans);font-weight:600;font-size:clamp(1.75rem,3.9vw,2.9rem);letter-spacing:-.02em;line-height:1.1}
 .h3{font-family:var(--sans);font-weight:600;font-size:clamp(1.15rem,2vw,1.4rem);letter-spacing:-.01em}
-.en{font-family:var(--serif);font-style:italic;font-weight:300;color:var(--gold)}
+.en{font-family:var(--serif);font-style:italic;font-weight:300;color:var(--gold-ink)}
 .body{color:var(--ink-2);max-width:58ch}
 .small{font-size:14.5px;color:var(--ink-3)}
 
@@ -129,7 +134,7 @@ h1,h2,h3{font-weight:400;letter-spacing:-.015em;line-height:1.08}
 .btn-ink{background:var(--ink);color:var(--paper)}
 .btn-ink:hover{transform:translateY(-3px);background:#2A231C}
 .btn-ghost{border:1px solid var(--line-2);color:var(--ink)}
-.btn-ghost:hover{transform:translateY(-3px);border-color:var(--gold);color:var(--gold)}
+.btn-ghost:hover{transform:translateY(-3px);border-color:var(--gold);color:var(--gold-ink)}
 
 /* ---------- SECTION RHYTHM (Onyx: alternating paper / sand) ---------- */
 section{padding:clamp(72px,11vh,132px) 0}
@@ -138,7 +143,7 @@ section{padding:clamp(72px,11vh,132px) 0}
 .ink{background:var(--ink);color:var(--paper)}
 .ink .body{color:rgba(253,251,247,.72)}
 .ink .small{color:rgba(253,251,247,.55)}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--gold);
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--gold-ink);
   text-transform:uppercase;margin-bottom:20px}
 .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
 .reveal.in{opacity:1;transform:none}
@@ -156,7 +161,7 @@ body.opened .hero .wrap,body.opened .nav .wrap{opacity:1}
 .way .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.24em;color:var(--ink-3)}
 .way h3{margin:auto 0 10px}
 .way p{font-size:14.5px;color:var(--ink-2);margin-bottom:20px}
-.way .go{font-size:13.5px;color:var(--gold);display:flex;align-items:center;gap:8px}
+.way .go{font-size:13.5px;color:var(--gold-ink);display:flex;align-items:center;gap:8px}
 .way .go svg{width:16px;height:16px;transition:transform .35s var(--ease)}
 .way:hover .go svg{transform:translateX(-5px)}
 
@@ -237,7 +242,7 @@ body.opened .hero .wrap,body.opened .nav .wrap{opacity:1}
 .fok{display:none;margin-top:26px;padding:24px;border:1px solid var(--gold);border-radius:var(--r);
   background:rgba(154,122,69,.07)}
 .fok.on{display:block}
-.fok h4{font-size:1.1rem;color:var(--gold);margin-bottom:7px;font-weight:600}
+.fok h4{font-size:1.1rem;color:var(--gold-ink);margin-bottom:7px;font-weight:600}
 .fok .ref{display:inline-block;font-family:var(--mono);margin-top:12px;padding:8px 15px;
   background:var(--paper);border:1px solid var(--line-2);border-radius:var(--r)}
 
@@ -854,6 +859,8 @@ function initBeans(){
     saucer.position.y=-.52; cup.add(saucer);
   }
   cup.visible=false; cup.position.y=-.35; scene.add(cup);
+  // world height of the brew surface at full cup scale: where the beans land
+  const CUP_RIM_Y=-0.4+0.44*1.5;
 
   const COUNT=window.matchMedia('(max-width:620px)').matches?9:14;
   const mesh=new THREE.InstancedMesh(beanGeo(),mat,COUNT);
@@ -884,7 +891,9 @@ function initBeans(){
       rot:new THREE.Vector3(Math.random()*6,Math.random()*6,Math.random()*6),
       spd:.14+Math.random()*.3, scl, dir:Math.random()>.5?1:-1,
       // no two beans are the same shape
-      sx:.92+Math.random()*.18, sy:.9+Math.random()*.22, sz:.9+Math.random()*.2});
+      sx:.92+Math.random()*.18, sy:.9+Math.random()*.22, sz:.9+Math.random()*.2,
+      pd:Math.random()*0.34,                 // stagger, so they pour in one by one
+      pa:Math.random()*Math.PI*2});          // its own angle on the way down
   }
   mesh.count=beans.length;
   const group=new THREE.Group();group.add(mesh);scene.add(group);
@@ -910,7 +919,7 @@ function initBeans(){
     /* 4 divisions*/ {cluster:.85,solo:0, cam:9.6,  spread:1.9,  clusterY:.3},
     /* 5 places   */ {cluster:.42,solo:0, cam:11.0, spread:3.0,  clusterY:.2},
     /* 6 numbers  */ {cluster:1,  solo:0, cam:7.2,  spread:1.05, clusterY:0},
-    /* 7 contact  */ {cluster:0,  solo:0, cam:6.4,  spread:1.2,  clusterY:0, cup:1}
+    /* 7 contact  */ {cluster:1,  solo:0, cam:6.6,  spread:1.2,  clusterY:0, cup:1}
   ];
   ACTS.forEach(a=>{ if(a.cup===undefined)a.cup=0; });
   const state={cluster:1,solo:0,cam:8.4,spread:1.35,clusterY:0,cup:0};
@@ -1007,13 +1016,30 @@ function initBeans(){
       // intro: start high and tight, fall into place, then part outward
       const dropY=(1-fallE)*9;
       const partOut=1+(1-partE)*-0.55;          // pulled in, then released
-      const px=(b.base.x+Math.sin(t*b.spd+i)*DRIFT)*state.spread*partOut;
-      const py=(b.base.y+Math.cos(t*b.spd*.8+i)*DRIFT)*state.spread*partOut+state.clusterY+dropY;
-      dummy.position.set(px,py,b.base.z*state.spread*partOut);
+      let px=(b.base.x+Math.sin(t*b.spd+i)*DRIFT)*state.spread*partOut;
+      let py=(b.base.y+Math.cos(t*b.spd*.8+i)*DRIFT)*state.spread*partOut+state.clusterY+dropY;
+      let pz=b.base.z*state.spread*partOut;
+      let s=b.scl*state.cluster*fallE;
+
+      /* ---- the pour: roasted beans spiral over the rim and drop into the cup ---- */
+      if(state.cup>0.001){
+        const pi_=Math.max(0,Math.min(1,(state.cup-b.pd)/Math.max(0.001,1-b.pd)));
+        const e=pi_*pi_;                       // accelerates as it falls in
+        const ang=b.pa+t*1.7+e*3.4;            // swirls while descending
+        const rad=0.62*(1-e)+0.10;             // funnels toward the centre
+        const fx=Math.cos(ang)*rad;
+        const fz=Math.sin(ang)*rad;
+        const fy=CUP_RIM_Y+1.7-e*1.55;         // from above the rim down to the brew
+        px+=(fx-px)*e; py+=(fy-py)*e; pz+=(fz-pz)*e;
+        // only vanish once it is actually below the surface
+        const sink=Math.max(0,(pi_-0.82)/0.18);
+        s*=1-sink;
+      }
+
+      dummy.position.set(px,py,pz);
       dummy.rotation.set(b.rot.x+t*b.spd*b.dir+(1-fallE)*4,
                          b.rot.y+t*b.spd*.7,
                          b.rot.z+t*b.spd*.4*b.dir);
-      const s=b.scl*state.cluster*fallE;
       dummy.scale.set(s*b.sx,s*b.sy,s*b.sz);
       dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
     }

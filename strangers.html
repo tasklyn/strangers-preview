@@ -838,6 +838,7 @@ function initBeans(){
 
   /* ---- the payoff: the beans become a cup ---- */
   const cup=new THREE.Group();
+  let brewGeo,brewBase,brewSurf,crema;
   {
     const porcelain=new THREE.MeshPhysicalMaterial({
       color:new THREE.Color(0xF6F1E8).convertSRGBToLinear(),
@@ -853,14 +854,27 @@ function initBeans(){
     rim.rotation.x=Math.PI/2; rim.position.y=.625; cup.add(rim);
     const handle=new THREE.Mesh(new THREE.TorusGeometry(.34,.062,16,48,Math.PI*1.25),porcelain);
     handle.position.set(1.0,.16,0); handle.rotation.z=-0.35; cup.add(handle);
-    const surf=new THREE.Mesh(new THREE.CircleGeometry(.88,64),brew);
-    surf.rotation.x=-Math.PI/2; surf.position.y=.44; cup.add(surf);
+    // The brew is a real surface: it rises as the cup fills and its vertices
+    // ripple, so it reads as liquid rather than a painted disc.
+    brewGeo=new THREE.CircleGeometry(1,80);
+    brewBase=Float32Array.from(brewGeo.attributes.position.array);
+    brewSurf=new THREE.Mesh(brewGeo,brew);
+    brewSurf.rotation.x=-Math.PI/2; cup.add(brewSurf);
+    // crema: a thin lighter ring riding the liquid edge
+    crema=new THREE.Mesh(new THREE.TorusGeometry(1,.028,10,80),
+      new THREE.MeshPhysicalMaterial({
+        color:new THREE.Color(0xB98A55).convertSRGBToLinear(),
+        roughness:.42,metalness:0,clearcoat:.6,envMapIntensity:.8}));
+    crema.rotation.x=Math.PI/2; cup.add(crema);
     const saucer=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.34,.06,64),porcelain);
     saucer.position.y=-.52; cup.add(saucer);
   }
   cup.visible=false; cup.position.y=-.35; scene.add(cup);
   // world height of the brew surface at full cup scale: where the beans land
   const CUP_RIM_Y=-0.4+0.44*1.5;
+  // cup interior: the wall tapers, so the liquid disc widens as the level rises
+  const CUP_LOW=-0.40, CUP_HIGH=0.44, R_LOW=0.645, R_HIGH=0.895;
+  let fillLevel=0, splash=0;
 
   const COUNT=window.matchMedia('(max-width:620px)').matches?9:14;
   const mesh=new THREE.InstancedMesh(beanGeo(),mat,COUNT);
@@ -1011,6 +1025,7 @@ function initBeans(){
     mx+=(tx-mx)*.05; my+=(ty-my)*.05;
     ry+=vy; rx+=vx; vy*=.94; vx*=.94; rx=Math.max(-.7,Math.min(.7,rx));
 
+    let poured=0;                 // how much of the cluster has entered the cup
     for(let i=0;i<beans.length;i++){
       const b=beans[i];
       // intro: start high and tight, fall into place, then part outward
@@ -1034,6 +1049,9 @@ function initBeans(){
         // only vanish once it is actually below the surface
         const sink=Math.max(0,(pi_-0.82)/0.18);
         s*=1-sink;
+        // a bean breaking the surface kicks a ripple
+        if(pi_>0.80&&pi_<0.90) splash=Math.min(1,splash+0.05);
+        poured+=pi_;
       }
 
       dummy.position.set(px,py,pz);
@@ -1053,6 +1071,36 @@ function initBeans(){
       cup.position.y=-0.4-(1-e)*1.6;
       cup.rotation.y=mx*.5+ry+Math.sin(t*.25)*.06;
       cup.rotation.x=Math.max(-.25,Math.min(.25,my*.25+rx*.4));
+
+      /* ---- the cup fills ---- */
+      // level follows how many beans have actually gone in, so you watch it rise
+      const fillTarget=beans.length?Math.min(1,poured/beans.length):0;
+      fillLevel+=(fillTarget-fillLevel)*0.06;
+      splash*=0.94;                                  // ripples settle
+
+      const lv=CUP_LOW+(CUP_HIGH-CUP_LOW)*fillLevel;
+      const rad=R_LOW+(R_HIGH-R_LOW)*fillLevel;
+      brewSurf.position.y=lv;
+      brewSurf.scale.setScalar(rad);
+      brewSurf.visible=fillLevel>0.02;
+      crema.position.y=lv;
+      crema.scale.setScalar(rad);
+      crema.visible=brewSurf.visible;
+
+      // ripples: concentric rings from the centre plus a cross swell, louder
+      // right after a bean lands. Scaled down because the mesh is scaled up.
+      if(brewSurf.visible){
+        const amp=(0.010+splash*0.05)/Math.max(rad,0.001);
+        const pa=brewGeo.attributes.position.array;
+        for(let k=0;k<pa.length;k+=3){
+          const vx=brewBase[k], vy=brewBase[k+1];
+          const d=Math.sqrt(vx*vx+vy*vy);
+          const edge=1-d;                            // still at the wall
+          pa[k+2]=(Math.sin(d*11-t*4.0)*0.7+Math.sin(vx*6+t*2.3)*0.3)*amp*edge;
+        }
+        brewGeo.attributes.position.needsUpdate=true;
+        brewGeo.computeVertexNormals();
+      }
     }
 
     // desktop: sits in the figure column (right, in RTL). narrow: centred,

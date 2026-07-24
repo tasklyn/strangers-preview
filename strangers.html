@@ -724,41 +724,51 @@ function initBeans(){
   function beanSurface(){
     const W=1024,H=512;
     const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-    x.fillStyle='#6B4A2F';x.fillRect(0,0,W,H);
-    // broad roast mottling
-    for(let i=0;i<300;i++){
-      const rx=Math.random()*W, ry=Math.random()*H, rr=18+Math.random()*90;
-      const g=x.createRadialGradient(rx,ry,0,rx,ry,rr);
-      const dark=Math.random()>.5;
-      g.addColorStop(0,dark?'rgba(58,36,20,.30)':'rgba(150,108,66,.24)');
-      g.addColorStop(1,'rgba(0,0,0,0)');
-      x.fillStyle=g;x.fillRect(rx-rr,ry-rr,rr*2,rr*2);
-    }
-    // pale silverskin down each crease face
-    for(const u of [0.25,0.75]){
-      const cx=u*W;
-      const g=x.createLinearGradient(cx-42,0,cx+42,0);
-      g.addColorStop(0,'rgba(198,164,120,0)');
-      g.addColorStop(.5,'rgba(206,176,132,.85)');
-      g.addColorStop(1,'rgba(198,164,120,0)');
-      x.fillStyle=g;x.fillRect(cx-42,0,84,H);
-      // ragged edge so it does not read as a printed stripe
-      for(let i=0;i<160;i++){
-        x.fillStyle='rgba(120,86,52,'+(0.1+Math.random()*0.28)+')';
-        const yy=Math.random()*H, off=(Math.random()-.5)*70;
-        x.fillRect(cx+off,yy,2+Math.random()*9,1+Math.random()*3);
+
+    // Procedural roast mottling. Used on its own until the photographic grain
+    // loads, then redrawn underneath it.
+    function paintBase(){
+      x.fillStyle='#6B4A2F';x.fillRect(0,0,W,H);
+      for(let i=0;i<300;i++){
+        const rx=Math.random()*W, ry=Math.random()*H, rr=18+Math.random()*90;
+        const g=x.createRadialGradient(rx,ry,0,rx,ry,rr);
+        const dark=Math.random()>.5;
+        g.addColorStop(0,dark?'rgba(58,36,20,.30)':'rgba(150,108,66,.24)');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        x.fillStyle=g;x.fillRect(rx-rr,ry-rr,rr*2,rr*2);
       }
     }
-    // pores
-    for(let i=0;i<2600;i++){
-      x.fillStyle='rgba(44,26,13,'+(0.06+Math.random()*0.26)+')';
-      x.beginPath();x.arc(Math.random()*W,Math.random()*H,0.4+Math.random()*1.7,0,7);x.fill();
+    // The crease must be painted in UV space: SphereGeometry wraps u around the
+    // equator, so the two crease faces land at u=0.25 and u=0.75.
+    function paintCrease(){
+      for(const u of [0.25,0.75]){
+        const cx=u*W;
+        const g=x.createLinearGradient(cx-42,0,cx+42,0);
+        g.addColorStop(0,'rgba(198,164,120,0)');
+        g.addColorStop(.5,'rgba(206,176,132,.85)');
+        g.addColorStop(1,'rgba(198,164,120,0)');
+        x.fillStyle=g;x.fillRect(cx-42,0,84,H);
+        for(let i=0;i<160;i++){   // ragged edge, so it is not a printed stripe
+          x.fillStyle='rgba(120,86,52,'+(0.1+Math.random()*0.28)+')';
+          const yy=Math.random()*H, off=(Math.random()-.5)*70;
+          x.fillRect(cx+off,yy,2+Math.random()*9,1+Math.random()*3);
+        }
+      }
     }
-    for(let i=0;i<900;i++){
-      x.fillStyle='rgba(196,152,102,'+(0.05+Math.random()*0.16)+')';
-      x.beginPath();x.arc(Math.random()*W,Math.random()*H,0.3+Math.random()*1.2,0,7);x.fill();
+    function paintPores(n1,n2){
+      for(let i=0;i<n1;i++){
+        x.fillStyle='rgba(44,26,13,'+(0.06+Math.random()*0.26)+')';
+        x.beginPath();x.arc(Math.random()*W,Math.random()*H,0.4+Math.random()*1.7,0,7);x.fill();
+      }
+      for(let i=0;i<n2;i++){
+        x.fillStyle='rgba(196,152,102,'+(0.05+Math.random()*0.16)+')';
+        x.beginPath();x.arc(Math.random()*W,Math.random()*H,0.3+Math.random()*1.2,0,7);x.fill();
+      }
     }
+    paintBase();paintCrease();paintPores(2600,900);
+
     const t=new THREE.CanvasTexture(c);
+
     t.encoding=THREE.sRGBEncoding;t.wrapS=t.wrapT=THREE.RepeatWrapping;
     t.anisotropy=renderer.capabilities.getMaxAnisotropy();
     // roughness: the pale crease is drier than the oily body

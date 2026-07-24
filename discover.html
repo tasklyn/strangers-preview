@@ -80,9 +80,12 @@ h1,h2,h3{font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0}
 /* ---------- THE FILM ---------- */
 /* The scroll runway is tall; the stage inside it is pinned by position:sticky,
    which needs no scroll library and cannot desync from the scrollbar. */
-#film{height:620svh;position:relative;background:#0B0704}
+#film,#film2{height:620svh;position:relative;background:#0B0704}
+#film2{height:540svh}
 .film__stage{position:sticky;top:0;height:100svh;overflow:hidden}
-#filmCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* must match BOTH films: the renderer is called with updateStyle=false, so the
+   canvas has no inline size and falls back to its attribute size without this */
+.film__stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .film__grain{position:absolute;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:overlay;
   background-image:radial-gradient(rgba(255,255,255,.7) .5px,transparent .5px);
   background-size:3px 3px}
@@ -102,7 +105,7 @@ h1,h2,h3{font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0}
 .film__caption.swap .film__step{opacity:0;transform:translateY(10px)}
 .film__title,.film__text,.film__step{transition:opacity .32s var(--ease),transform .32s var(--ease)}
 @media (prefers-reduced-motion:reduce){
-  #film{height:auto}
+  #film,#film2{height:auto}
   .film__stage{position:static;height:70svh}
 }
 
@@ -235,6 +238,20 @@ footer .cr{font-family:var(--mono);font-size:12px;color:rgba(255,247,234,.5);mar
   </div>
   <div class="rail"><i id="railCoffee"></i></div>
   <div class="pan" id="panCoffee"><div class="pan__track" id="trackCoffee"></div></div>
+</section>
+
+<!-- THE SECOND FILM: dough becomes a croissant -->
+<section id="film2">
+  <div class="film__stage">
+    <canvas></canvas>
+    <div class="film__grain" aria-hidden="true"></div>
+    <div class="film__caption">
+      <span class="film__step mono">01 / 05</span>
+      <h2 class="film__title">قبل الفجر</h2>
+      <p class="film__text">دقيق وزبدة وحليب وخميرة. أربعة أشياء فقط، ولا شيء جاهز.</p>
+    </div>
+    <div class="film__rail"><i></i></div>
+  </div>
 </section>
 
 <!-- CHAPTER 3: THE BAKERY JOURNEY -->
@@ -379,12 +396,20 @@ const ACTS=[
    col:0x4A2A16, rough:.62, coat:.5,  bg:0x1A0E08, key:0xFFE0B0, rim:0xBE420F, spark:.25}
 ];
 
-function initFilm(){
-  const cv=$('#filmCanvas');
+/* One engine, two films. opts: {root, acts, hero(), extra(scene,api)} */
+function makeFilm(opts){
+  const sec=$(opts.root); if(!sec)return;
+  const cv=sec.querySelector('canvas');
   if(!cv||!window.THREE||REDUCE)return;
   let renderer;
   try{ renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true}); }catch(e){ return; }
-  const stage=$('.film__stage'), sec=$('#film');
+  const stage=sec.querySelector('.film__stage');
+  const elStep=sec.querySelector('.film__step'),
+        elTitle=sec.querySelector('.film__title'),
+        elText=sec.querySelector('.film__text'),
+        elRail=sec.querySelector('.film__rail i'),
+        capEl=sec.querySelector('.film__caption');
+  const ACTS=opts.acts;
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.outputEncoding=THREE.sRGBEncoding;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
@@ -394,35 +419,10 @@ function initFilm(){
   const camera=new THREE.PerspectiveCamera(38,1,.1,80);
   camera.position.set(0,0,6);
 
-  // the same bean profile used across the brand
-  function beanGeo(){
-    const g=new THREE.SphereGeometry(1,132,86);
-    const p=g.attributes.position,v=new THREE.Vector3();
-    for(let i=0;i<p.count;i++){
-      v.fromBufferAttribute(p,i);
-      v.x*=.74; v.z*=.60;
-      const taper=1-.20*Math.pow(Math.abs(v.y),2.4); v.x*=taper; v.z*=taper;
-      v.z*=1-.10*Math.pow(Math.abs(v.z),2);
-      const cap=1-Math.pow(Math.min(1,Math.abs(v.y)),3.2);
-      const dx=v.x-.055*Math.sin(v.y*2.6);
-      const crease=Math.exp(-(dx*dx)/.016), dir=Math.sign(v.z)||1;
-      v.z-=dir*crease*.30*cap;
-      v.z+=dir*Math.exp(-Math.pow(Math.abs(dx)-.19,2)/.006)*.035*cap;
-      v.z*=1+.030*Math.cos(v.y*4.1+v.x*3.3);
-      v.x*=1+.022*Math.sin(v.y*3.4);
-      p.setXYZ(i,v.x,v.y,v.z);
-    }
-    g.computeVertexNormals();return g;
-  }
+  // the hero object is supplied per film; it owns its own material
   const mat=new THREE.MeshPhysicalMaterial({roughness:.5,metalness:0,clearcoat:.4});
-  const bean=new THREE.Mesh(beanGeo(),mat);
-  bean.scale.setScalar(1.55); scene.add(bean);
-
-  // the cherry skin: a second shell that peels away during processing
-  const skinMat=new THREE.MeshPhysicalMaterial({color:new THREE.Color(0xB4231C).convertSRGBToLinear(),
-    roughness:.22,clearcoat:.9,transparent:true,opacity:1});
-  const skin=new THREE.Mesh(new THREE.SphereGeometry(1,72,52),skinMat);
-  skin.scale.setScalar(1.34); scene.add(skin);
+  const hero=opts.hero(mat);
+  scene.add(hero);
 
   const amb=new THREE.AmbientLight(0xffffff,.35); scene.add(amb);
   const key=new THREE.DirectionalLight(0xffffff,1.5); key.position.set(3,4,5); scene.add(key);
@@ -451,7 +451,7 @@ function initFilm(){
   scene.background=new THREE.Color(0x123018);
 
   let prog=0, shown=-1;
-  const capEl=$('.film__caption');
+  const api={scene,camera,mat,hero,prog:0};      // handed to per-film extras
   function apply(p){
     const n=ACTS.length-1;
     const f=Math.max(0,Math.min(.9999,p))*n;
@@ -473,20 +473,17 @@ function initFilm(){
     rA.setHex(a.rim);rB.setHex(b.rim);rM.copy(rA).lerp(rB,ease);rim.color.copy(rM);
 
     pmat.opacity=(a.spark+(b.spark-a.spark)*ease)*.7;
-    // the cherry skin only exists for the first leg
-    const peel=Math.max(0,Math.min(1,f/0.92));
-    skin.visible=peel<1;
-    skinMat.opacity=1-peel;
-    skin.scale.setScalar(1.34+peel*.9);
+    api.f=f; api.ease=ease;
+    if(opts.onFrame)opts.onFrame(f,api);        // per-film extras (peel, morph)
 
     const idx=Math.round(f);
     if(idx!==shown){
       shown=idx;
       capEl.classList.add('swap');
       setTimeout(()=>{
-        $('#filmStep').textContent=String(idx+1).padStart(2,'0')+' / 0'+ACTS.length;
-        $('#filmTitle').textContent=ACTS[idx].t;
-        $('#filmText').textContent=ACTS[idx].p;
+        elStep.textContent=String(idx+1).padStart(2,'0')+' / '+String(ACTS.length).padStart(2,'0');
+        elTitle.textContent=ACTS[idx].t;
+        elText.textContent=ACTS[idx].p;
         capEl.classList.remove('swap');
       },320);
     }
@@ -496,7 +493,8 @@ function initFilm(){
     const r=sec.getBoundingClientRect();
     const total=Math.max(1,sec.offsetHeight-innerHeight);
     prog=Math.max(0,Math.min(1,-r.top/total));
-    $('#filmRail').style.width=(prog*100).toFixed(1)+'%';
+    api.prog=prog;
+    if(elRail)elRail.style.width=(prog*100).toFixed(1)+'%';
   }
   addEventListener('scroll',onScroll,{passive:true});
 
@@ -517,9 +515,10 @@ function initFilm(){
     if(!seen)return;
     const t=clock.getElapsedTime();
     apply(prog);
-    bean.rotation.y=t*.28+prog*4.2;
-    bean.rotation.x=Math.sin(t*.4)*.12;
-    skin.rotation.copy(bean.rotation);
+    hero.rotation.y=t*.28+prog*4.2;
+    hero.rotation.x=Math.sin(t*.4)*.12;
+    api.t=t;
+    if(opts.onTick)opts.onTick(t,api);
     camera.position.z=6-prog*1.4;
     const arr=pg.attributes.position.array;
     for(let i=0;i<PC;i++){
@@ -530,6 +529,126 @@ function initFilm(){
     pg.attributes.position.needsUpdate=true;
     renderer.render(scene,camera);
   })();
+}
+
+/* ---------- HERO GEOMETRIES ---------- */
+function beanGeo(){
+  const g=new THREE.SphereGeometry(1,132,86);
+  const p=g.attributes.position,v=new THREE.Vector3();
+  for(let i=0;i<p.count;i++){
+    v.fromBufferAttribute(p,i);
+    v.x*=.74; v.z*=.60;
+    const taper=1-.20*Math.pow(Math.abs(v.y),2.4); v.x*=taper; v.z*=taper;
+    v.z*=1-.10*Math.pow(Math.abs(v.z),2);
+    const cap=1-Math.pow(Math.min(1,Math.abs(v.y)),3.2);
+    const dx=v.x-.055*Math.sin(v.y*2.6);
+    const crease=Math.exp(-(dx*dx)/.016), dir=Math.sign(v.z)||1;
+    v.z-=dir*crease*.30*cap;
+    v.z+=dir*Math.exp(-Math.pow(Math.abs(dx)-.19,2)/.006)*.035*cap;
+    v.z*=1+.030*Math.cos(v.y*4.1+v.x*3.3);
+    v.x*=1+.022*Math.sin(v.y*3.4);
+    p.setXYZ(i,v.x,v.y,v.z);
+  }
+  g.computeVertexNormals();return g;
+}
+/* A croissant is a crescent tube that tapers to points and carries rolled
+   ridges. Built by sweeping a curve, then pushing vertices in and out from
+   the curve's centre line. */
+function croissantGeo(){
+  const pts=[];
+  for(let i=0;i<=28;i++){
+    const a=-Math.PI*.46+Math.PI*.92*(i/28);
+    pts.push(new THREE.Vector3(Math.sin(a)*1.45,-Math.cos(a)*.62+.42,0));
+  }
+  const curve=new THREE.CatmullRomCurve3(pts);
+  const g=new THREE.TubeGeometry(curve,180,.40,30,false);
+  const pos=g.attributes.position, uv=g.attributes.uv;
+  const v=new THREE.Vector3(), c=new THREE.Vector3();
+  for(let i=0;i<pos.count;i++){
+    const t=uv.getX(i);
+    v.fromBufferAttribute(pos,i);
+    curve.getPoint(t,c);
+    v.sub(c);
+    const taper=Math.pow(Math.sin(Math.PI*t),.55);   // pointed tips, fat middle
+    const ridge=1+.13*Math.sin(t*Math.PI*13);        // the rolled layers
+    v.multiplyScalar(taper*ridge);
+    v.add(c);
+    pos.setXYZ(i,v.x,v.y,v.z);
+  }
+  // the swept curve does not sit on the origin, so without this the croissant
+  // orbits off-frame as soon as it rotates
+  g.center();
+  g.computeVertexNormals();return g;
+}
+
+/* ---------- FILM 1 · THE CROP ---------- */
+function filmCrop(){
+  let skin,skinMat;
+  makeFilm({
+    root:'#film', acts:ACTS,
+    hero(mat){
+      const m=new THREE.Mesh(beanGeo(),mat); m.scale.setScalar(1.55); return m;
+    },
+    onFrame(f,api){
+      if(!skin){
+        skinMat=new THREE.MeshPhysicalMaterial({
+          color:new THREE.Color(0xB4231C).convertSRGBToLinear(),
+          roughness:.22,clearcoat:.9,transparent:true,opacity:1});
+        skin=new THREE.Mesh(new THREE.SphereGeometry(1,72,52),skinMat);
+        skin.scale.setScalar(1.34); api.scene.add(skin);
+      }
+      const peel=Math.max(0,Math.min(1,f/.92));      // the cherry only exists at the start
+      skin.visible=peel<1; skinMat.opacity=1-peel;
+      skin.scale.setScalar(1.34+peel*.9);
+      skin.rotation.copy(api.hero.rotation);
+    }
+  });
+}
+
+/* ---------- FILM 2 · THE BAKE ---------- */
+const BAKE=[
+  {t:'قبل الفجر', p:'دقيق وزبدة وحليب وخميرة. أربعة أشياء فقط، ولا شيء جاهز.',
+   col:0xEDE0C8, rough:.95, coat:.02, bg:0x121A24, key:0xBFD4E8, rim:0x2A3B4E, spark:.5},
+  {t:'التخمير',  p:'تُترك العجينة ترتاح ساعات. البطء هو ما يصنع النكهة، لا الخميرة وحدها.',
+   col:0xE8D5B2, rough:.9,  coat:.05, bg:0x2A2016, key:0xFFE3B8, rim:0x6B4A22, spark:.2},
+  {t:'الطي',     p:'تُطوى على الزبدة ثلاث مرات على مدى يومين. كل طية تضاعف الطبقات.',
+   col:0xF0D9A0, rough:.7,  coat:.28, bg:0x1B2A2E, key:0xE6F2F5, rim:0x3E6B74, spark:0},
+  {t:'الفرن',    p:'الحرارة تبخّر ماء الزبدة، فتنفصل الطبقات وترتفع. هنا يولد الكرواسون.',
+   col:0xC8802E, rough:.52, coat:.5,  bg:0x38130A, key:0xFFC170, rim:0xFF6A1E, spark:1},
+  {t:'الفرع',    p:'يصل ساخناً الساعة السادسة. وما لا يُباع في يومه لا يُعاد عرضه.',
+   col:0xA8601F, rough:.46, coat:.62, bg:0x24160C, key:0xFFE2B4, rim:0xBE420F, spark:.15}
+];
+function filmBake(){
+  let dough;
+  makeFilm({
+    root:'#film2', acts:BAKE,
+    hero(mat){
+      const m=new THREE.Mesh(croissantGeo(),mat); m.scale.setScalar(.82); return m;
+    },
+    // a full spin suits a bean; a wide crescent just swings out of frame, so
+    // this one sways and tilts instead
+    onTick(t,api){
+      api.hero.rotation.y=Math.sin(t*.32)*.55+api.prog*.9;
+      api.hero.rotation.x=-.22+Math.sin(t*.24)*.10;
+      api.hero.rotation.z=Math.sin(t*.19)*.08;
+    },
+    onFrame(f,api){
+      if(!dough){
+        // a plain ball of dough stands in for the first two acts, then dissolves
+        dough=new THREE.Mesh(new THREE.SphereGeometry(1,64,44),api.mat);
+        dough.scale.setScalar(1.15); api.scene.add(dough);
+      }
+      const n=BAKE.length-1;
+      const morph=Math.max(0,Math.min(1,(f-1.35)/.9));   // ball -> croissant
+      dough.visible=morph<1;
+      dough.scale.setScalar(1.05*(1-morph)+.2*morph);
+      api.hero.scale.setScalar(.2*(1-morph)+.82*morph);
+      api.hero.visible=morph>0;
+      dough.rotation.copy(api.hero.rotation);
+      // the dough breathes while it proves
+      if(f<1.6){const b=1+Math.sin(api.t*1.6)*.035; dough.scale.multiplyScalar(b);}
+    }
+  });
 }
 
 /* ---------- REVEAL ---------- */
@@ -569,7 +688,7 @@ $('#originGrid').addEventListener('keydown',e=>{
 
 window.addEventListener('load',()=>{
   gsap.registerPlugin(ScrollTrigger);
-  initFilm();
+  filmCrop(); filmBake();
   horizontal('#panCoffee','#trackCoffee','#railCoffee');
   horizontal('#panBakery','#trackBakery','#railBakery');
   ScrollTrigger.refresh();

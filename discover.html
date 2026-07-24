@@ -77,36 +77,34 @@ h1,h2,h3{font-weight:700;letter-spacing:-.035em;line-height:.95;margin:0}
   display:block;margin-bottom:14px}
 .chapter--dark .chap-no{color:var(--gold)}
 
-/* ---------- WORLD MAP ---------- */
-.mapwrap{position:relative;margin-top:44px;border:2px solid var(--ink);border-radius:6px;
-  background:var(--paper);overflow:hidden}
-#worldMap{display:block;width:100%;height:auto}
-.map__pins{position:absolute;inset:0;pointer-events:none}
-.pin{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;
-  background:none;border:0;padding:0;cursor:pointer;font-family:var(--sans)}
-.pin__dot{width:15px;height:15px;border-radius:50%;background:var(--gold);
-  border:2.5px solid var(--paper);box-shadow:0 0 0 2px var(--ink);
-  transition:transform .3s var(--ease)}
-.pin::after{content:"";position:absolute;top:50%;left:50%;width:15px;height:15px;
-  margin:-7.5px 0 0 -7.5px;border-radius:50%;border:2px solid var(--gold);
-  animation:ping 2.4s var(--ease) infinite}
-@keyframes ping{0%{transform:scale(1);opacity:.85}70%,100%{transform:scale(3.2);opacity:0}}
-.pin:hover .pin__dot,.pin.on .pin__dot{transform:scale(1.5)}
-.pin__label{position:absolute;top:18px;left:50%;transform:translateX(-50%);
-  white-space:nowrap;font-size:12px;font-weight:700;color:var(--ink);
-  background:var(--paper);border:1.5px solid var(--ink);border-radius:999px;
-  padding:2px 9px}
-.pin.on .pin__label{background:var(--ink);color:var(--cream)}
-.map__note{position:absolute;bottom:10px;inset-inline-start:14px;margin:0;
-  font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);max-width:60%;line-height:1.6}
-@media (prefers-reduced-motion:reduce){.pin::after{animation:none;opacity:0}}
-@media (max-width:640px){
-  .pin__label{font-size:10px;padding:1px 6px}
-  .map__note{position:static;padding:10px 14px;max-width:none}
+/* ---------- THE FILM ---------- */
+/* The scroll runway is tall; the stage inside it is pinned by position:sticky,
+   which needs no scroll library and cannot desync from the scrollbar. */
+#film{height:620svh;position:relative;background:#0B0704}
+.film__stage{position:sticky;top:0;height:100svh;overflow:hidden}
+#filmCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.film__grain{position:absolute;inset:0;pointer-events:none;opacity:.16;mix-blend-mode:overlay;
+  background-image:radial-gradient(rgba(255,255,255,.7) .5px,transparent .5px);
+  background-size:3px 3px}
+.film__caption{position:absolute;bottom:11vh;inset-inline-start:clamp(20px,5vw,60px);
+  max-width:min(30ch,80vw);color:#FFF7EA;z-index:3}
+/* the counter is Latin digits with a slash: RTL would reorder it to "06 / 01" */
+.film__step{display:block;font-size:11px;letter-spacing:.34em;color:var(--gold);margin-bottom:12px;
+  direction:ltr;text-align:right;unicode-bidi:isolate}
+.film__title{font-size:clamp(2.2rem,6vw,4.4rem);letter-spacing:-.04em;line-height:.94;
+  margin:0 0 14px;text-shadow:0 4px 30px rgba(0,0,0,.7)}
+.film__text{margin:0;font-size:clamp(.98rem,1.7vw,1.15rem);line-height:1.75;
+  color:rgba(255,247,234,.84);text-shadow:0 2px 18px rgba(0,0,0,.8)}
+.film__rail{position:absolute;bottom:0;inset-inline:0;height:3px;background:rgba(255,247,234,.14);z-index:3}
+.film__rail i{display:block;height:100%;width:0;background:var(--gold)}
+/* the caption swaps with a quick lift rather than a cross-fade mush */
+.film__caption.swap .film__title,.film__caption.swap .film__text,
+.film__caption.swap .film__step{opacity:0;transform:translateY(10px)}
+.film__title,.film__text,.film__step{transition:opacity .32s var(--ease),transform .32s var(--ease)}
+@media (prefers-reduced-motion:reduce){
+  #film{height:auto}
+  .film__stage{position:static;height:70svh}
 }
-.origin.on{background:var(--ink);color:var(--cream)}
-.origin.on dt{color:rgba(255,247,234,.6)}
-.origin.on .flagname{color:var(--gold)}
 
 /* ---------- ORIGINS ---------- */
 .origins{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:44px}
@@ -209,14 +207,22 @@ footer .cr{font-family:var(--mono);font-size:12px;color:rgba(255,247,234,.5);mar
     <h2 class="h2 reveal">من أين تأتي <span class="band">حبّتنا</span></h2>
     <p class="lead reveal" style="margin-top:20px">لا نشتري «بنّاً». نشتري محصولاً من مزرعة لها اسم، وارتفاع، وطريقة معالجة تغيّر طعم الفنجان تماماً.</p>
 
-    <div class="mapwrap reveal">
-      <canvas id="worldMap" role="img"
-        aria-label="خريطة العالم توضّح دول منشأ محصول سترينجرز داخل حزام البن"></canvas>
-      <div class="map__pins" id="mapPins"></div>
-      <p class="map__note mono">حزام البن: المنطقة بين مدار السرطان ومدار الجدي، حيث ينمو البن العربي</p>
-    </div>
-
     <div class="origins" id="originGrid"></div>
+  </div>
+</section>
+
+<!-- THE FILM: one continuous shot. The bean is the character; the world
+     changes around it as you scroll. No cuts, no sections. -->
+<section id="film">
+  <div class="film__stage">
+    <canvas id="filmCanvas"></canvas>
+    <div class="film__grain" aria-hidden="true"></div>
+    <div class="film__caption">
+      <span class="film__step mono" id="filmStep">01 / 06</span>
+      <h2 class="film__title" id="filmTitle">على الشجرة</h2>
+      <p class="film__text" id="filmText">ثمرة حمراء تنضج على ارتفاع ألفي متر. داخلها بذرتان: هما القهوة.</p>
+    </div>
+    <div class="film__rail"><i id="filmRail"></i></div>
   </div>
 </section>
 
@@ -258,6 +264,7 @@ footer .cr{font-family:var(--mono);font-size:12px;color:rgba(255,247,234,.5);mar
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
@@ -352,92 +359,177 @@ $('#trackCoffee').innerHTML=stages(COFFEE);
 $('#trackBakery').innerHTML=stages(BAKERY);
 
 /* =====================================================================
-   WORLD MAP
-   Equirectangular projection drawn to canvas from a local outline file, so
-   there is no tile server, no API key and nothing to break offline. The view
-   is cropped to the coffee belt because that is the only part that matters.
+   THE FILM
+   One bean, one continuous shot. Scroll drives a 0..1 timeline; colour,
+   surface, lighting and particles are all interpolated along it, so the
+   stages melt into each other instead of cutting.
    ===================================================================== */
-const MAP={lon0:-125,lon1:65,lat0:40,lat1:-40};   // window on the growing world
-function project(lon,lat,w,h){
-  return [ (lon-MAP.lon0)/(MAP.lon1-MAP.lon0)*w,
-           (lat-MAP.lat0)/(MAP.lat1-MAP.lat0)*h ];
-}
-async function drawMap(){
-  const cv=$('#worldMap'); if(!cv)return;
-  const pinHost=$('#mapPins');
-  let shapes=null;
-  try{
-    const res=await fetch('assets/world.json',{cache:'force-cache'});
-    if(res.ok)shapes=await res.json();
-  }catch(_){}
+const ACTS=[
+  {t:'على الشجرة', p:'ثمرة حمراء تنضج على ارتفاع ألفي متر. داخلها بذرتان: هما القهوة.',
+   col:0xB4231C, rough:.28, coat:.85, bg:0x123018, key:0xFFE9C4, rim:0x4CAF50, spark:0},
+  {t:'المعالجة',  p:'يُزال اللبّ بالماء أو تُترك الثمرة تجف عليه. هنا يتحدد نصف طعم الفنجان.',
+   col:0x9FB07A, rough:.62, coat:.35, bg:0x0E2A33, key:0xDCF2FF, rim:0x3FA9D6, spark:1},
+  {t:'التجفيف',   p:'تُفرد على مصاطب تحت الشمس حتى تنزل رطوبتها إلى أحد عشر بالمئة.',
+   col:0xC8C79A, rough:.86, coat:.06, bg:0x8A6A34, key:0xFFF1CE, rim:0xE0A64B, spark:.4},
+  {t:'الشحن',     p:'تُعبّأ خضراء في أكياس مبطّنة، وتسافر شهراً حتى تصل مستودعنا.',
+   col:0xA8AE84, rough:.9,  coat:.04, bg:0x0A0F14, key:0x9FB6C9, rim:0x2E4456, spark:0},
+  {t:'التحميص',  p:'منحنى خاص لكل محصول. الحرارة والوقت يقرران أين تقف الحلاوة وأين تبدأ المرارة.',
+   col:0x6B3A1C, rough:.7,  coat:.34, bg:0x2A0B03, key:0xFFB463, rim:0xFF5A18, spark:1},
+  {t:'الفنجان',   p:'تُطحن عند الطلب، وتُستخلص خلال دقائق. من الثمرة إلى يدك.',
+   col:0x4A2A16, rough:.62, coat:.5,  bg:0x1A0E08, key:0xFFE0B0, rim:0xBE420F, spark:.25}
+];
 
-  function render(){
-    const wrap=cv.parentElement;
-    const w=wrap.clientWidth, h=Math.round(w*0.46);
-    const dpr=Math.min(devicePixelRatio||1,2);
-    cv.width=w*dpr; cv.height=h*dpr;
-    cv.style.height=h+'px';
-    const x=cv.getContext('2d');
-    x.setTransform(dpr,0,0,dpr,0,0);
-    x.clearRect(0,0,w,h);
+function initFilm(){
+  const cv=$('#filmCanvas');
+  if(!cv||!window.THREE||REDUCE)return;
+  let renderer;
+  try{ renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true}); }catch(e){ return; }
+  const stage=$('.film__stage'), sec=$('#film');
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.05;
 
-    // the coffee belt: the tropics, where arabica actually grows
-    const [,yTropN]=project(0, 23.44,w,h);
-    const [,yTropS]=project(0,-23.44,w,h);
-    x.fillStyle='rgba(190,66,15,.10)';
-    x.fillRect(0,yTropN,w,yTropS-yTropN);
-    x.strokeStyle='rgba(190,66,15,.45)';x.lineWidth=1;x.setLineDash([5,5]);
-    [yTropN,yTropS].forEach(y=>{x.beginPath();x.moveTo(0,y);x.lineTo(w,y);x.stroke();});
-    x.setLineDash([]);
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(38,1,.1,80);
+  camera.position.set(0,0,6);
 
-    // landmasses
-    if(shapes){
-      x.fillStyle='#D9C3A3'; x.strokeStyle='rgba(43,21,8,.32)'; x.lineWidth=.7;
-      for(const rings of shapes){
-        for(const flat of rings){
-          x.beginPath();
-          for(let i=0;i<flat.length;i+=2){
-            const [px,py]=project(flat[i],flat[i+1],w,h);
-            i===0?x.moveTo(px,py):x.lineTo(px,py);
-          }
-          x.closePath(); x.fill(); x.stroke();
-        }
-      }
-    }else{
-      x.fillStyle='var(--ink-3)';
-      x.font='600 14px system-ui';x.textAlign='center';
-      x.fillText('تعذّر تحميل حدود الخريطة',w/2,h/2);
+  // the same bean profile used across the brand
+  function beanGeo(){
+    const g=new THREE.SphereGeometry(1,132,86);
+    const p=g.attributes.position,v=new THREE.Vector3();
+    for(let i=0;i<p.count;i++){
+      v.fromBufferAttribute(p,i);
+      v.x*=.74; v.z*=.60;
+      const taper=1-.20*Math.pow(Math.abs(v.y),2.4); v.x*=taper; v.z*=taper;
+      v.z*=1-.10*Math.pow(Math.abs(v.z),2);
+      const cap=1-Math.pow(Math.min(1,Math.abs(v.y)),3.2);
+      const dx=v.x-.055*Math.sin(v.y*2.6);
+      const crease=Math.exp(-(dx*dx)/.016), dir=Math.sign(v.z)||1;
+      v.z-=dir*crease*.30*cap;
+      v.z+=dir*Math.exp(-Math.pow(Math.abs(dx)-.19,2)/.006)*.035*cap;
+      v.z*=1+.030*Math.cos(v.y*4.1+v.x*3.3);
+      v.x*=1+.022*Math.sin(v.y*3.4);
+      p.setXYZ(i,v.x,v.y,v.z);
     }
-    placePins(w,h);
+    g.computeVertexNormals();return g;
+  }
+  const mat=new THREE.MeshPhysicalMaterial({roughness:.5,metalness:0,clearcoat:.4});
+  const bean=new THREE.Mesh(beanGeo(),mat);
+  bean.scale.setScalar(1.55); scene.add(bean);
+
+  // the cherry skin: a second shell that peels away during processing
+  const skinMat=new THREE.MeshPhysicalMaterial({color:new THREE.Color(0xB4231C).convertSRGBToLinear(),
+    roughness:.22,clearcoat:.9,transparent:true,opacity:1});
+  const skin=new THREE.Mesh(new THREE.SphereGeometry(1,72,52),skinMat);
+  skin.scale.setScalar(1.34); scene.add(skin);
+
+  const amb=new THREE.AmbientLight(0xffffff,.35); scene.add(amb);
+  const key=new THREE.DirectionalLight(0xffffff,1.5); key.position.set(3,4,5); scene.add(key);
+  const rim=new THREE.PointLight(0xffffff,2.2,24); rim.position.set(-4,-1,2); scene.add(rim);
+
+  // particles do triple duty: water, dust, then embers
+  const PC=260, pg=new THREE.BufferGeometry(), pa=new Float32Array(PC*3), pv=[];
+  for(let i=0;i<PC;i++){
+    pa[i*3]=(Math.random()*2-1)*4.2; pa[i*3+1]=(Math.random()*2-1)*3;
+    pa[i*3+2]=(Math.random()*2-1)*2.4;
+    pv.push(.004+Math.random()*.014);
+  }
+  pg.setAttribute('position',new THREE.BufferAttribute(pa,3));
+  function dot(){const c=document.createElement('canvas');c.width=c.height=32;const x=c.getContext('2d');
+    const g=x.createRadialGradient(16,16,0,16,16,16);
+    g.addColorStop(0,'rgba(255,255,255,.95)');g.addColorStop(1,'rgba(255,255,255,0)');
+    x.fillStyle=g;x.fillRect(0,0,32,32);return new THREE.CanvasTexture(c);}
+  const pmat=new THREE.PointsMaterial({size:.075,map:dot(),transparent:true,opacity:0,
+    depthWrite:false,blending:THREE.AdditiveBlending});
+  scene.add(new THREE.Points(pg,pmat));
+
+  const cA=new THREE.Color(),cB=new THREE.Color(),cM=new THREE.Color();
+  const bgA=new THREE.Color(),bgB=new THREE.Color(),bgM=new THREE.Color();
+  const kA=new THREE.Color(),kB=new THREE.Color(),kM=new THREE.Color();
+  const rA=new THREE.Color(),rB=new THREE.Color(),rM=new THREE.Color();
+  scene.background=new THREE.Color(0x123018);
+
+  let prog=0, shown=-1;
+  const capEl=$('.film__caption');
+  function apply(p){
+    const n=ACTS.length-1;
+    const f=Math.max(0,Math.min(.9999,p))*n;
+    const i=Math.floor(f), t=f-i;
+    const a=ACTS[i], b=ACTS[Math.min(n,i+1)];
+    const ease=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;   // hold on each act, snap between
+
+    cA.setHex(a.col);cB.setHex(b.col);cM.copy(cA).lerp(cB,ease);
+    mat.color.copy(cM).convertSRGBToLinear();
+    mat.roughness=a.rough+(b.rough-a.rough)*ease;
+    mat.clearcoat=a.coat+(b.coat-a.coat)*ease;
+
+    bgA.setHex(a.bg);bgB.setHex(b.bg);bgM.copy(bgA).lerp(bgB,ease);
+    // background is written straight to the sRGB framebuffer: converting it to
+    // linear here crushes it to near-black
+    scene.background.copy(bgM);
+
+    kA.setHex(a.key);kB.setHex(b.key);kM.copy(kA).lerp(kB,ease);key.color.copy(kM);
+    rA.setHex(a.rim);rB.setHex(b.rim);rM.copy(rA).lerp(rB,ease);rim.color.copy(rM);
+
+    pmat.opacity=(a.spark+(b.spark-a.spark)*ease)*.7;
+    // the cherry skin only exists for the first leg
+    const peel=Math.max(0,Math.min(1,f/0.92));
+    skin.visible=peel<1;
+    skinMat.opacity=1-peel;
+    skin.scale.setScalar(1.34+peel*.9);
+
+    const idx=Math.round(f);
+    if(idx!==shown){
+      shown=idx;
+      capEl.classList.add('swap');
+      setTimeout(()=>{
+        $('#filmStep').textContent=String(idx+1).padStart(2,'0')+' / 0'+ACTS.length;
+        $('#filmTitle').textContent=ACTS[idx].t;
+        $('#filmText').textContent=ACTS[idx].p;
+        capEl.classList.remove('swap');
+      },320);
+    }
   }
 
-  function placePins(w,h){
-    pinHost.innerHTML=ORIGINS.map((o,i)=>{
-      const [px,py]=project(o.lon,o.lat,w,h);
-      // physical `left`: the projection measures x from the left edge, and the
-      // page is RTL, so `right` would mirror every pin to the wrong continent
-      return `<button class="pin" data-i="${i}" type="button"
-        style="left:${(px/w*100).toFixed(2)}%;top:${(py/h*100).toFixed(2)}%"
-        aria-label="${o.country}">
-        <span class="pin__dot"></span><span class="pin__label">${o.country}</span></button>`;
-    }).join('');
+  function onScroll(){
+    const r=sec.getBoundingClientRect();
+    const total=Math.max(1,sec.offsetHeight-innerHeight);
+    prog=Math.max(0,Math.min(1,-r.top/total));
+    $('#filmRail').style.width=(prog*100).toFixed(1)+'%';
   }
+  addEventListener('scroll',onScroll,{passive:true});
 
-  pinHost.addEventListener('click',e=>{
-    const b=e.target.closest('.pin'); if(!b)return;
-    select(+b.dataset.i);
-  });
+  function size(){
+    const w=stage.clientWidth,h=stage.clientHeight;
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h; camera.updateProjectionMatrix();
+  }
+  addEventListener('resize',()=>{size();onScroll();});
+  size(); onScroll();
 
-  render();
-  let t; addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(render,150);});
-}
+  const clock=new THREE.Clock();
+  let seen=true;
+  new IntersectionObserver(e=>{seen=e[0].isIntersecting;},{threshold:.01}).observe(sec);
 
-/* pin <-> card selection, both directions */
-function select(i){
-  $$('.pin').forEach((p,k)=>p.classList.toggle('on',k===i));
-  $$('.origin').forEach((c,k)=>c.classList.toggle('on',k===i));
-  const card=$$('.origin')[i];
-  if(card)card.scrollIntoView({block:'nearest',behavior:'smooth'});
+  (function frame(){
+    requestAnimationFrame(frame);
+    if(!seen)return;
+    const t=clock.getElapsedTime();
+    apply(prog);
+    bean.rotation.y=t*.28+prog*4.2;
+    bean.rotation.x=Math.sin(t*.4)*.12;
+    skin.rotation.copy(bean.rotation);
+    camera.position.z=6-prog*1.4;
+    const arr=pg.attributes.position.array;
+    for(let i=0;i<PC;i++){
+      arr[i*3+1]-=pv[i]*(prog<.3?3:-2.2);          // water falls, embers rise
+      if(arr[i*3+1]<-3)arr[i*3+1]=3;
+      if(arr[i*3+1]>3)arr[i*3+1]=-3;
+    }
+    pg.attributes.position.needsUpdate=true;
+    renderer.render(scene,camera);
+  })();
 }
 
 /* ---------- REVEAL ---------- */
@@ -477,7 +569,7 @@ $('#originGrid').addEventListener('keydown',e=>{
 
 window.addEventListener('load',()=>{
   gsap.registerPlugin(ScrollTrigger);
-  drawMap();
+  initFilm();
   horizontal('#panCoffee','#trackCoffee','#railCoffee');
   horizontal('#panBakery','#trackBakery','#railBakery');
   ScrollTrigger.refresh();
